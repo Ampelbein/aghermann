@@ -12,6 +12,8 @@
 #ifndef _SIGFILE_SOURCE_BASE_H
 #define _SIGFILE_SOURCE_BASE_H
 
+#include <tuple>
+
 #include "common/fs.hh"
 #include "common/alg.hh"
 #include "common/subject_id.hh"
@@ -407,6 +409,10 @@ class CSource {
 		{
 			return sigfile::make_fname_annotations( filename(), channel);
 		}
+
+      // supporting functions
+	tuple<string, string, int>
+	figure_session_and_episode();
 };
 
 

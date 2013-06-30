@@ -273,6 +273,62 @@ CSource (CSource&& rv)
 }
 
 
+
+
+
+
+
+
+tuple<string, string, int>
+sigfile::CSource::
+figure_session_and_episode()
+{
+	int status = 0;
+	string session, episode;
+
+	// (a) parsed from RecordingID_raw
+	char int_session[81], int_episode[81];
+	string rec_id_isolated (agh::str::trim( recording_id()));
+#define T "%80[-a-zA-Z0-9 _]"
+	if ( sscanf( rec_id_isolated.c_str(), T "," T,      int_episode, int_session) == 2 ||
+	     sscanf( rec_id_isolated.c_str(), T ":" T,      int_session, int_episode) == 2 ||
+	     sscanf( rec_id_isolated.c_str(), T "/"  T,     int_session, int_episode) == 2 ||
+	     sscanf( rec_id_isolated.c_str(), T " (" T ")", int_session, int_episode) == 2 )
+		;
+	else
+		status = 1;
+#undef T
+
+	// (b) identified from file name
+	///// if ( sscanf( agh::fs::path_elements( filename).back().c_str(), "%*s-%d.%s", ) == 3 )
+	size_t	basename_start = _filename.rfind( '/'),
+		dot = _filename.rfind('.');
+	string fn_episode =
+		_filename.substr(
+			basename_start + 1,
+			dot - basename_start - 1);
+	// chip away '-1' if present
+	if ( fn_episode.size() >= 3 /* strlen("a-1") */ ) {
+		size_t sz = fn_episode.size();
+		if ( fn_episode[sz-2] == '-' && isdigit(fn_episode[sz-1]) )
+			fn_episode.erase( sz-2, 2);
+	}
+
+	if ( status ) { // (a) failed
+		episode.assign( fn_episode);    // use RecordingID_raw as Session
+		session.assign( rec_id_isolated);
+	} else {
+		episode.assign( int_episode);
+		session.assign( int_session);
+	}
+
+	return make_tuple( session, episode, status);
+}
+
+
+
+
+
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8

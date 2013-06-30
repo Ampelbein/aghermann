@@ -515,41 +515,11 @@ _parse_header()
 		}
 
 	      // deal with episode and session
-		{
-		      // (a) parsed from RecordingID_raw
-			char int_session[81], int_episode[81];
-			string rec_id_isolated (trim( string (header.recording_id, 80)));
-#define T "%80[-a-zA-Z0-9 _]"
-			if ( sscanf( rec_id_isolated.c_str(), T ", " T,     int_episode, int_session) == 2 ||
-			     sscanf( rec_id_isolated.c_str(), T ": " T,     int_session, int_episode) == 2 ||
-			     sscanf( rec_id_isolated.c_str(), T "/"  T,     int_session, int_episode) == 2 ||
-			     sscanf( rec_id_isolated.c_str(), T " (" T ")", int_session, int_episode) == 2 )
-				;
-			else
-				_status |= (nosession | noepisode);
-#undef T
-		      // (b) identified from file name
-			string fn_episode;
-			size_t basename_start = _filename.rfind( '/');
-			fn_episode =
-				_filename.substr(
-					basename_start + 1,
-					_filename.size() - basename_start - 4 /* strlen(".edf") */ - 1);
-			// chip away '-1' if present
-			if ( fn_episode.size() >= 3 /* strlen("a-1") */ ) {
-				size_t sz = fn_episode.size();
-				if ( fn_episode[sz-2] == '-' && isdigit(fn_episode[sz-1]) )
-					fn_episode.erase( sz-2, 2);
-			}
-
-			if ( _status & noepisode ) { // (a) failed
-				_episode.assign( fn_episode);    // use RecordingID_raw as Session
-				_session.assign( rec_id_isolated);
-			} else {
-				_episode.assign( int_episode);
-				_session.assign( int_session);
-			}
-		}
+		int parsed_status;
+		tie (_session, _episode, parsed_status) =
+			figure_session_and_episode();
+		if ( parsed_status )
+			_status |= (nosession | noepisode);
 
 	      // parse times
 		{
