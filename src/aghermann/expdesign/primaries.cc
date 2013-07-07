@@ -569,7 +569,7 @@ sync()
 			for ( auto &D : J.measurements )
 				for ( auto &E : D.second.episodes )
 					for ( auto &F : E.sources )
-						F().write_ancillary_files();
+						F().save_ancillary_files();
 }
 
 

@@ -22,7 +22,6 @@
 #include <map>
 #include <stdexcept>
 
-#include "libsigproc/sigproc.hh"
 #include "channel.hh"
 #include "source-base.hh"
 
@@ -199,9 +198,6 @@ class CEDFFile
 				h, 0, n_data_records * operator[](h).samples_per_record); }
 
 	valarray<TFloat>
-	get_region_filtered_smpl( int, size_t, size_t) const;
-
-	valarray<TFloat>
 	get_signal_filtered( const int h) const
 		{ return get_region_filtered_smpl(
 				h, 0, n_data_records * operator[](h).samples_per_record); }
@@ -258,9 +254,6 @@ class CEDFFile
 
 
       // reporting & misc
-	void write_ancillary_files();
-
-	enum TEdfDetails { with_channels = 1, with_annotations = 2 };
 	string details( int which) const;
 
 	sigproc::TWinType af_dampen_window_type; // master copy

@@ -9,6 +9,7 @@
  *         License:  GPL
  */
 
+#include "libsigfile/source-base.hh"
 #include "aghermann/ui/misc.hh"
 #include "aghermann/ui/sf/sf.hh"
 #include "mw.hh"
@@ -197,7 +198,7 @@ iSubjectTimelineEDFInfo_activate_cb(
 	const auto& F = J->using_episode->sources.front();
 	gtk_text_buffer_set_text(
 		ED.tEDFFileDetailsReport,
-		F().details( 0|sigfile::CEDFFile::with_channels).c_str(), -1);
+		F().details( 0|sigfile::CSource::TDetails::with_channels).c_str(), -1);
 	gtk_window_set_title(
 		(GtkWindow*)ED.wEDFFileDetails,
 		snprintf_buf( "%s header", F().filename()));

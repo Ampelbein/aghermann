@@ -176,10 +176,7 @@ CEDFFile (const string& fname_, const int flags_)
 
 	_extract_embedded_annotations();
 
-      // ancillary files:
-	if ( flags_ & sigfile::CSource::no_ancillary_files )
-		;
-	else
+	if ( not (flags_ & CSource::no_ancillary_files) )
 		load_ancillary_files();
 }
 

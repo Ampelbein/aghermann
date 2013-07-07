@@ -15,6 +15,7 @@
 
 #include "aghermann/globals.hh"
 #include "aghermann/expdesign/recording.hh"
+#include "libsigproc/sigproc.hh"
 #include "beersma.hh"
 
 using namespace std;

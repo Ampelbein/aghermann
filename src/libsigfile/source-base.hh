@@ -238,7 +238,11 @@ class CSource {
 	      : _filename (fname_),
 		_status (0),
 		_flags (flags_)
-		{}
+		{
+			// if ( not (_flags & no_ancillary_files) )
+			// 	load_ancillary_files();
+			/// defer until, at least, n_channels is known
+		}
 	CSource( CSource&&);
 	virtual ~CSource()
 		{
@@ -250,6 +254,7 @@ class CSource {
 	int flags()	const { return _flags; }
 
 	virtual string explain_status()			const = 0;
+	enum TDetails { with_channels = 1, with_annotations = 2 };
 	virtual string details( int which_details)	const = 0;
 
       // identification
@@ -355,7 +360,7 @@ class CSource {
 
 	// filtered
 	virtual valarray<TFloat>
-	get_region_filtered_smpl( int, size_t, size_t) const = 0;
+	get_region_filtered_smpl( int, size_t, size_t) const;
 
 	valarray<TFloat>
 	get_region_filtered_sec( const int h,

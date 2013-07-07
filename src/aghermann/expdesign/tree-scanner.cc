@@ -15,6 +15,7 @@
 #include <string>
 
 #include "common/alg.hh"
+#include "libsigfile/all.hh"
 #include "primaries.hh"
 
 
@@ -246,11 +247,19 @@ agh::CExpDesign::
 is_supported_source( sigfile::CTypedSource& F)
 {
 	using namespace sigfile;
-	CEDFFile::TSubtype subtype;
-	return F.type() == CTypedSource::TType::edf and
-		(subtype = static_cast<CEDFFile*>(&F()) -> subtype(),
-		 (subtype == CEDFFile::TSubtype::edf ||
-		  subtype == CEDFFile::TSubtype::edfplus_c));
+	union {
+		CEDFFile::TSubtype e;
+		CTSVFile::TSubtype t;
+	} u;
+	return (F.type() == CTypedSource::TType::edf and
+		(u.e = static_cast<CEDFFile*>(&F()) -> subtype(),
+		 (u.e == CEDFFile::TSubtype::edf ||
+		  u.e == CEDFFile::TSubtype::edfplus_c)))
+		or
+		(F.type() == CTypedSource::TType::ascii and
+		 (u.t = static_cast<CTSVFile*>(&F()) -> subtype(),
+		  (u.t == CTSVFile::TSubtype::csv ||
+		   u.t == CTSVFile::TSubtype::tsv)));
 }
 
 namespace {

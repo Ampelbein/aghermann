@@ -19,7 +19,8 @@ libsigfile_la_SOURCES := \
 	tsv.cc \
 	tsv.hh \
 	page.cc \
-	page.hh
+	page.hh \
+	all.hh
 
 libsigfile_la_LDFLAGS := \
 	-avoid-version \

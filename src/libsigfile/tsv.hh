@@ -21,6 +21,7 @@
 #include <list>
 #include <map>
 #include <stdexcept>
+#include <fstream>
 
 #include "libsigproc/sigproc.hh"
 #include "channel.hh"
@@ -204,14 +205,12 @@ class CTSVFile
 
       // signal data extractors
 	valarray<TFloat>
-	get_region_original_smpl( int, size_t, size_t) const;
+	get_region_original_smpl( const int h, const size_t sa, const size_t sz) const
+		{ return operator[](h).data[ slice (sa, sz-sa, 1) ];}
 
 	valarray<TFloat>
 	get_signal_original( const int h) const // there is a CSource::get_signal_original already, but this one is a little better
 		{ return get_region_original_smpl( h, 0, channels.front().data.size()); }
-
-	valarray<TFloat>
-	get_region_filtered_smpl( int, size_t, size_t) const;
 
 	valarray<TFloat>
 	get_signal_filtered( const int h) const
@@ -260,10 +259,7 @@ class CTSVFile
 
 
       // reporting & misc
-	void write_ancillary_files();
-
-	enum TTsvDetails { with_channels = 1, with_annotations = 2 };
-	string details( int which) const;
+	string details( int which_details) const;
 
 	sigproc::TWinType af_dampen_window_type; // master copy
 
@@ -376,7 +372,7 @@ class CTSVFile
 	time_t	_start_time,
 		_end_time;
 
-	int	_fd;
+	FILE	*_f;
 
 	int _parse_header();
 	int _read_data();

@@ -12,12 +12,14 @@
 
 #include <fstream>
 #include "common/string.hh"
+#include "libsigproc/sigproc.hh"
 #include "source-base.hh"
 
 using namespace std;
+using namespace sigfile;
 
 void
-sigfile::SArtifacts::
+SArtifacts::
 mark_artifact( const double aa, const double az)
 {
 	if ( aa >= az )
@@ -38,7 +40,7 @@ mark_artifact( const double aa, const double az)
 
 
 void
-sigfile::SArtifacts::
+SArtifacts::
 clear_artifact( const double aa, const double az)
 {
 	auto A = obj.begin();
@@ -66,7 +68,7 @@ clear_artifact( const double aa, const double az)
 
 float
 __attribute__ ((pure))
-sigfile::SArtifacts::
+SArtifacts::
 region_dirty_fraction( const double ra, const double rz) const
 {
 	size_t	dirty = 0;
@@ -95,7 +97,7 @@ region_dirty_fraction( const double ra, const double rz) const
 
 
 unsigned long
-sigfile::SArtifacts::
+SArtifacts::
 dirty_signature() const
 {
 	string sig ("a");
@@ -107,10 +109,9 @@ dirty_signature() const
 
 
 unsigned long
-sigfile::SFilterPack::
+SFilterPack::
 dirty_signature() const
 {
-//	DEF_UNIQUE_CHARP (tmp);
 	char *tmp;
 	ASPRINTF( &tmp, "%g%d%g%d%d",
 		  low_pass_cutoff, low_pass_order, high_pass_cutoff, high_pass_order, (int)notch_filter);
@@ -124,7 +125,7 @@ dirty_signature() const
 
 
 int
-sigfile::CSource::
+CSource::
 load_ancillary_files()
 {
 	int retval = 0;
@@ -207,7 +208,7 @@ load_ancillary_files()
 
 
 int
-sigfile::CSource::
+CSource::
 save_ancillary_files()
 {
 	int retval = 0;
@@ -280,7 +281,7 @@ CSource (CSource&& rv)
 
 
 tuple<string, string, int>
-sigfile::CSource::
+CSource::
 figure_session_and_episode()
 {
 	int status = 0;
@@ -325,6 +326,105 @@ figure_session_and_episode()
 	return make_tuple( session, episode, status);
 }
 
+
+
+
+
+
+
+
+
+valarray<TFloat>
+CSource::
+get_region_filtered_smpl( const int h,
+			  const size_t smpla, const size_t smplz) const
+{
+	valarray<TFloat> recp =
+		get_region_original_smpl( h, smpla, smplz);
+	if ( recp.size() == 0 )
+		return valarray<TFloat> (0);
+	// and zeromean
+       	recp -= (recp.sum() / recp.size());
+
+	size_t this_samplerate = samplerate(h);
+
+      // artifacts
+	const auto& AA = artifacts(h);
+	for ( const auto& A : AA() ) {
+		size_t	Aa = A.a * this_samplerate,
+			Az = A.z * this_samplerate;
+		if ( unlikely (Aa >= smplz) )
+			break;
+		size_t	run = (Az - Aa),
+			window = min( run, this_samplerate),
+			t;
+		if ( unlikely (Az > smplz) )
+			run = smplz - Aa;
+		valarray<TFloat>
+			W (run);
+
+		if ( run > window ) {
+			// construct a vector of multipliers using an INVERTED windowing function on the
+			// first and last windows of the run
+			size_t	t0;
+			for ( t = 0; t < window/2; ++t )
+				W[t] = (1 - sigproc::winf[(size_t)AA.dampen_window_type]( t, window));
+			t0 = run-window;  // start of the last window but one
+			for ( t = window/2; t < window; ++t )
+				W[t0 + t] = (1 - sigproc::winf[(size_t)AA.dampen_window_type]( t, window));
+			// AND, connect mid-first to mid-last windows (at lowest value of the window)
+			TFloat minimum = sigproc::winf[(size_t)AA.dampen_window_type]( window/2, window);
+			W[ slice(window/2, run-window, 1) ] =
+				(1. - minimum);
+		} else  // run is shorter than samplerate (1 sec)
+			for ( t = 0; t < window; ++t )
+				W[t] = (1 - sigproc::winf[(size_t)AA.dampen_window_type]( t, window));
+
+		// now gently apply the multiplier vector onto the artifacts
+		recp[ slice(Aa, run, 1) ] *= (W * (TFloat)AA.factor);
+	}
+
+      // filters
+	const auto& ff = filters(h);
+	if ( ff.low_pass_cutoff > 0. && ff.high_pass_cutoff > 0. &&
+	     ff.low_pass_order  > 0  && ff.high_pass_order  > 0 ) {
+		auto tmp (exstrom::band_pass(
+				  recp, this_samplerate,
+				  ff.high_pass_cutoff, ff.low_pass_cutoff,
+				  ff.low_pass_order, true));
+		recp = tmp;
+	} else {
+		if ( ff.low_pass_cutoff > 0. && ff.low_pass_order > 0 ) {
+			auto tmp (exstrom::low_pass(
+					  recp, this_samplerate,
+					  ff.low_pass_cutoff, ff.low_pass_order, true));
+			recp = tmp;
+		}
+		if ( ff.high_pass_cutoff > 0. && ff.high_pass_order > 0 ) {
+			auto tmp (exstrom::high_pass(
+					  recp, this_samplerate,
+					  ff.high_pass_cutoff, ff.high_pass_order, true));
+			recp = tmp;
+		}
+	}
+
+	switch ( ff.notch_filter ) {
+	case SFilterPack::TNotchFilter::at50Hz:
+		recp = exstrom::band_stop( recp, this_samplerate,
+					   48, 52, 1, true);  // hardcoded numerals spotted!
+	    break;
+	case SFilterPack::TNotchFilter::at60Hz:
+		recp = exstrom::band_stop( recp, this_samplerate,
+					   58, 62, 1, true);
+	    break;
+	case SFilterPack::TNotchFilter::none:
+	default:
+	    break;
+	}
+
+	// filters happen to append samples, so
+	return move(recp[ slice (0, smplz-smpla, 1)]);
+}
 
 
 
