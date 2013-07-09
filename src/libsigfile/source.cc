@@ -64,10 +64,10 @@ CTypedSource (CTypedSource&& rv)
 {
 	switch ( _type = rv._type ) {
 	case TType::ascii:
-		_obj = new CTSVFile( move(*static_cast<CTSVFile*>(rv._obj)));
+		_obj = static_cast<CTSVFile*> (rv._obj);
 		break;
 	case TType::edf:
-		_obj = new CEDFFile( move(*static_cast<CEDFFile*>(rv._obj)));
+		_obj = static_cast<CEDFFile*> (rv._obj);
 		break;
 
 	case TType::bin:
@@ -78,7 +78,6 @@ CTypedSource (CTypedSource&& rv)
 		throw invalid_argument ("Bad source type");
 	}
 
-	delete rv._obj;
 	rv._obj = nullptr;
 }
 
