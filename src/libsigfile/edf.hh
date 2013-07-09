@@ -245,14 +245,6 @@ class CEDFFile
 	resize_records( size_t new_records);
 	// unused, undefined
 
-      // export
-	int export_original( int h, const string& fname) const;
-	int export_filtered( int h, const string& fname) const;
-
-	int export_original_( int h, const string& fname) const;
-	int export_filtered_( int h, const string& fname) const;
-
-
       // reporting & misc
 	string details( int which) const;
 

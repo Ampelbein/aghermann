@@ -216,6 +216,11 @@ struct SFilterPack {
 
 class CSource {
 	friend class CTypedSource;
+    public:
+	enum TFlags {
+		no_ancillary_files         = 1<<1,
+		no_field_consistency_check = 1<<2,
+	};
     protected:
 	string	_filename;
 
@@ -223,10 +228,6 @@ class CSource {
 	void clear_status()
 		{ _status = 0; }
 
-	enum TFlags {
-		no_ancillary_files         = 1<<1,
-		no_field_consistency_check = 1<<2,
-	};
 	int	_flags;
 
 	agh::SSubjectId
@@ -401,9 +402,9 @@ class CSource {
 
       // export
 	virtual int
-	export_original( int, const string& fname) const = 0;
+	export_original( int, const string& fname) const;
 	virtual int
-	export_filtered( int, const string& fname) const = 0;
+	export_filtered( int, const string& fname) const;
 
       // filenames
 	string make_fname_artifacts( const SChannel& channel) const

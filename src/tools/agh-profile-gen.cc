@@ -203,7 +203,7 @@ main( int argc, char **argv)
 		if ( A.file.empty() )
 			throw invalid_argument ("Missing file name");
 
-		sigfile::CTypedSource F (A.file, A.pagesize, 0|sigfile::CTypedSource::no_ancillary_files);
+		sigfile::CTypedSource F (A.file, A.pagesize, 0|sigfile::CSource::no_ancillary_files);
 		if ( do_psd ) {
 			metrics::psd::CProfile P (F, A.h, A.psd_pp);
 			if ( P.go_compute() )

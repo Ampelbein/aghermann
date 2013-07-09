@@ -130,6 +130,7 @@ load_ancillary_files()
 {
 	int retval = 0;
 
+	FAFA;
 	for ( int h = 0; h < (int)n_channels(); ++h ) {
 		auto& H = channel_by_id(h);
 
@@ -151,6 +152,7 @@ load_ancillary_files()
 			}
 		}
 
+	FAFA;
 	step2:
 	      // 2. annotations
 		{
@@ -182,6 +184,7 @@ load_ancillary_files()
 	step3:
 		;
 	}
+	FAFA;
 
       // 3. filters
 	{
@@ -200,6 +203,7 @@ load_ancillary_files()
 			}
 	}
 
+	FAFA;
 	return retval;
 }
 
@@ -427,6 +431,40 @@ get_region_filtered_smpl( const int h,
 }
 
 
+
+
+int
+CSource::
+export_original( const int h,
+		 const string& fname) const
+{
+	valarray<TFloat> signal = get_signal_original( h);
+	FILE *fd = fopen( fname.c_str(), "w");
+	if ( fd ) {
+		for ( size_t i = 0; i < signal.size(); ++i )
+			fprintf( fd, "%g\n", signal[i]);
+		fclose( fd);
+		return 0;
+	} else
+		return -1;
+}
+
+
+int
+CSource::
+export_filtered( const int h,
+		 const string& fname) const
+{
+	valarray<TFloat> signal = get_signal_filtered( h);
+	FILE *fd = fopen( fname.c_str(), "w");
+	if ( fd ) {
+		for ( size_t i = 0; i < signal.size(); ++i )
+			fprintf( fd, "%g\n", signal[i]);
+		fclose( fd);
+		return 0;
+	} else
+		return -1;
+}
 
 
 // Local Variables:

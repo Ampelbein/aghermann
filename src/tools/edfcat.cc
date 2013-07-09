@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include <fstream>
+#include "libsigproc/sigproc.hh"
 #include "libsigfile/edf.hh"
 #include "libsigfile/source.hh"
 #include "common/alg.hh"
@@ -335,7 +336,7 @@ exec_convert( const SOperation::SObject& obj)
 
 	sigfile::CEDFFile F ((obj + ".edf").c_str(),
 			     sigfile::CEDFFile::TSubtype::edf,
-			     0|sigfile::CTypedSource::no_ancillary_files,
+			     0|sigfile::CSource::no_ancillary_files,
 			     make_channel_headers_for_CEDFFile( Hh.size(), "channel%zu", obj.samplerate),
 			     obj.record_size,
 			     ceilf(duration / obj.record_size));
@@ -358,7 +359,7 @@ exec_convert( const SOperation::SObject& obj)
 int
 exec_prune( const SOperation::SObject& obj)
 {
-	sigfile::CEDFFile F (obj.c_str(), sigfile::CTypedSource::no_ancillary_files);
+	sigfile::CEDFFile F (obj.c_str(), sigfile::CSource::no_ancillary_files);
 
 	list<pair<sigfile::SChannel, size_t>> selected_channels;
 	for ( auto& select_this : obj.channels ) {
@@ -378,7 +379,7 @@ exec_prune( const SOperation::SObject& obj)
 
 	sigfile::CEDFFile G ((agh::fs::make_fname_base( obj, ".edf", false) + "-mod.edf").c_str(),
 			     sigfile::CEDFFile::TSubtype::edf,
-			     sigfile::CTypedSource::no_ancillary_files,
+			     sigfile::CSource::no_ancillary_files,
 			     selected_channels,
 			     F.data_record_size,
 			     F.n_data_records);

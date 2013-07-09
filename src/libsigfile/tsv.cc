@@ -226,6 +226,18 @@ put_region_smpl( int, const valarray<TFloat>&, size_t) const
 }
 
 
+
+size_t
+CTSVFile::
+resize_seconds( double s)
+{
+	assert ( s > 0. );
+	for ( auto& H : channels )
+		H.data.resize( s * _samplerate);
+	return 0;
+}
+
+
 string
 CTSVFile::
 details( const int which) const

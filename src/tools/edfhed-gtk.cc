@@ -174,7 +174,7 @@ main( int argc, char **argv)
 
 	try {
 		auto F = sigfile::CEDFFile (fname,
-					    sigfile::CTypedSource::no_ancillary_files |
+					    sigfile::CSource::no_ancillary_files |
 					    sigfile::CEDFFile::no_field_consistency_check);
 
 		channel_no = 0;

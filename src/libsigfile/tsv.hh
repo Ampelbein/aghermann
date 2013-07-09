@@ -250,14 +250,6 @@ class CTSVFile
 	size_t
 	resize_seconds( double);
 
-      // export
-	int export_original( int h, const string& fname) const;
-	int export_filtered( int h, const string& fname) const;
-
-	int export_original_( int h, const string& fname) const;
-	int export_filtered_( int h, const string& fname) const;
-
-
       // reporting & misc
 	string details( int which_details) const;
 

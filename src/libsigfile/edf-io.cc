@@ -116,40 +116,6 @@ put_region_smpl( const int h,
 
 
 
-
-int
-CEDFFile::
-export_original( const int h,
-		 const string& fname) const
-{
-	valarray<TFloat> signal = get_signal_original( h);
-	FILE *fd = fopen( fname.c_str(), "w");
-	if ( fd ) {
-		for ( size_t i = 0; i < signal.size(); ++i )
-			fprintf( fd, "%g\n", signal[i]);
-		fclose( fd);
-		return 0;
-	} else
-		return -1;
-}
-
-
-int
-CEDFFile::
-export_filtered( const int h,
-		 const string& fname) const
-{
-	valarray<TFloat> signal = get_signal_filtered( h);
-	FILE *fd = fopen( fname.c_str(), "w");
-	if ( fd ) {
-		for ( size_t i = 0; i < signal.size(); ++i )
-			fprintf( fd, "%g\n", signal[i]);
-		fclose( fd);
-		return 0;
-	} else
-		return -1;
-}
-
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
