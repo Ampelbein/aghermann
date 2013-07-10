@@ -370,6 +370,9 @@ CEDFFile (CEDFFile&& rv)
 CEDFFile::
 ~CEDFFile ()
 {
+	if ( not (_flags & no_ancillary_files) )
+		save_ancillary_files();
+
 	if ( _mmapping != (void*)-1 ) {
 		munmap( _mmapping, _fsize);
 		close( _fd);

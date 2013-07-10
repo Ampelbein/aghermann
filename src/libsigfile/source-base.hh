@@ -247,8 +247,9 @@ class CSource {
 	CSource( CSource&&);
 	virtual ~CSource()
 		{
-			if ( not (_flags & no_ancillary_files) )
-				save_ancillary_files();
+			// if ( not (_flags & no_ancillary_files) )
+			// 	save_ancillary_files();
+			/// for similar reasons, some methods will revert to pure when called from CSource dtor
 		}
 
 	int status()	const { return _status; }
