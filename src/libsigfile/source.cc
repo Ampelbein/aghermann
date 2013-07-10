@@ -62,22 +62,8 @@ CTypedSource::
 CTypedSource (CTypedSource&& rv)
       : CHypnogram (move(rv))
 {
-	switch ( _type = rv._type ) {
-	case TType::ascii:
-		_obj = static_cast<CTSVFile*> (rv._obj);
-		break;
-	case TType::edf:
-		_obj = static_cast<CEDFFile*> (rv._obj);
-		break;
-
-	case TType::bin:
-		throw invalid_argument ("Source type 'bin' not yet supported");
-	case TType::unrecognised:
-		throw invalid_argument ("Unrecognised source type");
-	default:
-		throw invalid_argument ("Bad source type");
-	}
-
+	_type   = rv._type;
+	_obj    = rv._obj;
 	rv._obj = nullptr;
 }
 
