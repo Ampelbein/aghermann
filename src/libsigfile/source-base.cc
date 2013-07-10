@@ -130,7 +130,6 @@ load_ancillary_files()
 {
 	int retval = 0;
 
-	FAFA;
 	for ( int h = 0; h < (int)n_channels(); ++h ) {
 		auto& H = channel_by_id(h);
 
@@ -152,7 +151,6 @@ load_ancillary_files()
 			}
 		}
 
-	FAFA;
 	step2:
 	      // 2. annotations
 		{
@@ -184,7 +182,6 @@ load_ancillary_files()
 	step3:
 		;
 	}
-	FAFA;
 
       // 3. filters
 	{
@@ -203,7 +200,6 @@ load_ancillary_files()
 			}
 	}
 
-	FAFA;
 	return retval;
 }
 
