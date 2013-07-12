@@ -404,7 +404,7 @@ aghui::SExpDesignUI::
 figure_binsize_item()
 {
 	size_t i = 0;
-	while ( FFTPageSizeValues[i] < ED->fft_params.pagesize )
+	while ( FFTBinSizeValues[i] < ED->fft_params.binsize )
 		++i;
 	return i;
 }
