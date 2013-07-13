@@ -217,11 +217,11 @@ class CTSVFile
 		{ return get_region_filtered_smpl( h, 0, channels.front().data.size()); }
 
       // put signal
-	int put_region_smpl( int, const valarray<TFloat>&, size_t) const;
-	int put_region_sec( const int h, const valarray<TFloat>& src, const float offset) const
+	int put_region_smpl( int, const valarray<TFloat>&, size_t);
+	int put_region_sec( const int h, const valarray<TFloat>& src, const float offset)
 		{ return put_region_smpl( h, src, (size_t)(offset * _samplerate)); }
 
-	int put_signal( const int h, const valarray<TFloat>& src) const
+	int put_signal( const int h, const valarray<TFloat>& src)
 		{ return put_region_smpl( h, src, 0); }
 
       // signal data info

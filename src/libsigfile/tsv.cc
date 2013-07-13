@@ -219,9 +219,15 @@ _read_data()
 
 int
 CTSVFile::
-put_region_smpl( int, const valarray<TFloat>&, size_t) const
+put_region_smpl( int h, const valarray<TFloat>& V, size_t off)
 {
-	
+	if ( unlikely (h > (int)channels.size() - 1) )
+		throw out_of_range ("Bad channel index");
+	if ( unlikely (off + V.size() > channels[h].data.size()) )
+		throw out_of_range ("Bad offset");
+
+	channels[h].data[ slice (off, V.size(), 1) ] = V[ slice (0, V.size(), 1) ];
+
 	return 0;
 }
 

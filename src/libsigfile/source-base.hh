@@ -386,9 +386,9 @@ class CSource {
 
       // put samples
 	virtual int
-	put_region_smpl( int, const valarray<TFloat>&, size_t) const = 0;
+	put_region_smpl( int, const valarray<TFloat>&, size_t) = 0;
 
-	int put_region_sec( const int h, const valarray<TFloat>& src, const float offset) const
+	int put_region_sec( const int h, const valarray<TFloat>& src, const float offset)
 		{ return put_region_smpl( h, src, offset * samplerate(h)); }
 
 	int put_signal( const int h, const valarray<TFloat>& src)

@@ -204,13 +204,13 @@ class CEDFFile
 
       // put signal
 	int
-	put_region_smpl( int, const valarray<TFloat>&, size_t) const;
+	put_region_smpl( int, const valarray<TFloat>&, size_t);
 	int
-	put_region_sec( const int h, const valarray<TFloat>& src, const float offset) const
+	put_region_sec( const int h, const valarray<TFloat>& src, const float offset)
 		{ return put_region_smpl( h, src, (size_t)(offset * samplerate(h))); }
 
 	int
-	put_signal( const int h, const valarray<TFloat>& src) const
+	put_signal( const int h, const valarray<TFloat>& src)
 		{ return put_region_smpl( h, src, 0); }
 
       // signal data info

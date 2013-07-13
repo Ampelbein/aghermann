@@ -69,7 +69,7 @@ int
 CEDFFile::
 put_region_smpl( const int h,
 		 const valarray<TFloat>& src,
-		 const size_t offset) const
+		 const size_t offset)
 {
 	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
 		throw invalid_argument("CEDFFile::put_region_(): broken source");
