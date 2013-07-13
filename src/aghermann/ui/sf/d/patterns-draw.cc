@@ -108,7 +108,7 @@ draw_thing( cairo_t *cr)
 						  da_thing_wd, 0, zeroline, thing_display_scale);
 			aghui::cairo_draw_signal( cr, env_l, 0, env_l.size(),
 						  da_thing_wd, 0, zeroline, thing_display_scale,
-						  1, aghui::TDrawSignalDirection::backward, true);
+						  1, aghui::TDrawSignalDirection::backward);
 			cairo_close_path( cr);
 			cairo_fill( cr);
 			cairo_stroke( cr);
@@ -178,8 +178,7 @@ draw_field( cairo_t *cr)
 			cr,
 			profile, 0, profile.size(),
 			da_field_wd, 0., da_field_ht/2,
-			field_display_scale,
-			1, TDrawSignalDirection::forward, true);
+			field_display_scale);
 		cairo_line_to( cr, da_field_wd, da_field_ht/2);
 		cairo_line_to( cr, 0, da_field_ht/2);
 		cairo_close_path( cr);

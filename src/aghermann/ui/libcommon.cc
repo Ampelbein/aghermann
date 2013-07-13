@@ -194,8 +194,9 @@ cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 		   const size_t hspan, const float hoff, const float voff, const float scale,
 		   const unsigned short decimate,
 		   const aghui::TDrawSignalDirection direction,
-		   const bool continue_path)
+		   const aghui::TDrawSignalPathOption continue_path_option)
 {
+	bool continue_path = continue_path_option == TDrawSignalPathOption::yes;
 	switch ( direction ) {
 
 	case TDrawSignalDirection::forward:

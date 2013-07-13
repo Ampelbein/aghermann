@@ -41,7 +41,7 @@ draw_signal( const valarray<TFloat>& signal,
 				  start - half_pad,
 				  end + half_pad,
 				  width, 0, vdisp, signal_display_scale,
-				  resample_signal ? max((unsigned short)1, (unsigned short)spp()) : 1);
+				  resample_signal ? max(1u, (unsigned)spp()) : 1);
 }
 
 
@@ -293,7 +293,9 @@ draw_page( cairo_t *cr,
 					aghui::cairo_draw_signal(
 						cr, env_l, 0, env_l.size(),
 						me-ma, ma, y0, signal_display_scale,
-						1, aghui::TDrawSignalDirection::backward, true);
+						1,
+						aghui::TDrawSignalDirection::backward,
+						aghui::TDrawSignalPathOption::yes);
 					cairo_close_path( cr);
 					cairo_fill( cr);
 					cairo_stroke( cr);

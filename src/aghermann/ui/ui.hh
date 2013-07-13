@@ -121,7 +121,8 @@ void gtk_cell_layout_set_renderer( GtkComboBox*);
 
 
 
-enum TDrawSignalDirection { forward, backward };
+enum class TDrawSignalDirection { forward, backward };
+enum class TDrawSignalPathOption { yes, no };
 
 void
 cairo_draw_signal( cairo_t*,
@@ -130,7 +131,7 @@ cairo_draw_signal( cairo_t*,
 		   size_t da_wd, float hdisp, float vdisp, float display_scale,
 		   unsigned short decimate = 1,
 		   TDrawSignalDirection direction = TDrawSignalDirection::forward,
-		   bool continue_path = false);
+		   TDrawSignalPathOption continue_path = TDrawSignalPathOption::yes);
 void
 cairo_draw_envelope( cairo_t*,
 		     const valarray<TFloat>&,
@@ -144,7 +145,7 @@ cairo_draw_signal( cairo_t *cr,
 		   size_t width, double hdisp, double vdisp, float display_scale,
 		   unsigned short decimate = 1,
 		   TDrawSignalDirection direction = TDrawSignalDirection::forward,
-		   bool continue_path = false)
+		   TDrawSignalPathOption continue_path = TDrawSignalPathOption::yes)
 {
 	valarray<TFloat> tmp (end - start); // avoid copying other rows, cols
 	for ( ssize_t c = 0; c < (end-start); ++c )
