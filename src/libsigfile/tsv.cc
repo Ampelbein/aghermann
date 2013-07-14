@@ -72,7 +72,8 @@ CTSVFile (const string& fname_, const int flags_)
 	}
 	// channels now available
 
-	_read_data();
+	if ( _read_data() )
+		throw invalid_argument (explain_status(_status)); // _status set in _parse_header()
 
 	if ( not (flags_ & CSource::no_ancillary_files) )
 		load_ancillary_files();
@@ -88,12 +89,13 @@ CTSVFile (const string& fname_, const TSubtype subtype_, const int flags_,
 	  const double recording_time_)
       : CSource (fname_, flags_),
 	_subtype (subtype_),
-	_samplerate (samplerate_)
+	_samplerate (samplerate_),
+	_line0 (nullptr)
 {
 	_f = fopen( fname_.c_str(), "r");
 	if ( !_f ) {
 		fprintf( stderr, "CTSVFile::CTSVFile(\"%s\"): Failed to open file for writing\n", fname_.c_str());
-		throw invalid_argument (explain_status(_status |= TStatus::sysfail));
+		throw invalid_argument (explain_status(_status |= CSource::TStatus::sysfail));
 	}
 
       // fill out some essential header fields
@@ -138,6 +140,11 @@ CTSVFile (CTSVFile&& rv)
 
 	_f = rv._f;
 	rv._f = nullptr;
+
+	_line0_mallocked_bytes = rv._line0_mallocked_bytes;
+	_line0 = rv._line0;
+	rv._line0 = nullptr;
+
 }
 
 
@@ -146,6 +153,8 @@ CTSVFile::
 {
 	if ( not (flags() & sigfile::CSource::no_ancillary_files) )
 		save_ancillary_files();
+	if ( _line0 )
+		free( (void*)_line0);
 }
 
 
@@ -156,29 +165,54 @@ int
 CTSVFile::
 _parse_header()
 {
-	size_t	n_channels;
-
       // 1. read metadata
-
 	regex_t RE;
-	assert (0 == regcomp( &RE, "^#\\W*(\\w+)\\W*(:|=)\\", REG_EXTENDED));
-	regmatch_t M[1+2];
+	assert (0 == regcomp( &RE, "^#\\W*([a-zA-Z_][a-zA-Z_0-9]*)\\W*(:|=)\\W*(.+)\\W*\n", REG_EXTENDED));
+	regmatch_t M[1+1+2];
 
-	size_t n = 4096;
-	char *line = (char*)malloc( n);
-	while ( getline( &line, &n, _f) > 0 ) {
-		if ( regexec( &RE, line, 1+2, M, 0) == 0 ) {
-			metadata[string (line, M[1].rm_so, M[1].rm_eo)] =
-				string (line, M[2].rm_so, M[2].rm_eo);
-			printf( "matched metadata [%s] = %s\n", string (line, M[1].rm_so, M[1].rm_eo).c_str(), string (line, M[2].rm_so, M[2].rm_eo).c_str());
-		} else
-			if ( line[0] != '#' )
-				break; // end of header
+	_line0_mallocked_bytes = 4096;
+	_line0 = (char*)malloc( _line0_mallocked_bytes);
+
+	while ( getline( &_line0, &_line0_mallocked_bytes, _f) != -1 ) {
+		if ( _line0[0] == '\n' )
+			continue;
+		if ( regexec( &RE, _line0, 1+1+2, M, 0) == 0 ) {
+			string	K = agh::str::trim( string (_line0, M[1].rm_so, (M[1].rm_eo - M[1].rm_so))),
+				V = agh::str::trim( string (_line0, M[3].rm_so, (M[3].rm_eo - M[3].rm_so)));
+			metadata[K] = V;
+		} else if ( _line0[0] != '#' )
+			break; // end of header
 	}
-	free( (void*)line);
 
       // 2. pick essential bits
-	
+	if ( metadata.find( "recording_id") == metadata.end() ) {
+		fprintf( stderr, "No session/episode in header\n");
+		_status |= (nosession | noepisode);
+		return -1;
+	}
+	_recording_id = metadata["recording_id"];
+
+	if ( metadata.find( "patient_id") == metadata.end() ) {
+		fprintf( stderr, "No patient_id in header\n");
+		_status |= (nosession | noepisode);
+		return -1;
+	}
+	_patient_id = metadata["patient_id"];
+
+	if ( metadata.find( "samplerate") == metadata.end() ||
+	     (_samplerate = stoi( metadata["samplerate"])) > 2048 ) {
+		fprintf( stderr, "Samplerate missing or too high in header\n");
+		_status |= bad_header;
+		return -1;
+	}
+
+	if ( metadata.find( "channels") == metadata.end() ) {
+		fprintf( stderr, "No channels in header\n");
+		_status |= bad_header;
+		return -1;
+	}
+	for ( const auto& h : agh::str::tokens( metadata["channels"], " ,;\t") )
+		channels.emplace_back( h);
 
       // 3. deal with episode and session
 	int parsed_with_issues;
@@ -187,7 +221,7 @@ _parse_header()
 	if ( parsed_with_issues )
 		_status |= (nosession | noepisode);
 
-	// are channels unique?
+      // 4. are channels unique?
 	for ( auto &H : channels )
 		for ( auto &J : channels ) {
 			if ( &J != &H && J.ucd == H.ucd ) {
@@ -197,8 +231,12 @@ _parse_header()
 		}
 outer_break:
 
-      // 4. read one line of channel data, figure subtype and number of channels
-	
+      // 4. sample one line of channel data
+	if ( agh::str::tokens( _line0, "\t;, ").size() != channels.size() ) {
+		fprintf( stderr, "Number of channels declared in header (%zu) different from number of columns of data\n", channels.size());
+		_status |= bad_channel_count;
+		return -1;
+	}
 
 	return 0;
 }
@@ -208,7 +246,37 @@ int
 CTSVFile::
 _read_data()
 {
-	
+	vector<vector<double>> c2 (channels.size());
+
+	// _line0 contains the first row of data already (it is the
+	// first line not beginning with a #)
+	size_t r, ll = 0;
+	do {
+		for ( r = 0; r < channels.size(); ++r ) {
+			double x;
+			if ( 1 != fscanf( _f, "%lg", &x) )
+				goto outer_break;
+			c2[r].push_back( x);
+		}
+		++ll;
+	} while ( getline( &_line0, &_line0_mallocked_bytes, _f) > 0 );
+
+outer_break:
+
+	if ( r != 0 && r != channels.size() ) {
+		fprintf( stderr, "Number of data read (%zu) not a multiple of channel count (%zu)\n", r, channels.size());
+		_status |= bad_channel_count;
+		return -1;
+	}
+
+	printf( "read %zu samples in %zu channels\n", ll/channels.size(), channels.size());
+	// vector -> valarray
+	for ( size_t h = 0; h < channels.size(); ++h ) {
+		channels[h].data.resize( ll);
+		for ( size_t i = 0; i < ll; ++i )
+			channels[h].data[i] = c2[h][i];
+	}
+
 	return 0;
 }
 
@@ -249,37 +317,33 @@ CTSVFile::
 details( const int which) const
 {
 	ostringstream recv;
-	if ( _status & bad_header )
-		recv << "Bad header, or no file\n";
-	else {
-		char b[20];
-		recv << agh::str::sasprintf(
-			"File\t: %s\n"
-			" subtype\t: %s\n"
-			" PatientID\t: %s\n"
-			" RecordingID\t: %s\n"
-			" Start time\t: %s\n"
-			" Duration\t: %s\n"
-			" # of channels\t: %zu\n"
-			" Sample rate\t: %zu\n",
-			filename(),
-			subtype_s(),
-			patient_id(),
-			recording_id(),
-			(strftime( b, 20, "%F %T", localtime(&_start_time)), b),
-			agh::str::dhms( recording_time()).c_str(),
-			channels.size(),
-			_samplerate);
+	char b[20];
+	recv << agh::str::sasprintf(
+		"File\t: %s\n"
+		" subtype\t: %s\n"
+		" PatientID\t: %s\n"
+		" RecordingID\t: %s\n"
+		" Start time\t: %s\n"
+		" Duration\t: %s\n"
+		" # of channels\t: %zu\n"
+		" Sample rate\t: %zu\n",
+		filename(),
+		subtype_s(),
+		patient_id(),
+		recording_id(),
+		(strftime( b, 20, "%F %T", localtime(&_start_time)), b),
+		agh::str::dhms( recording_time()).c_str(),
+		channels.size(),
+		_samplerate);
 
-		if ( which & with_channels ) {
-			size_t i = 0;
-			for ( auto &H : channels )
-				recv << agh::str::sasprintf(
-					" Channel %zu:\n"
-					"  Label\t: %s\n",
-					++i,
-					H.ucd.name());
-		}
+	if ( which & with_channels ) {
+		size_t i = 0;
+		for ( auto &H : channels )
+			recv << agh::str::sasprintf(
+				" Channel %zu:\n"
+				"  Label\t: %s\n",
+				++i,
+				H.ucd.name());
 	}
 
 	return recv.str();
@@ -324,6 +388,8 @@ explain_status( const int status)
 		recv.emplace_back( string("* Number of channels grearter than ") + to_string(max_channels));
 	if ( status & extra_patientid_subfields )
 		recv.emplace_back( "* Extra subfields in PatientId");
+	if ( status & bad_channel_count )
+		recv.emplace_back( "* Number of channels declared in header different from number of columns of data");
 	return join(recv, "\n");
 }
 

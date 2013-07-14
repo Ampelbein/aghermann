@@ -107,7 +107,7 @@ class CTSVFile
 	time_t end_time() const
 		{ return _end_time; }
 	double recording_time() const // in seconds
-		{ return channels.front().data.size() * _samplerate; } // all channels have the same sr, obviously
+		{ return (double)channels.front().data.size() / _samplerate; } // all channels have the same sr, obviously
 
 	// setters
 	int set_patient_id( const string& s)
@@ -260,6 +260,10 @@ class CTSVFile
 
       // channels
 	struct SSignal {
+		SSignal (const SChannel& ch)
+		      : ucd (ch)
+			{}
+
 		SChannel
 			ucd; // Universal Channel Designation, епта
 
@@ -348,6 +352,8 @@ class CTSVFile
 		_end_time;
 
 	FILE	*_f;
+	char	*_line0;
+	size_t	_line0_mallocked_bytes;
 
 	int _parse_header();
 	int _read_data();
