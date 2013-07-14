@@ -195,12 +195,12 @@ class CEDFFile
 	valarray<TFloat>
 	get_signal_original( const int h) const // there is a CSource::get_signal_original already, but this one is a little better
 		{ return get_region_original_smpl(
-				h, 0, n_data_records * operator[](h).samples_per_record); }
+				h, 0, n_data_records * operator[](h).samples_per_record - 1); }
 
 	valarray<TFloat>
 	get_signal_filtered( const int h) const
 		{ return get_region_filtered_smpl(
-				h, 0, n_data_records * operator[](h).samples_per_record); }
+				h, 0, n_data_records * operator[](h).samples_per_record - 1); }
 
       // put signal
 	int

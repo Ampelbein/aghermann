@@ -210,11 +210,11 @@ class CTSVFile
 
 	valarray<TFloat>
 	get_signal_original( const int h) const // there is a CSource::get_signal_original already, but this one is a little better
-		{ return get_region_original_smpl( h, 0, channels.front().data.size()); }
+		{ return get_region_original_smpl( h, 0, channels.front().data.size()-1); }
 
 	valarray<TFloat>
 	get_signal_filtered( const int h) const
-		{ return get_region_filtered_smpl( h, 0, channels.front().data.size()); }
+		{ return get_region_filtered_smpl( h, 0, channels.front().data.size()-1); }
 
       // put signal
 	int put_region_smpl( int, const valarray<TFloat>&, size_t);
