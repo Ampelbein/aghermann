@@ -13,7 +13,8 @@ liba_a_SOURCES := \
 	alg.hh \
 	fs.hh \
 	lang.hh \
-	subject_id.hh
+	subject_id.hh \
+	../libsigfile/source-base.hh
 
 if DO_PCH
 BUILT_SOURCES := \
