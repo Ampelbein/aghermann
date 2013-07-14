@@ -49,7 +49,6 @@ enum TOptChar : char {
 	o_profile    = 't',
 	o_page       = 'p',
 	o_step       = 'i',
-	o_samplearte = 's',
 	o_psd_params = 'P',
 	o_mc_params  = 'M',
 	o_swu_params = 'S',
@@ -61,7 +60,6 @@ static struct argp_option options[] = {
        {"profile",		o_profile,    "pms",			0, "profile(s) to generate (p=PSD, m=MC, s=SWU)"},
        {"page",			o_page,       "PAGESIZE",		0, "page size (sec)"				},
        {"step",			o_step,       "STEP",			0, "step (sec)"					},
-       {"samplerate",		o_samplearte, "SAMPLERATE",		0, "samplerate (1/sec)"				},
        {"psd-params",		o_psd_params, "BINSIZE",		0, "PSD: binsize (sec, one of .1, .25, .5)"	},
        {"mc-params",		o_mc_params,  "SCOPE:F0FC:BANDWIDTH:IIR_BACKPOLATE:GAIN:SMOOTH",
 									0, "MC parameters"				},
@@ -95,8 +93,6 @@ struct SArguments {
 	metrics::mc ::SPPack mc_pp;
 	metrics::swu::SPPack swu_pp;
 
-	size_t	samplerate;
-
 	SArguments()
 	      : h (-1),
 		pagesize (NAN),
@@ -126,10 +122,6 @@ parse_opt( int key, char *arg, struct argp_state *state)
 
 	case TOptChar::o_step:
 		Q.step = atof( arg);
-		break;
-
-	case TOptChar::o_samplearte:
-		Q.samplerate = atof( arg);
 		break;
 
 	case TOptChar::o_channel:
