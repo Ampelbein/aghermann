@@ -321,23 +321,6 @@ class CTSVFile
 
 
 	enum TStatus : int_least32_t {
-		ok			  = 0,
-		bad_header		  = (1 <<  0),
-		bad_numfld		  = (1 <<  2),
-		date_unparsable		  = (1 <<  4),
-		time_unparsable		  = (1 <<  5),
-		nosession		  = (1 <<  6),
-		noepisode		  = (1 <<  7),
-		nonkemp_signaltype	  = (1 <<  8),
-		non1020_channel		  = (1 <<  9),
-		dup_channels		  = (1 << 10),
-		sysfail			  = (1 << 12),
-		too_many_channels	  = (1 << 13),
-		nonconforming_patient_id  = (1 << 14),
-		missing_patient_id        = (1 << 15),
-		invalid_subject_details   = (1 << 16),
-		extra_patientid_subfields = (1 << 19),
-
 		inoperable		 = (bad_header
 					   | bad_numfld
 					   | date_unparsable | time_unparsable

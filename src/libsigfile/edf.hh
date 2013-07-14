@@ -358,34 +358,16 @@ class CEDFFile
 
 
 	enum TStatus : int_least32_t {
-		ok			  = 0,
-		bad_header		  = (1 <<  0),
-		bad_version		  = (1 <<  1),
-		bad_numfld		  = (1 <<  2),
-		bad_recording		  = (1 <<  3),
-		date_unparsable		  = (1 <<  4),
-		time_unparsable		  = (1 <<  5),
-		nosession		  = (1 <<  6),
-		noepisode		  = (1 <<  7),
-		nonkemp_signaltype	  = (1 <<  8),
-		non1020_channel		  = (1 <<  9),
-		dup_channels		  = (1 << 10),
-		nogain			  = (1 << 11),
-		sysfail			  = (1 << 12),
-		too_many_channels	  = (1 << 13),
-		nonconforming_patient_id  = (1 << 14),
-		missing_patient_id        = (1 << 15),
-		invalid_subject_details   = (1 << 16),
-		file_truncated            = (1 << 17),
-		trailing_junk             = (1 << 18),
-		extra_patientid_subfields = (1 << 19),
-		recognised_channel_conflicting_type = (1 << 20),
-		mmap_error		  = (1 << 21),
+		bad_version		  = (1 << (COMMON_STATUS_BITS + 1)),
+		file_truncated            = (1 << (COMMON_STATUS_BITS + 2)),
+		trailing_junk             = (1 << (COMMON_STATUS_BITS + 3)),
+		mmap_error		  = (1 << (COMMON_STATUS_BITS + 4)),
+		nogain			  = (1 << (COMMON_STATUS_BITS + 5)),
+		recognised_channel_conflicting_type = (1 << (COMMON_STATUS_BITS + 6)),
 
 		inoperable		 = (bad_header
 					   | bad_version
 					   | bad_numfld
-					   | bad_recording
 					   | date_unparsable | time_unparsable
 					   | dup_channels
 					   | nogain

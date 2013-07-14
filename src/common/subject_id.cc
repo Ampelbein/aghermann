@@ -14,6 +14,7 @@
 #include <string>
 #include <cstring>
 #include "string.hh"
+#include "libsigfile/source-base.hh" // for CEDFFile::TStatus flags
 #include "subject_id.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -178,6 +179,31 @@ update_from( const SSubjectId& j)
 		++mismatched_fields;
 
 	return mismatched_fields;
+}
+
+
+int
+SSubjectId::
+parse_recording_id_edf_style( const string& s)
+{
+	using namespace agh::str;
+	int_least32_t status = 0;
+	auto subfields = tokens( s, " ");
+	if ( subfields.size() < 4 ) {
+		id = subfields.front();
+		status |= sigfile::CSource::nonconforming_patient_id;
+	} else {
+		if ( subfields.size() > 4 )
+			status |= sigfile::CSource::extra_patientid_subfields;
+		auto i = subfields.begin();
+		id = *i++;
+		gender = agh::SSubjectId::char_to_gender((*i++)[0]);
+		dob = agh::SSubjectId::str_to_dob(*i++);
+		name = join( tokens(*i++, "_"), " ");
+		if ( not valid() )
+			status |= sigfile::CSource::invalid_subject_details;
+	}
+	return status;
 }
 
 

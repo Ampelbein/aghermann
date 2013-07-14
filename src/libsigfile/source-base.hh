@@ -221,12 +221,31 @@ class CSource {
 		no_ancillary_files         = 1<<1,
 		no_field_consistency_check = 1<<2,
 	};
+	enum TStatus : int_least32_t {
+		ok			  = 0,
+		bad_header		  = (1 <<  0),
+		bad_numfld		  = (1 <<  1),
+		date_unparsable		  = (1 <<  2),
+		time_unparsable		  = (1 <<  3),
+		nosession		  = (1 <<  4),
+		noepisode		  = (1 <<  5),
+		nonkemp_signaltype	  = (1 <<  6),
+		non1020_channel		  = (1 <<  7),
+		dup_channels		  = (1 <<  8),
+		sysfail			  = (1 <<  9),
+		too_many_channels	  = (1 << 10),
+		nonconforming_patient_id  = (1 << 11),
+		missing_patient_id        = (1 << 12),
+		invalid_subject_details   = (1 << 13),
+		extra_patientid_subfields = (1 << 14),
+		bad_channel_count         = (1 << 15)
+	};
+	const static unsigned COMMON_STATUS_BITS = 15;
     protected:
 	string	_filename;
 
-	int	_status;
-	void clear_status()
-		{ _status = 0; }
+	int_least32_t
+		_status;
 
 	int	_flags;
 

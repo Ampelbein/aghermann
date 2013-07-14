@@ -124,12 +124,12 @@ CEDFFile (const string& fname_, const int flags_)
 		struct stat stat0;
 		int stst = stat( fname_.c_str(), &stat0);
 		if ( stst == -1 )
-			throw invalid_argument (explain_status(_status |= TStatus::sysfail));
+			throw invalid_argument (explain_status(_status |= CSource::TStatus::sysfail));
 		_fsize = stat0.st_size;
 	}
 	_fd = open( fname_.c_str(), O_RDWR);
 	if ( _fd == -1 )
-		throw invalid_argument (explain_status(_status |= TStatus::sysfail));
+		throw invalid_argument (explain_status(_status |= sysfail));
 
       // mmap
 	_mmapping =
@@ -195,7 +195,7 @@ CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
 {
 	_fd = open( fname_.c_str(), O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP);
 	if ( _fd == -1 )
-		throw invalid_argument (explain_status(_status |= TStatus::sysfail));
+		throw invalid_argument (explain_status(_status |= CSource::TStatus::sysfail));
 
 	header_length = 256 + (channels_.size() * 256);
 	size_t total_samplerate = 0;
@@ -205,7 +205,7 @@ CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
 	_fsize = header_length + 2 * total_samplerate * data_record_size * n_data_records;
 	// extend
 	if ( lseek( _fd, _fsize-1, SEEK_SET) == -1 || write( _fd, "\0", 1) != 1 )
-		throw invalid_argument (explain_status(_status |= TStatus::sysfail));
+		throw invalid_argument (explain_status(_status |= sysfail));
 
 //	size_t sys_page_size = (size_t) sysconf( _SC_PAGESIZE);
 	_mmapping =
@@ -226,7 +226,7 @@ CEDFFile (const string& fname_, const TSubtype subtype_, const int flags_,
 	strncpy( header.version_number, version_string, 8);
 
 	_subject = {"Fafa_1", "Mr. Fafa"};
-	set_patient_id( _subject.make_recording_id());
+	set_patient_id( _subject.make_recording_id_edf_style());
 
 	set_recording_id( "Zzz");
 	set_comment( fname_);
@@ -494,25 +494,10 @@ _parse_header()
 		_recording_id = trim( string (header.patient_id, 80));
 
 	      // sub-parse patient_id into SSubjectId struct
-		{
-			auto subfields = tokens( _patient_id, " ");
-			if ( unlikely (_patient_id.empty()) ) {
-				_status |= missing_patient_id;
-			} else if ( subfields.size() < 4 ) {
-				_subject.id = subfields.front();
-				_status |= nonconforming_patient_id;
-			} else {
-				if ( subfields.size() > 4 )
-					_status |= extra_patientid_subfields;
-				auto i = subfields.begin();
-				_subject.id = *i++;
-				_subject.gender = agh::SSubjectId::char_to_gender((*i++)[0]);
-				_subject.dob = agh::SSubjectId::str_to_dob(*i++);
-				_subject.name = join( tokens(*i++, "_"), " ");
-				if ( not _subject.valid() )
-					_status |= invalid_subject_details;
-			}
-		}
+		if ( unlikely (_patient_id.empty()) )
+			_status |= missing_patient_id;
+		_status |=
+			_subject.parse_recording_id_edf_style( _patient_id);
 
 	      // deal with episode and session
 		int parsed_status;

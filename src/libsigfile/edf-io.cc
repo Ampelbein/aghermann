@@ -20,7 +20,7 @@ CEDFFile::
 get_region_original_smpl( const int h,
 			  const size_t sa, const size_t sz) const
 {
-	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
+	if ( unlikely (_status & (CSource::TStatus::bad_header | TStatus::bad_version)) )
 		throw invalid_argument ("CEDFFile::get_region_original(): broken source");
 	if ( unlikely (_mmapping == NULL) )
 		throw invalid_argument ("CEDFFile::get_region_original(): no data");
@@ -71,7 +71,7 @@ put_region_smpl( const int h,
 		 const valarray<TFloat>& src,
 		 const size_t offset)
 {
-	if ( unlikely (_status & (TStatus::bad_header | TStatus::bad_version)) )
+	if ( unlikely (_status & (CSource::TStatus::bad_header | TStatus::bad_version)) )
 		throw invalid_argument("CEDFFile::put_region_(): broken source");
 	if ( unlikely (_mmapping == NULL) )
 		throw invalid_argument("CEDFFile::put_region_(): no data");

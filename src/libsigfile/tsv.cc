@@ -57,11 +57,11 @@ CTSVFile (const string& fname_, const int flags_)
 		struct stat stat0;
 		int stst = stat( fname_.c_str(), &stat0);
 		if ( stst == -1 )
-			throw invalid_argument (explain_status(_status |= TStatus::sysfail));
+			throw invalid_argument (explain_status(_status |= CSource::TStatus::sysfail));
 	}
 	_f = fopen( fname_.c_str(), "r");
 	if ( !_f )
-		throw invalid_argument (explain_status(_status |= TStatus::sysfail));
+		throw invalid_argument (explain_status(_status |= sysfail));
 
       // parse header
 	if ( _parse_header() ) {  // creates channels list

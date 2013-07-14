@@ -82,13 +82,16 @@ struct SSubjectId {
 		}
 	int update_from( const SSubjectId&);
 
-	string make_recording_id() const
+	string make_recording_id_edf_style() const
 		{
 			return agh::str::sasprintf(
 				"%s %c %s %s",
 				id.c_str(), gender_sign(), dob_to_str().c_str(),
 				name.c_str());
 		}
+
+	// flag bits as in CEDFFile::TStatus
+	int parse_recording_id_edf_style( const string&);
 
 	static char gender_sign( TGender);
 	static TGender char_to_gender( char);
