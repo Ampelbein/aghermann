@@ -50,9 +50,9 @@ samplerate() const
 
 size_t
 metrics::CProfile::
-pages() const
+steps() const
 {
-	return _using_F().recording_time() / Pp.step;
+	return (_using_F().recording_time() - Pp.pagesize) / Pp.step;
 }
 
 
@@ -187,7 +187,7 @@ mirror_back( const string& fname)
 	try {
 		if ( (fd = open( fname.c_str(), O_RDONLY)) == -1 )
 			throw -1;
-		_data.resize( pages() * _bins);
+		_data.resize( steps() * _bins);
 		if ( read( fd, &_data[0], _data.size() * sizeof(TFloat))
 		     != (ssize_t)(_data.size() * sizeof(TFloat)) )
 			throw -2;
@@ -231,7 +231,7 @@ export_tsv( const string& fname) const
 	for ( bin = 0; bin < _bins; ++bin )
 		fprintf( f, "%zu%c", bin, bin+1 == _bins ? '\n' : '\t');
 
-	for ( p = 0; p < pages(); ++p ) {
+	for ( p = 0; p < steps(); ++p ) {
 		fprintf( f, "%zu", p);
 		for ( bin = 0; bin < _bins; ++bin )
 			fprintf( f, "\t%g", nmth_bin( p, bin));

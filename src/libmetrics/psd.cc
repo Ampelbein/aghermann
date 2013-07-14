@@ -93,7 +93,7 @@ int
 metrics::psd::CProfile::
 go_compute()
 {
-	_data.resize( pages() * _bins);
+	_data.resize( steps() * _bins);
 
 	size_t	sr = samplerate();
 	size_t	spp = sr * Pp.pagesize,
@@ -165,7 +165,8 @@ go_compute()
 		W[ slice(window/2, spp-window, 1) ] = wfun( window/2, window);
 	}
 
-	for ( p = 0; p < pages(); ++p ) {
+	for ( p = 0; p < steps(); ++p ) {
+		// assert (p * sps + spp < S.size());
 		memcpy( fft_Ti, &S[p * sps], spp * sizeof(double));
 		for ( size_t s = 0; s < spp; ++s )
 			fft_Ti[s] *= W[s];
@@ -226,12 +227,12 @@ export_tsv( const string& fname) const
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no).name(),
-		 pages(), Pp.pagesize, Pp.step, _bins*Pp.binsize, Pp.binsize);
+		 steps(), Pp.pagesize, Pp.step, _bins*Pp.binsize, Pp.binsize);
 
 	for ( bin = 0; bin < _bins; ++bin, bum += Pp.binsize )
 		fprintf( f, "%g%c", bum, bin+1 == _bins ? '\n' : '\t');
 
-	for ( p = 0; p < pages(); ++p ) {
+	for ( p = 0; p < steps(); ++p ) {
 		fprintf( f, "%zu", p);
 		for ( bin = 0; bin < _bins; ++bin )
 			fprintf( f, "\t%g", nmth_bin( p, bin));
@@ -262,10 +263,10 @@ export_tsv( float from, float upto,
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no).name(),
-		 pages(), Pp.pagesize, Pp.step, from, upto);
+		 steps(), Pp.pagesize, Pp.step, from, upto);
 
 	valarray<TFloat> crs = course( from, upto);
-	for ( size_t p = 0; p < pages(); ++p )
+	for ( size_t p = 0; p < steps(); ++p )
 		fprintf( f, "%zu\t%g\n", p, crs[p]);
 
 	fclose( f);

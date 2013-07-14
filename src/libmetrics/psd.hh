@@ -146,7 +146,7 @@ class CProfile
 	// in a frequency range
 	valarray<TFloat> course( double from, double upto) const
 		{
-			valarray<TFloat> acc (0., pages());
+			valarray<TFloat> acc (0., steps());
 			size_t	bin_a = min( (size_t)(from / Pp.binsize), _bins),
 				bin_z = min( (size_t)(upto / Pp.binsize), _bins);
 			for ( size_t b = bin_a; b < bin_z; ++b )

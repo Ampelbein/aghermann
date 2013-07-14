@@ -227,7 +227,7 @@ get_psd_in_bands()
 {
 	crecording.psd_profile.compute();
 	if ( resample_power ) {
-		auto xi = vector<size_t> (crecording.psd_profile.pages());
+		auto xi = vector<size_t> (crecording.psd_profile.steps());
 		for ( size_t i = 0; i < xi.size(); ++i )
 			xi[i] = i;
 		for ( size_t b = 0; b <= psd.uppermost_band; ++b ) {

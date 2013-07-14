@@ -69,12 +69,12 @@ int
 metrics::swu::CProfile::
 go_compute()
 {
-	_data.resize( pages() * _bins);
+	_data.resize( steps() * _bins);
 
 	auto dS = sigproc::derivative(
 		_using_F().get_signal_filtered( _using_sig_no));
 
-	for ( size_t p = 0; p < pages(); ++p ) {
+	for ( size_t p = 0; p < steps(); ++p ) {
 		auto	a = p * (samplerate() * Pp.step),
 			z = a + (samplerate() * Pp.pagesize);
 		auto	la = a, lz = a;
@@ -131,9 +131,9 @@ export_tsv( const string& fname) const
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no).name(),
-		 pages(), Pp.pagesize, Pp.step);
+		 steps(), Pp.pagesize, Pp.step);
 
-	for ( size_t p = 0; p < pages(); ++p )
+	for ( size_t p = 0; p < steps(); ++p )
 		fprintf( f, "%zu\t%g\n", p, nmth_bin( p, 0));
 
 	fclose( f);

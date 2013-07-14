@@ -75,7 +75,7 @@ int
 metrics::mc::CProfile::
 go_compute()
 {
-	_data.resize( pages() * _bins);
+	_data.resize( steps() * _bins);
 	auto S = _using_F().get_signal_filtered( _using_sig_no);
 	for ( size_t b = 0; b < bins(); ++b ) {
 		auto su_ss = metrics::mc::do_sssu_reduction(
@@ -87,7 +87,7 @@ go_compute()
 			Pp.bandwidth);
 		auto suss = su_ss.first - su_ss.second;  // make it positive
 
-		for ( size_t p = 0; p < pages(); ++p )
+		for ( size_t p = 0; p < steps(); ++p )
 			nmth_bin(p, b) =
 				agh::alg::value_within( suss[p], (TFloat)0., (TFloat)INFINITY);
 	}
@@ -124,12 +124,12 @@ export_tsv( const string& fname) const
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no).name(),
-		 pages(), Pp.pagesize, Pp.step, Pp.freq_from, Pp.freq_from + Pp.bandwidth * bins(), Pp.bandwidth);
+		 steps(), Pp.pagesize, Pp.step, Pp.freq_from, Pp.freq_from + Pp.bandwidth * bins(), Pp.bandwidth);
 
 	for ( bin = 0; bin < _bins; ++bin, bum += Pp.bandwidth )
 		fprintf( f, "%g%c", bum, bin+1 == _bins ? '\n' : '\t');
 
-	for ( p = 0; p < pages(); ++p ) {
+	for ( p = 0; p < steps(); ++p ) {
 		fprintf( f, "%zu", p);
 		for ( bin = 0; bin < _bins; ++bin )
 			fprintf( f, "\t%g", nmth_bin( p, bin));
@@ -158,9 +158,9 @@ export_tsv( size_t bin,
 		 _using_F().subject().name.c_str(), _using_F().session(), _using_F().episode(),
 		 (int)strlen(asctime_)-1, asctime_,
 		 _using_F().channel_by_id(_using_sig_no).name(),
-		 pages(), Pp.pagesize, Pp.step, Pp.freq_from, Pp.freq_from + (bin+1) * Pp.bandwidth);
+		 steps(), Pp.pagesize, Pp.step, Pp.freq_from, Pp.freq_from + (bin+1) * Pp.bandwidth);
 
-	for ( size_t p = 0; p < pages(); ++p )
+	for ( size_t p = 0; p < steps(); ++p )
 		fprintf( f, "%zu\t%g\n", p, nmth_bin(p, bin));
 
 	fclose( f);

@@ -107,7 +107,7 @@ class CProfile {
 			return _bins;
 		}
 
-	size_t pages() const;
+	size_t steps() const; // overlapping pages
 	size_t samplerate() const;
 
       // accessors
@@ -136,7 +136,7 @@ class CProfile {
 	// in a bin
 	valarray<TFloat> course( size_t m) const
 		{
-			return _data[ slice(m, pages(), _bins) ];
+			return _data[ slice(m, steps(), _bins) ];
 		}
 
 	valarray<TFloat> spectrum( size_t p) const
