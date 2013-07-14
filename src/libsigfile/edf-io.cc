@@ -73,8 +73,6 @@ put_region_smpl( const int h,
 {
 	if ( unlikely (_status & (CSource::TStatus::bad_header | TStatus::bad_version)) )
 		throw invalid_argument("CEDFFile::put_region_(): broken source");
-	if ( unlikely (_mmapping == NULL) )
-		throw invalid_argument("CEDFFile::put_region_(): no data");
 	if ( unlikely (offset >= samplerate(h) * recording_time()) )
 		throw range_error("CEDFFile::put_region_(): offset beyond end of file");
 	if ( unlikely (offset + src.size() > samplerate(h) * recording_time()) ) {
