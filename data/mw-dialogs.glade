@@ -328,7 +328,7 @@
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 1.0_rc &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
+                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.9.1 &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
