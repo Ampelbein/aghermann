@@ -134,7 +134,6 @@ CTSVFile (CTSVFile&& rv)
 	_start_time = rv._start_time;
 	_end_time   = rv._end_time;
 
-
 	swap( channels, rv.channels);
 	swap( common_annotations, rv.common_annotations);
 
@@ -177,8 +176,8 @@ _parse_header()
 		if ( _line0[0] == '\n' )
 			continue;
 		if ( regexec( &RE, _line0, 1+1+2, M, 0) == 0 ) {
-			string	K = agh::str::trim( string (_line0, M[1].rm_so, (M[1].rm_eo - M[1].rm_so))),
-				V = agh::str::trim( string (_line0, M[3].rm_so, (M[3].rm_eo - M[3].rm_so)));
+			string	K = trim( string (_line0, M[1].rm_so, (M[1].rm_eo - M[1].rm_so))),
+				V = trim( string (_line0, M[3].rm_so, (M[3].rm_eo - M[3].rm_so)));
 			metadata[K] = V;
 		} else if ( _line0[0] != '#' )
 			break; // end of header
