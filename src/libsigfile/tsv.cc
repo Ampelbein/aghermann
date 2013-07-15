@@ -39,9 +39,9 @@ set_start_time( time_t s)
 {
 	char b[9];
 	strftime( b, 9, "%d.%m.%y", localtime(&s));
-	_recording_date.assign( b);
+	metadata["recording_date"].assign( b);
 	strftime( b, 9, "%H.%M.%s", localtime(&s));
-	_recording_time.assign( b);
+	metadata["recording_time"].assign( b);
 
 	return 0;
 }
@@ -120,13 +120,8 @@ CTSVFile::
 CTSVFile (CTSVFile&& rv)
       : CSource (move(rv))
 {
-	swap( _patient_id,   rv._patient_id);
-	swap( _recording_id, rv._recording_id);
-	swap( _recording_date, rv._recording_date);
-	swap( _recording_time, rv._recording_time);
 	swap( _episode,    rv._episode);
 	swap( _session,    rv._session);
-	swap( _comment, rv._comment);
 
 	swap( metadata, rv.metadata);
 
@@ -189,14 +184,15 @@ _parse_header()
 		_status |= (nosession | noepisode);
 		return -1;
 	}
-	_recording_id = metadata["recording_id"];
 
 	if ( metadata.find( "patient_id") == metadata.end() ) {
 		fprintf( stderr, "No patient_id in header\n");
-		_status |= (nosession | noepisode);
+		_status |= CSource::missing_patient_id;;
 		return -1;
 	}
-	_patient_id = metadata["patient_id"];
+
+	if ( metadata.find( "comment") == metadata.end() )
+		;
 
 	if ( metadata.find( "samplerate") == metadata.end() ||
 	     (_samplerate = stoi( metadata["samplerate"])) > 2048 ) {

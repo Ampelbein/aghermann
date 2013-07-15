@@ -91,11 +91,20 @@ class CTSVFile
 
 	// identification
 	const char* patient_id() const
-		{ return _patient_id.c_str(); }
+		{
+			const auto I = metadata.find("patient_id");
+			return (I == metadata.end()) ? "" : I->c_str();
+		}
 	const char* recording_id() const
-		{ return _recording_id.c_str(); }
+		{
+			const auto I = metadata.find("recording_id");
+			return (I == metadata.end()) ? "" : I->c_str();
+		}
 	const char* comment() const
-		{ return _comment.c_str(); }
+		{
+			const auto I = metadata.find("comment");
+			return (I == metadata.end()) ? "" : I->c_str();
+		}
 	const char* episode() const
 		{ return _episode.c_str(); }
 	const char* session() const
@@ -112,14 +121,20 @@ class CTSVFile
 	// setters
 	int set_patient_id( const string& s)
 		{
-			_patient_id = s;
+			metadata["patient_id"] = s;
 			return 0;
 		}
 	int set_recording_id( const string& s)
 		{
-			_recording_id = s;
+			metadata["recording_id"] = s;
 			return 0;
 		}
+	int set_comment( const string& s)
+		{
+			metadata["comment"] = s;
+			return 0;
+		}
+
 	int set_episode( const string& s) // assigning to _episode or _session directly won't have a lasting effect; think again.
 		{
 			_episode = s;
@@ -128,11 +143,6 @@ class CTSVFile
 	int set_session( const string& s)
 		{
 			_session = s;
-			return 0;
-		}
-	int set_comment( const string& s)
-		{
-			_comment = s;
 			return 0;
 		}
 
@@ -335,13 +345,7 @@ class CTSVFile
 	static string explain_status( int);
 
     private:
-      // header... why is it private?
-	string	_patient_id,
-		_recording_id,
-		_recording_date,
-		_recording_time,
-		_comment;
-
+      // header...
 	string	_episode,
 		_session;
 
