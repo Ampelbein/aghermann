@@ -74,7 +74,7 @@ show_empty_experiment_blurb()
 		"• Have your EDF sources named <i>Episode</i>.edf, and placed in the corresponding <i>Session</i> directory.\n"
 		"\n"
 		"Once set up, either:\n"
-		"• select <b>Experiment→Close</b> and then select in the Session Manager the top directory of the newly created experiment tree, or\n"
+		"• select <b>Experiment→Close this session</b> and then select in the Session Manager the top directory of the newly created experiment tree, or\n"
 		"• select <b>Experiment→Rescan Tree</b> if this is the tree you have just populated.\n"
 		"\n"
 		"Alternatively, <b>Drag-and-Drop</b> any EDF sources onto this window and identify and place them individually.\n"
@@ -86,7 +86,7 @@ show_empty_experiment_blurb()
 
 	gtk_box_pack_start( (GtkBox*)cMeasurements,
 			    (GtkWidget*)blurb_label,
-			    TRUE, TRUE, 0);
+			    TRUE, TRUE, 10);
 	GtkWidget *bDownload = gtk_button_new_with_label("  Get sample dataset  ");
 	g_object_set( (GObject*)bDownload,
 		      "expand", FALSE,
