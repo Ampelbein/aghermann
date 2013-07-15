@@ -838,7 +838,7 @@ rm */*/*/.*.{psd,mc,swu}</property>
                                     </child>
                                     <child>
                                       <object class="GtkImageMenuItem" id="iExpClose">
-                                        <property name="label">_Close This Session</property>
+                                        <property name="label">_Close this session</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="use_underline">True</property>
