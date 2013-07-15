@@ -500,11 +500,12 @@ _parse_header()
 			_subject.parse_recording_id_edf_style( _patient_id);
 
 	      // deal with episode and session
-		int parsed_status;
-		tie (_session, _episode, parsed_status) =
-			figure_session_and_episode();
-		if ( parsed_status )
-			_status |= (nosession | noepisode);
+		{
+			int parsed_status;
+			tie (_session, _episode, parsed_status) =
+				figure_session_and_episode();
+			_status |= parsed_status;
+		}
 
 	      // parse times
 		{
@@ -881,8 +882,8 @@ explain_status( const int status)
 		recv.emplace_back( "* Date field ill-formed");
 	if ( status & time_unparsable )
 		recv.emplace_back( "* Time field ill-formed");
-	if ( status & nosession )
-		recv.emplace_back( "* No session information in field RecordingID");
+	if ( status & (nosession|noepisode) )
+		recv.emplace_back( "* No session/episode information in RecordingID");
 	if ( status & non1020_channel )
 		recv.emplace_back( "* Channel designation not following the 10-20 system");
 	if ( status & nonconforming_patient_id )

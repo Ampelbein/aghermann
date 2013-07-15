@@ -297,7 +297,7 @@ figure_session_and_episode()
 	     sscanf( rec_id_isolated.c_str(), T " (" T ")", int_session, int_episode) == 2 )
 		;
 	else
-		status = 1;
+		status = (nosession|noepisode);
 #undef T
 
 	// (b) identified from file name
