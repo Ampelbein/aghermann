@@ -93,17 +93,17 @@ class CTSVFile
 	const char* patient_id() const
 		{
 			const auto I = metadata.find("patient_id");
-			return (I == metadata.end()) ? "" : I->c_str();
+			return (I == metadata.end()) ? "" : I->second.c_str();
 		}
 	const char* recording_id() const
 		{
 			const auto I = metadata.find("recording_id");
-			return (I == metadata.end()) ? "" : I->c_str();
+			return (I == metadata.end()) ? "" : I->second.c_str();
 		}
 	const char* comment() const
 		{
 			const auto I = metadata.find("comment");
-			return (I == metadata.end()) ? "" : I->c_str();
+			return (I == metadata.end()) ? "" : I->second.c_str();
 		}
 	const char* episode() const
 		{ return _episode.c_str(); }
