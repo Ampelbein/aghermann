@@ -24,9 +24,6 @@ page size (sec)
 \fB\-P\fR, \fB\-\-psd\-params\fR=\fIBINSIZE\fR
 PSD: binsize (sec, one of .1, .25, .5)
 .TP
-\fB\-s\fR, \fB\-\-samplerate\fR=\fISAMPLERATE\fR
-samplerate (1/sec)
-.TP
 \fB\-S\fR, \fB\-\-swu\-params\fR=\fIMIN_UPSWING_LEN\fR
 SWU parameters
 .TP
