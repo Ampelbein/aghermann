@@ -491,7 +491,7 @@ _parse_header()
 		}
 
 		_patient_id = trim( string (header.patient_id, 80));
-		_recording_id = trim( string (header.patient_id, 80));
+		_recording_id = trim( string (header.recording_id, 80));
 
 	      // sub-parse patient_id into SSubjectId struct
 		if ( unlikely (_patient_id.empty()) )
