@@ -108,6 +108,7 @@ SExpDesignUIWidgets ()
 	     !AGH_GBGETOBJ (GtkMenuItem,	iiExpGlobalOperations) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpGloballyDetectArtifacts) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpGloballySetFilters) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iiExpSubjectSort) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iMontageSetDefaults) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpClose) ||
 	     !AGH_GBGETOBJ (GtkMenuItem,	iExpQuit) ||
@@ -746,7 +747,9 @@ set_controls_for_empty_experiment( bool indeed, const bool flush)
 	gtk_widget_set_visible( gtk_notebook_get_nth_page( tTaskSelector, 1), indeed);
 
 	gtk_widget_set_visible( (GtkWidget*)iExpAnnotations, indeed);
+	gtk_widget_set_visible( (GtkWidget*)iExpPurgeComputed, indeed);
 	gtk_widget_set_visible( (GtkWidget*)iiExpGlobalOperations, indeed);
+	gtk_widget_set_visible( (GtkWidget*)iiExpSubjectSort, indeed);
 
 	gtk_widget_set_visible( (GtkWidget*)eMsmtSession, indeed);
 	gtk_widget_set_visible( (GtkWidget*)eMsmtChannel, indeed);

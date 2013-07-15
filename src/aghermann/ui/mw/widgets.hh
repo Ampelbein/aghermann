@@ -97,6 +97,7 @@ struct SExpDesignUIWidgets {
 		*iExpClose, *iExpQuit,
 		*iExpBasicSADetectUltradianCycles,
 		*iiExpGlobalOperations,
+		*iiExpSubjectSort,
 		*iExpGloballyDetectArtifacts,
 		*iExpGloballySetFilters,
 		*iMontageSetDefaults,
