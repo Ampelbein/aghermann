@@ -610,8 +610,7 @@ aghui::SScoringFacility::SChannel::
 _put_selection()
 {
 	if ( selection_end_time - selection_start_time > 1. ) {
-		_p.artifacts_d().W_V.down();
-		auto& P = _p.artifacts_d().P;
+		auto& P = _p._p.global_artifact_detection_profiles["default"];
 		auto sssu =
 			metrics::mc::do_sssu_reduction(
 				valarray<TFloat> {signal_filtered[ slice (selection_start, (selection_end - selection_start), 1) ]},
