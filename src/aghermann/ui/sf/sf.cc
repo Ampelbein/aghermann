@@ -169,7 +169,7 @@ SScoringFacility (agh::CSubject& J,
 					h.signal_filtered,
 					vpagesize() * h.samplerate() * min (h.crecording.total_pages(), (size_t)10),
 					interchannel_gap / 2);
-		agh::alg::ensure_within( h.signal_display_scale, 1e-9, 1e9);
+		agh::alg::ensure_within( h.signal_display_scale, 1e-6, 1e6);
 
 		if ( h.schannel().type() == sigfile::SChannel::TType::eeg ) {
 		      // calibrate profile display scales
