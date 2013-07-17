@@ -46,7 +46,7 @@ trim( const string& r0)
 		--rsize;
 	r.resize( rsize);
 	r.erase( 0, r.find_first_not_of(" \t"));
-	return r;
+	return move(r);
 }
 
 string
@@ -55,7 +55,7 @@ pad( const string& r0, size_t to)
 {
 	string r (to, ' ');
 	memcpy( (void*)r.data(), (const void*)r0.data(), min( to, r0.size()));
-	return r;
+	return move(r);
 }
 
 
@@ -73,7 +73,7 @@ sasprintf( const char* fmt, ...)
 
 	string ret {_};
 	free( (void*)_);
-	return ret;
+	return move(ret);
 }
 
 
@@ -90,7 +90,7 @@ tokens_trimmed( const string& s_, const char* sep)
 		acc.emplace_back( trim(p));
 		p = strtok_r( NULL, sep, &pp);
 	}
-	return acc;
+	return move(acc);
 }
 
 list<string>
@@ -105,7 +105,7 @@ tokens( const string& s_, const char* sep)
 		acc.emplace_back( p);
 		p = strtok_r( NULL, sep, &pp);
 	}
-	return acc;
+	return move(acc);
 }
 
 
