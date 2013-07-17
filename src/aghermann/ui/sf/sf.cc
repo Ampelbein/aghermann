@@ -269,9 +269,10 @@ SScoringFacility (agh::CSubject& J,
 		int optimal_win_height = min(
 			(int)(HypnogramHeight + bar_height + da_ht + 100),
 			(int)(gdk_screen_get_height( gdk_screen_get_default()) * .95));
-		gtk_window_set_default_size( wSF,
-					     gdk_screen_get_width( gdk_screen_get_default()) * .90,
-					     optimal_win_height);
+		gtk_window_set_default_size(
+			wSF,
+			gdk_screen_get_width( gdk_screen_get_default()) * .90,
+			optimal_win_height);
 	}
 
 	// set current page and page size
@@ -289,9 +290,10 @@ SScoringFacility (agh::CSubject& J,
 
       // advise parent we are open
 	_p.open_scoring_facilities.push_front( this);
-	gtk_widget_set_visible( (GtkWidget*)_p.iExpRefresh, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)_p.iExpClose, FALSE);
-	gtk_widget_set_visible( (GtkWidget*)_p.tSettings, FALSE);
+	for ( auto x : {(GtkWidget*)_p.iExpRefresh,
+			(GtkWidget*)_p.iExpClose,
+			(GtkWidget*)_p.tSettings} )
+		gtk_widget_set_visible( x, FALSE);
 
 	// tell main window we are done (so it can start another instance of scoring facility)
 	_p.sb_clear();
@@ -313,12 +315,12 @@ aghui::SScoringFacility::
 	_p.open_scoring_facilities.remove( this);
 	bool enable_expd_destructive_controls =
 		_p.open_scoring_facilities.empty();
-	gtk_widget_set_visible( (GtkWidget*)_p.iExpRefresh,
-				enable_expd_destructive_controls);
-	gtk_widget_set_visible( (GtkWidget*)_p.iExpClose,
-				enable_expd_destructive_controls);
-	gtk_widget_set_visible( (GtkWidget*)_p.tSettings,
-				enable_expd_destructive_controls);
+	for ( auto x : {(GtkWidget*)_p.iExpRefresh,
+			(GtkWidget*)_p.iExpClose,
+			(GtkWidget*)_p.tSettings} )
+		gtk_widget_set_visible(
+			(GtkWidget*)x,
+			enable_expd_destructive_controls);
 
 	if ( ica )
 		delete ica;
