@@ -463,14 +463,20 @@ daSFMontage_scroll_event_cb(
 		} else {
 			switch ( event->direction ) {
 			case GDK_SCROLL_DOWN:
-				Ch->psd.display_scale /= SF._p.scroll_factor;
-				Ch->swu.display_scale /= SF._p.scroll_factor;
-				Ch->mc.display_scale  /= SF._p.scroll_factor;
+				if ( Ch->draw_psd )
+					Ch->psd.display_scale /= SF._p.scroll_factor;
+				if ( Ch->draw_swu )
+					Ch->swu.display_scale /= SF._p.scroll_factor;
+				if ( Ch->draw_mc )
+					Ch->mc.display_scale  /= SF._p.scroll_factor;
 			    break;
 			case GDK_SCROLL_UP:
-				Ch->psd.display_scale *= SF._p.scroll_factor;
-				Ch->swu.display_scale *= SF._p.scroll_factor;
-				Ch->mc.display_scale  *= SF._p.scroll_factor;
+				if ( Ch->draw_psd )
+					Ch->psd.display_scale *= SF._p.scroll_factor;
+				if ( Ch->draw_swu )
+					Ch->swu.display_scale *= SF._p.scroll_factor;
+				if ( Ch->draw_mc )
+					Ch->mc.display_scale  *= SF._p.scroll_factor;
 			    break;
 			case GDK_SCROLL_LEFT:
 				if ( SF.cur_vpage() > 0 )
