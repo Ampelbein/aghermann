@@ -533,7 +533,7 @@ calculate_profile_scale()
 	double value =
 		unlikely (valid_episodes == 0)
 		? 1.
-		: tl_height / valid_episodes / avg_profile_height * .3;
+		: tl_height / valid_episodes / avg_profile_height * .9;
 
 	switch ( display_profile_type ) {
 	case metrics::TType::psd:
