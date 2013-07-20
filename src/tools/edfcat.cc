@@ -21,7 +21,7 @@
 #include <fstream>
 #include "libsigproc/sigproc.hh"
 #include "libsigfile/edf.hh"
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 #include "common/alg.hh"
 #include "common/fs.hh"
 #include "common/string.hh"

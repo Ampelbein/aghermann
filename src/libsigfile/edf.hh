@@ -36,7 +36,6 @@ using namespace std;
 namespace sigfile {
 
 
-
 class CEDFFile
   : public CSource {
 
@@ -91,7 +90,8 @@ class CEDFFile
       // interface
 	// status
 	string explain_status() const
-		{ return explain_status( _status); }
+		{ return move(explain_status( _status)); }
+	static string explain_status( int);
 
 	// identification
 	const char* patient_id() const
@@ -106,10 +106,6 @@ class CEDFFile
 		{ return _reserved.c_str(); }
 
 	// times
-	time_t start_time() const
-		{ return _start_time; }
-	time_t end_time() const
-		{ return _end_time; }
 	double recording_time() const // in seconds
 		{ return n_data_records * data_record_size; }
 
@@ -122,7 +118,9 @@ class CEDFFile
 		{ return 1; }
 	int set_reserved( const string&); // but you can clobber "reserved" field if you must
 
-	int set_start_time( time_t);
+	int set_recording_date( const string&);
+	int set_recording_time( const string&);
+
 	// channels
 	size_t n_channels() const
 		{ return channels.size(); }
@@ -363,12 +361,13 @@ class CEDFFile
 		trailing_junk             = (1 << (COMMON_STATUS_BITS + 3)),
 		mmap_error		  = (1 << (COMMON_STATUS_BITS + 4)),
 		nogain			  = (1 << (COMMON_STATUS_BITS + 5)),
-		recognised_channel_conflicting_type = (1 << (COMMON_STATUS_BITS + 6)),
+		nonconforming_patient_id  = (1 << (COMMON_STATUS_BITS + 6)),
+		extra_patientid_subfields = (1 << (COMMON_STATUS_BITS + 7)),
 
 		inoperable		 = (bad_header
 					   | bad_version
 					   | bad_numfld
-					   | date_unparsable | time_unparsable
+					   | bad_datetime
 					   | dup_channels
 					   | nogain
 					   | sysfail
@@ -376,13 +375,9 @@ class CEDFFile
 					   | file_truncated
 					   | mmap_error)
 	};
-	static string explain_status( int);
 
     private:
 	TSubtype _subtype;
-
-	time_t	_start_time,
-		_end_time;
 
 	string	_patient_id, // this is trimmed, raw; parsed into SSubjectId fields
 		_recording_id,

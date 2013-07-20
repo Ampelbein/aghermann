@@ -11,8 +11,8 @@ libsigfile_la_SOURCES := \
 	channel.hh \
 	source-base.cc \
 	source-base.hh \
-	source.cc \
-	source.hh \
+	typed-source.cc \
+	typed-source.hh \
 	edf.cc \
 	edf-io.cc \
 	edf.hh \
@@ -42,7 +42,7 @@ BUILT_SOURCES := \
 	forward-decls.hh.gch \
 	channel.hh.gch \
 	source-base.hh.gch \
-	source.hh.gch \
+	typed-source.hh.gch \
 	edf.hh.gch \
 	tsv.hh.gch \
 	page.hh.gch

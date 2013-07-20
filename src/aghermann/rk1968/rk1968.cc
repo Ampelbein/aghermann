@@ -13,7 +13,7 @@
 #include <forward_list>
 
 #include "libsigfile/page.hh"
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 #include "aghermann/expdesign/recording.hh"
 #include "aghermann/expdesign/primaries.hh"
 #include "libmetrics/bands.hh"

@@ -17,7 +17,7 @@
 #include "common/lang.hh"
 #include "common/fs.hh"
 #include "libsigproc/sigproc.hh"
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 #include "swu.hh"
 
 using namespace std;

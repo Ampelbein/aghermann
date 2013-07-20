@@ -1,5 +1,5 @@
 /*
- *       File name:  libsigfile/source.cc
+ *       File name:  libsigfile/typed-source.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-11-14
@@ -10,7 +10,7 @@
  */
 
 
-#include "source.hh"
+#include "typed-source.hh"
 #include "edf.hh"
 #include "tsv.hh"
 

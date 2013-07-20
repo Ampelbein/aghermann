@@ -23,7 +23,7 @@
 #include "common/lang.hh"
 #include "common/string.hh"
 #include "edf.hh"
-#include "source.hh"
+#include "typed-source.hh"
 
 using namespace std;
 
@@ -85,15 +85,16 @@ set_reserved( const string& s)
 
 int
 CEDFFile::
-set_start_time( time_t s)
+set_recording_date( const string& s)
 {
-	char b[9];
-	// set start
-	strftime( b, 9, "%d.%m.%y", localtime(&s));
-	memcpy( header.recording_date, b, 8);
-	strftime( b, 9, "%H.%M.%s", localtime(&s));
-	memcpy( header.recording_time, b, 8);
-
+	memcpy( header.recording_date, s.c_str(), 8);
+	return 0;
+}
+int
+CEDFFile::
+set_recording_time( const string& s)
+{
+	memcpy( header.recording_time, s.c_str(), 8);
 	return 0;
 }
 
@@ -341,8 +342,6 @@ CEDFFile (CEDFFile&& rv)
 	data_record_size = rv.data_record_size;
 
 	_subtype    = rv._subtype;
-	_start_time = rv._start_time;
-	_end_time   = rv._end_time;
 
 	swap( _patient_id,   rv._patient_id);
 	swap( _recording_id, rv._recording_id);
@@ -482,7 +481,7 @@ _parse_header()
 
 		if ( !header_length || !n_data_records || !data_record_size || !n_channels ) {
 			_status |= bad_numfld;
-			if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+			if ( not (_flags & sigfile::CSource::no_field_consistency_check) )
 				return -2;
 		}
 		if ( n_channels == 0 )  {
@@ -499,50 +498,25 @@ _parse_header()
 		_status |=
 			_subject.parse_recording_id_edf_style( _patient_id);
 
+	      // times
+		figure_times(
+			string (header.recording_date, 8),
+			string (header.recording_time, 8),
+			TAcceptTimeFormat::edf_strict);
+		if ( _status & bad_datetime && !(_flags & CSource::TFlags::no_field_consistency_check) )
+			return -2;
+		_end_time = _start_time + (time_t)recording_time();
+
 	      // deal with episode and session
-		{
-			int parsed_status;
-			tie (_session, _episode, parsed_status) =
-				figure_session_and_episode();
-			_status |= parsed_status;
-		}
-
-	      // parse times
-		{
-			struct tm ts;
-			char *p;
-			//memset( &ts, 0, sizeof(struct tm));
-			ts.tm_isdst = 0;  // importantly
-			string tmp (header.recording_date, 8);
-			p = strptime( tmp.c_str(), "%d.%m.%y", &ts);
-			if ( p == NULL || *p != '\0' ) {
-				_status |= date_unparsable;
-				if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
-					return -2;
-			}
-			tmp = {string (header.recording_time, 8)};
-			p = strptime( tmp.c_str(), "%H.%M.%S", &ts);
-			if ( p == NULL || *p != '\0' ) {
-				_status |= time_unparsable;
-				if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
-					return -2;
-			}
-
-			// if ( ts.tm_year < 50 )
-			// 	ts.tm_year += 100;
-			_start_time = mktime( &ts);
-			if ( _start_time == (time_t)-1 )
-				_status |= (date_unparsable|time_unparsable);
-			else
-				_end_time = _start_time + n_data_records * data_record_size;
-		}
+		tie (_session, _episode) =
+			figure_session_and_episode();
 
 	      // assign "reserved"
 		_reserved = trim( string (header.reserved, 44));
 
 		if ( n_channels > max_channels ) {
 			_status |= bad_numfld;
-			if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+			if ( not (_flags & sigfile::CSource::no_field_consistency_check) )
 				return -2;
 		} else {
 			channels.resize( n_channels);
@@ -561,7 +535,7 @@ _parse_header()
 						string suggested_type = tt.front();
 						H.ucd = {(tt.pop_front(), agh::str::join( tt, " "))};
 						if ( suggested_type != H.ucd.type_s() )
-							_status |= recognised_channel_conflicting_type;
+							_status |= conflicting_channel_type;
 					} else {
 						H.ucd = sigfile::SChannel (isolated_label);
 
@@ -588,7 +562,7 @@ _parse_header()
 				if ( sscanf( H.header.physical_min, "%8lg",
 					     &H.physical_min) != 1 ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (_flags & sigfile::CSource::no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -599,7 +573,7 @@ _parse_header()
 				if ( sscanf( H.header.physical_max, "%8lg",
 					     &H.physical_max) != 1 ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (_flags & sigfile::CSource::no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -611,7 +585,7 @@ _parse_header()
 				if ( sscanf( H.header.digital_min, "%8d",
 					     &H.digital_min) != 1 ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (_flags & sigfile::CSource::no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -622,7 +596,7 @@ _parse_header()
 				if ( sscanf( H.header.digital_max, "%8d",
 					     &H.digital_max) != 1 ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (_flags & sigfile::CSource::no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -638,7 +612,7 @@ _parse_header()
 					strtoul( t.c_str(), &tail, 10);
 				if ( tail == NULL || *tail != '\0' ) {
 					_status |= bad_numfld;
-					if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+					if ( not (_flags & sigfile::CSource::no_field_consistency_check) )
 						return -2;
 				}
 			}
@@ -651,7 +625,7 @@ _parse_header()
 		return -1;
 	} catch (invalid_argument ex) {
 		_status |= bad_numfld;
-		if ( not (flags() & sigfile::CSource::no_field_consistency_check) )
+		if ( not (_flags & sigfile::CSource::no_field_consistency_check) )
 			return -3;
 	}
 
@@ -868,48 +842,48 @@ CEDFFile::
 explain_status( const int status)
 {
 	list<string> recv;
-	if ( status & sysfail )
-		recv.emplace_back( "* stat or fopen error");
-	if ( status & bad_header )
-		recv.emplace_back( "* Ill-formed header");
 	if ( status & bad_version )
-		recv.emplace_back( "* Bad Version signature (i.e., not an EDF file)");
-	if ( status & missing_patient_id )
-		recv.emplace_back( "* Missing PatientId");
-	if ( status & bad_numfld )
-		recv.emplace_back( "* Garbage in numerical fields");
-	if ( status & date_unparsable )
-		recv.emplace_back( "* Date field ill-formed");
-	if ( status & time_unparsable )
-		recv.emplace_back( "* Time field ill-formed");
-	if ( status & (nosession|noepisode) )
-		recv.emplace_back( "* No session/episode information in RecordingID");
-	if ( status & non1020_channel )
-		recv.emplace_back( "* Channel designation not following the 10-20 system");
+		recv.emplace_back( "Bad Version signature (i.e., not an EDF file)");
 	if ( status & nonconforming_patient_id )
-		recv.emplace_back( "* PatientId not conforming to section 2.1.3.3 of EDF spec");
-	if ( status & invalid_subject_details )
-		recv.emplace_back( "* PatientId has incomplete or ill-formed subject details");
-	if ( status & nonkemp_signaltype )
-		recv.emplace_back( "* Signal type not listed in Kemp et al");
-	if ( status & dup_channels )
-		recv.emplace_back( "* Duplicate channel names");
-	if ( status & nogain )
-		recv.emplace_back( "* Physical or Digital Min value greater than Max");
-	if ( status & too_many_channels )
-		recv.emplace_back( string("* Number of channels grearter than ") + to_string(max_channels));
+		recv.emplace_back( "PatientId not conforming to section 2.1.3.3 of EDF spec");
 	if ( status & file_truncated )
-		recv.emplace_back( "* File truncated");
+		recv.emplace_back( "File truncated");
 	if ( status & trailing_junk )
-		recv.emplace_back( "* File has trailing junk");
+		recv.emplace_back( "File has trailing junk");
 	if ( status & extra_patientid_subfields )
-		recv.emplace_back( "* Extra subfields in PatientId");
-	if ( status & recognised_channel_conflicting_type )
-		recv.emplace_back( "* Explicitly specified signal type does not match type of known channel name");
+		recv.emplace_back( "Extra subfields in PatientId");
 	if ( status & mmap_error )
-		recv.emplace_back( "* mmap error");
+		recv.emplace_back( "mmap error");
 
-	return join(recv, "\n");
+	return CSource::explain_status(status) + (recv.empty() ? "" : (join(recv, "\n") + '\n'));
+}
+
+
+
+
+
+int
+agh::SSubjectId::
+parse_recording_id_edf_style( const string& s)
+{
+	using namespace agh::str;
+	int_least32_t status = 0;
+	auto subfields = tokens( s, " ");
+	if ( subfields.size() < 4 ) {
+		id = subfields.front();
+		status |= sigfile::CEDFFile::nonconforming_patient_id;
+	} else {
+		if ( subfields.size() > 4 )
+			status |= sigfile::CEDFFile::extra_patientid_subfields;
+		auto i = subfields.begin();
+		id = *i++;
+		gender = agh::SSubjectId::char_to_gender((*i++)[0]);
+		dob = agh::SSubjectId::str_to_dob(*i++);
+		name = join( tokens(*i++, "_"), " ");
+		if ( not valid() )
+			status |= sigfile::CSource::invalid_subject_details;
+	}
+	return status;
 }
 
 

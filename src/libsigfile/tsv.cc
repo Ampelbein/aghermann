@@ -21,7 +21,7 @@
 #include "common/lang.hh"
 #include "common/string.hh"
 #include "tsv.hh"
-#include "source.hh"
+#include "typed-source.hh"
 
 using namespace std;
 
@@ -32,19 +32,6 @@ using agh::str::tokens;
 using agh::str::tokens_trimmed;
 
 using sigfile::CTSVFile;
-
-int
-CTSVFile::
-set_start_time( time_t s)
-{
-	char b[9];
-	strftime( b, 9, "%d.%m.%y", localtime(&s));
-	metadata["recording_date"].assign( b);
-	strftime( b, 9, "%H.%M.%s", localtime(&s));
-	metadata["recording_time"].assign( b);
-
-	return 0;
-}
 
 
 
@@ -126,8 +113,6 @@ CTSVFile (CTSVFile&& rv)
 	swap( metadata, rv.metadata);
 
 	_subtype    = rv._subtype;
-	_start_time = rv._start_time;
-	_end_time   = rv._end_time;
 
 	swap( channels, rv.channels);
 	swap( common_annotations, rv.common_annotations);
@@ -145,7 +130,7 @@ CTSVFile (CTSVFile&& rv)
 CTSVFile::
 ~CTSVFile ()
 {
-	if ( not (flags() & sigfile::CSource::no_ancillary_files) )
+	if ( not (_flags & sigfile::CSource::no_ancillary_files) )
 		save_ancillary_files();
 	if ( _line0 )
 		free( (void*)_line0);
@@ -153,6 +138,20 @@ CTSVFile::
 
 
 
+int
+CTSVFile::
+set_recording_date( const string& s)
+{
+	metadata["recording_date"] = s;
+	return 0;
+}
+int
+CTSVFile::
+set_recording_time( const string& s)
+{
+	metadata["recording_time"] = s;
+	return 0;
+}
 
 
 int
@@ -181,7 +180,7 @@ _parse_header()
       // 2. pick essential bits
 	if ( metadata.find( "recording_id") == metadata.end() ) {
 		fprintf( stderr, "No session/episode in header\n");
-		_status |= (nosession | noepisode);
+		_status |= bad_session_or_episode;
 		return -1;
 	}
 
@@ -190,6 +189,20 @@ _parse_header()
 		_status |= CSource::missing_patient_id;;
 		return -1;
 	}
+
+	if ( metadata.find( "recording_date") == metadata.end() ||
+	     metadata.find( "recording_time") == metadata.end() ) {
+		fprintf( stderr, "No recording_date in header\n");
+		_status |= CSource::bad_datetime;
+		return -1;
+	}
+
+	figure_times(
+		metadata["recording_date"],
+		metadata["recording_time"],
+		TAcceptTimeFormat::any);
+	if ( _status & bad_datetime && !(_flags & CSource::TFlags::no_field_consistency_check) )
+		return -1;
 
 	if ( metadata.find( "comment") == metadata.end() )
 		;
@@ -210,11 +223,8 @@ _parse_header()
 		channels.emplace_back( h);
 
       // 3. deal with episode and session
-	int parsed_with_issues;
-	tie( _session, _episode, parsed_with_issues) =
+	tie( _session, _episode) =
 		figure_session_and_episode();
-	if ( parsed_with_issues )
-		_status |= (nosession | noepisode);
 
       // 4. are channels unique?
 	for ( auto &H : channels )
@@ -264,13 +274,16 @@ outer_break:
 		return -1;
 	}
 
-	printf( "read %zu samples in %zu channels\n", ll/channels.size(), channels.size());
 	// vector -> valarray
 	for ( size_t h = 0; h < channels.size(); ++h ) {
 		channels[h].data.resize( ll);
 		for ( size_t i = 0; i < ll; ++i )
 			channels[h].data[i] = c2[h][i];
 	}
+
+
+	// only now as late
+	_end_time = _start_time + (time_t)recording_time();
 
 	return 0;
 }
@@ -355,37 +368,9 @@ CTSVFile::
 explain_status( const int status)
 {
 	list<string> recv;
-	if ( status & sysfail )
-		recv.emplace_back( "* stat or fopen error");
-	if ( status & bad_header )
-		recv.emplace_back( "* Ill-formed header");
-	if ( status & missing_patient_id )
-		recv.emplace_back( "* Missing PatientId");
-	if ( status & bad_numfld )
-		recv.emplace_back( "* Garbage in numerical fields");
-	if ( status & date_unparsable )
-		recv.emplace_back( "* Date field ill-formed");
-	if ( status & time_unparsable )
-		recv.emplace_back( "* Time field ill-formed");
-	if ( status & nosession )
-		recv.emplace_back( "* No session information in field RecordingID");
-	if ( status & non1020_channel )
-		recv.emplace_back( "* Channel designation not following the 10-20 system");
-	if ( status & nonconforming_patient_id )
-		recv.emplace_back( "* PatientId not conforming to section 2.1.3.3 of EDF spec");
-	if ( status & invalid_subject_details )
-		recv.emplace_back( "* PatientId has incomplete or ill-formed subject details");
-	if ( status & nonkemp_signaltype )
-		recv.emplace_back( "* Signal type not listed in Kemp et al");
-	if ( status & dup_channels )
-		recv.emplace_back( "* Duplicate channel names");
-	if ( status & too_many_channels )
-		recv.emplace_back( string("* Number of channels grearter than ") + to_string(max_channels));
-	if ( status & extra_patientid_subfields )
-		recv.emplace_back( "* Extra subfields in PatientId");
 	if ( status & bad_channel_count )
-		recv.emplace_back( "* Number of channels declared in header different from number of columns of data");
-	return join(recv, "\n");
+		recv.emplace_back( "Number of channels declared in header different from number of columns of data");
+	return CSource::explain_status(status) + (recv.empty() ? "" : (join(recv, "\n") + '\n'));
 }
 
 

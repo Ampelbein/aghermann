@@ -11,7 +11,7 @@
  */
 
 #include "common/lang.hh"
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 #include "mc.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

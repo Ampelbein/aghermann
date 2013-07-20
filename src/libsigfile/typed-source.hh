@@ -1,5 +1,5 @@
 /*
- *       File name:  libsigfile/source.hh
+ *       File name:  libsigfile/typed-source.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-11-11

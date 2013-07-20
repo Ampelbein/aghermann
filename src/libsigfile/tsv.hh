@@ -111,12 +111,10 @@ class CTSVFile
 		{ return _session.c_str(); }
 
 	// times
-	time_t start_time() const
-		{ return _start_time; }
-	time_t end_time() const
-		{ return _end_time; }
 	double recording_time() const // in seconds
 		{ return (double)channels.front().data.size() / _samplerate; } // all channels have the same sr, obviously
+	int set_recording_date( const string&);
+	int set_recording_time( const string&);
 
 	// setters
 	int set_patient_id( const string& s)
@@ -145,8 +143,6 @@ class CTSVFile
 			_session = s;
 			return 0;
 		}
-
-	int set_start_time( time_t);
 
 	// channels
 	size_t n_channels() const
@@ -335,9 +331,10 @@ class CTSVFile
 
 
 	enum TStatus : int_least32_t {
+		bad_channel_count         = (1 << (COMMON_STATUS_BITS + 1)),
 		inoperable		 = (bad_header
 					   | bad_numfld
-					   | date_unparsable | time_unparsable
+					   | bad_datetime
 					   | dup_channels
 					   | sysfail
 					   | too_many_channels)
@@ -352,8 +349,6 @@ class CTSVFile
 	TSubtype _subtype;
 
 	size_t	_samplerate;
-	time_t	_start_time,
-		_end_time;
 
 	FILE	*_f;
 	char	*_line0;

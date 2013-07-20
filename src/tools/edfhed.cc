@@ -18,7 +18,7 @@
 
 //#include <argp.h>
 #include "common/fs.hh"
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 #include "libsigfile/edf.hh"
 
 // there's some deep and curious issue argp.h brings up if it is
@@ -261,8 +261,7 @@ set_recording_datetime_from_mtime( sigfile::CEDFFile& F)
 static int
 set_mtime_from_recording_datetime( sigfile::CEDFFile& F)
 {
-	if ( F.status() & sigfile::CEDFFile::date_unparsable ||
-	     F.status() & sigfile::CEDFFile::time_unparsable ) {
+	if ( F.status() & sigfile::CSource::bad_datetime ) {
 		fprintf( stderr, "Error: Bad recording_date or _time fields; not setting file mtime");
 		return -1;
 	}

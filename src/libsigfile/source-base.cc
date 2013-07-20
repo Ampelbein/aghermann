@@ -269,22 +269,40 @@ CSource (CSource&& rv)
       : _subject (move(rv._subject))
 {
 	swap( _filename, rv._filename);
-	_status = rv._status;
-	_flags = rv._flags;
+	_status     = rv._status;
+	_flags      = rv._flags;
+
+	_start_time = rv._start_time;
+	_end_time   = rv._end_time;
+}
+
+
+
+
+int
+CSource::
+set_start_time( time_t s)
+{
+	_end_time = (_start_time = s)
+		+ (time_t)recording_time();
+
+	char b[9];
+	strftime( b, 9, "%d.%m.%y", localtime(&s));
+	set_recording_date( b);
+	strftime( b, 9, "%H.%M.%s", localtime(&s));
+	set_recording_time( b);
+
+	return 0;
 }
 
 
 
 
 
-
-
-
-tuple<string, string, int>
+tuple<string, string>
 CSource::
 figure_session_and_episode()
 {
-	int status = 0;
 	string session, episode;
 
 	// (a) parsed from RecordingID_raw
@@ -297,7 +315,7 @@ figure_session_and_episode()
 	     sscanf( rec_id_isolated.c_str(), T " (" T ")", int_session, int_episode) == 2 )
 		;
 	else
-		status = (nosession|noepisode);
+		_status |= bad_session_or_episode;
 #undef T
 
 	// (b) identified from file name
@@ -315,7 +333,7 @@ figure_session_and_episode()
 			fn_episode.erase( sz-2, 2);
 	}
 
-	if ( status ) { // (a) failed
+	if ( _status & bad_session_or_episode ) { // (a) failed
 		episode.assign( fn_episode);    // use RecordingID_raw as Session
 		session.assign( rec_id_isolated);
 	} else {
@@ -323,12 +341,35 @@ figure_session_and_episode()
 		session.assign( int_session);
 	}
 
-	return make_tuple( session, episode, status);
+	return make_tuple( session, episode);
 }
 
 
 
 
+void
+CSource::
+figure_times( const string& date_s, const string& time_s, TAcceptTimeFormat option)
+{
+	struct tm ts;
+	char *p;
+	//memset( &ts, 0, sizeof(struct tm));
+	ts.tm_isdst = 0;  // importantly
+	p = strptime( date_s.c_str(), "%d.%m.%y", &ts);
+	if ( p == NULL || *p != '\0' ) {
+		_status |= bad_datetime;
+	}
+	p = strptime( time_s.c_str(), "%H.%M.%S", &ts);
+	if ( p == NULL || *p != '\0' ) {
+		_status |= bad_datetime;
+	}
+
+	// if ( ts.tm_year < 50 )
+	// 	ts.tm_year += 100;
+	_start_time = mktime( &ts);
+	if ( _start_time == (time_t)-1 )
+		_status |= bad_datetime;
+}
 
 
 
@@ -460,6 +501,41 @@ export_filtered( const int h,
 		return 0;
 	} else
 		return -1;
+}
+
+
+
+string
+CSource::
+explain_status( const int status)
+{
+	list<string> recv;
+	if ( status & sysfail )
+		recv.emplace_back( "stat or fopen error");
+	if ( status & bad_header )
+		recv.emplace_back( "Ill-formed header");
+	if ( status & missing_patient_id )
+		recv.emplace_back( "Missing PatientId");
+	if ( status & bad_numfld )
+		recv.emplace_back( "Garbage in numerical fields");
+	if ( status & bad_datetime )
+		recv.emplace_back( "Date/time field ill-formed");
+	if ( status & bad_session_or_episode )
+		recv.emplace_back( "No session/episode information in RecordingID");
+	if ( status & non1020_channel )
+		recv.emplace_back( "Channel designation not following the 10-20 system");
+	if ( status & invalid_subject_details )
+		recv.emplace_back( "PatientId has incomplete or ill-formed subject details");
+	if ( status & nonkemp_signaltype )
+		recv.emplace_back( "Signal type not listed in Kemp et al");
+	if ( status & dup_channels )
+		recv.emplace_back( "Duplicate channel names");
+	if ( status & too_many_channels )
+		recv.emplace_back( string("Number of channels grearter than ") + to_string(max_channels));
+	if ( status & conflicting_channel_type )
+		recv.emplace_back( "Explicitly specified signal type does not match type of known channel name");
+
+	return recv.empty() ? "" : agh::str::join(recv, "\n") + "\n";
 }
 
 

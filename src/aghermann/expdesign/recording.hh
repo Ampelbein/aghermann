@@ -15,7 +15,7 @@
 
 #include <cstdarg>
 
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 #include "libmetrics/all.hh"
 #include "aghermann/model/forward-decls.hh"
 #include "forward-decls.hh"

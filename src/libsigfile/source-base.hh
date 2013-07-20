@@ -225,22 +225,18 @@ class CSource {
 		ok			  = 0,
 		bad_header		  = (1 <<  0),
 		bad_numfld		  = (1 <<  1),
-		date_unparsable		  = (1 <<  2),
-		time_unparsable		  = (1 <<  3),
-		nosession		  = (1 <<  4),
-		noepisode		  = (1 <<  5),
-		nonkemp_signaltype	  = (1 <<  6),
-		non1020_channel		  = (1 <<  7),
-		dup_channels		  = (1 <<  8),
-		sysfail			  = (1 <<  9),
-		too_many_channels	  = (1 << 10),
-		nonconforming_patient_id  = (1 << 11),
-		missing_patient_id        = (1 << 12),
-		invalid_subject_details   = (1 << 13),
-		extra_patientid_subfields = (1 << 14),
-		bad_channel_count         = (1 << 15)
+		bad_datetime		  = (1 <<  2),
+		bad_session_or_episode	  = (1 <<  3),
+		nonkemp_signaltype	  = (1 <<  4),
+		non1020_channel		  = (1 <<  5),
+		dup_channels		  = (1 <<  6),
+		sysfail			  = (1 <<  7),
+		too_many_channels	  = (1 <<  8),
+		missing_patient_id        = (1 <<  9),
+		invalid_subject_details   = (1 << 10),
+		conflicting_channel_type  = (1 << 11),
 	};
-	const static unsigned COMMON_STATUS_BITS = 15;
+	const static unsigned COMMON_STATUS_BITS = 11;
     protected:
 	string	_filename;
 
@@ -274,7 +270,10 @@ class CSource {
 	int status()	const { return _status; }
 	int flags()	const { return _flags; }
 
-	virtual string explain_status()			const = 0;
+	static string explain_status( int);
+	virtual string explain_status() const
+		{ return move(explain_status( _status)); }
+
 	enum TDetails { with_channels = 1, with_annotations = 2 };
 	virtual string details( int which_details)	const = 0;
 
@@ -295,9 +294,17 @@ class CSource {
 	virtual const char* session()			const = 0;
 
       // recording time and duration
-	virtual time_t start_time()			const = 0;
-	virtual time_t end_time()			const = 0;
+	time_t	_start_time,
+		_end_time;
+	virtual time_t start_time() const
+		{ return _start_time; }
+	virtual time_t end_time() const
+		{ return _end_time; }
 	virtual double recording_time()			const = 0;
+
+	virtual int set_start_time( time_t);
+	virtual int set_recording_date( const string&) = 0;
+	virtual int set_recording_time( const string&) = 0;
 
       // channels
 	const static size_t max_channels = 1024;
@@ -352,7 +359,6 @@ class CSource {
 	virtual int set_episode( const string&)	      = 0;
 	virtual int set_session( const string&)	      = 0;
 	virtual int set_comment( const string&)	      = 0;
-	virtual int set_start_time( time_t)	      = 0;
 
       // get samples
 	// original
@@ -437,8 +443,12 @@ class CSource {
 		}
 
       // supporting functions
-	tuple<string, string, int>
-	figure_session_and_episode();
+	tuple<string, string>
+	figure_session_and_episode(); // hand over the pair separately for specific ways to store these fields in derived classes
+
+	enum class TAcceptTimeFormat { edf_strict, any };
+	void
+	figure_times( const string&, const string&, TAcceptTimeFormat);
 };
 
 

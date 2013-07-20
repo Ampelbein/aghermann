@@ -18,7 +18,7 @@
 
 #include "common/lang.hh"
 #include "common/alg.hh"
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 #include "forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)

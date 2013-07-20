@@ -12,7 +12,7 @@
 
 #include <gtk/gtk.h>
 #include "libsigfile/edf.hh"
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 
 
 void

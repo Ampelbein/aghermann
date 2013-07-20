@@ -19,7 +19,7 @@
 #include <numeric>
 #include <valarray>
 
-#include "libsigfile/source.hh"
+#include "libsigfile/typed-source.hh"
 #include "page-metrics-base.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
