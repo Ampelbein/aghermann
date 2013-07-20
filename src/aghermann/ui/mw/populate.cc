@@ -127,10 +127,41 @@ populate( bool do_load)
 		set_controls_for_empty_experiment( false);
 	}
 
-	if ( not ED->error_log().empty() ) {
+	if ( ED->error_log_n_messages() > 0 ) {
 		if ( not suppress_scan_report ) {
-			gtk_text_buffer_set_text( gtk_text_view_get_buffer( tScanLog),
-						  ED->error_log().c_str(), -1);
+			auto buffer = gtk_text_view_get_buffer( tScanLog);
+			for ( const auto& L : ED->error_log() ) {
+
+				GtkTextIter X0, X9;
+				gtk_text_buffer_get_end_iter(
+					buffer, &X0);
+				gint x0 = gtk_text_iter_get_offset( &X0);
+
+				gtk_text_buffer_insert_at_cursor(
+					buffer, (L.first + '\n').c_str(), -1);
+				gtk_text_buffer_get_iter_at_offset(
+					buffer, &X0, x0);
+				gtk_text_buffer_get_end_iter(
+					buffer, &X9);
+				// gtk_text_iter_backward_cursor_position(
+				// 	&X9);
+
+				switch ( L.second ) {
+				case agh::CExpDesign::TLogEntryStyle::bold:
+					gtk_text_buffer_apply_tag_by_name(
+						buffer, "bold",
+						&X0, &X9);
+					break;
+				case agh::CExpDesign::TLogEntryStyle::italic:
+					gtk_text_buffer_apply_tag_by_name(
+						buffer, "italic",
+						&X0, &X9);
+					break;
+				case agh::CExpDesign::TLogEntryStyle::plain:
+				default:
+					break;
+				}
+			}
 			gtk_widget_show_all( (GtkWidget*)wScanLog);
 		} else
 			gdk_window_beep( gtk_widget_get_window( (GtkWidget*)wMainWindow));

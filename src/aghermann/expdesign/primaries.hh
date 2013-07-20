@@ -310,18 +310,18 @@ class CExpDesign {
 			return _session_dir.substr( _session_dir.rfind( '/'));
 		}
 
+      // error log
+	enum class TLogEntryStyle { plain, bold, italic };
+	const list<pair<string, TLogEntryStyle>>&
+	error_log() const
+		{ return _error_log; }
 	void reset_error_log()
-		{
-			_error_log.clear();
-		}
+		{ _error_log.clear(); }
 	const char* last_error() const
-		{
-			return &_error_log[_error_log.rfind("\n", _error_log.size()-1)];
-		}
-	const string& error_log() const
-		{
-			return _error_log;
-		}
+		{ return _error_log.back().first.c_str(); }
+	string error_log_serialize() const;
+	size_t error_log_n_messages() const
+		{ return _error_log.size(); }
 	void log_message( const char* fmt, ...);
 
       // contains
@@ -483,7 +483,8 @@ class CExpDesign {
 
 	int	_status;
 	string	_session_dir;
-	string	_error_log;
+	list<pair<string, TLogEntryStyle>>
+		_error_log;
 
 	sid_t	_id_pool;
       // load/save

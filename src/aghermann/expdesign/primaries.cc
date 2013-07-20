@@ -145,19 +145,34 @@ log_message( const char* fmt, ...)
 	va_list ap;
 	va_start (ap, fmt);
 
-	char *buf;
-	assert (vasprintf( &buf, fmt, ap) > 0);
-
-	_error_log += buf;
-	if ( strlen(buf) && *(buf + strlen(buf)-1) != '\n' ) {
-		_error_log += "\n";
-		fprintf( stdout, "%s\n", buf);
-	} else
-		fputs( buf, stdout);
-
-	free( (void*)buf);
+	char *buf0;
+	int np = vasprintf( &buf0, fmt, ap);
+	char *buf = buf0;
+	if ( np > 0 ) {
+		TLogEntryStyle style =
+			(strncmp( buf, "$$", 2) == 0)
+			? ((buf += 2), TLogEntryStyle::bold)
+			: (strncmp( buf, "//", 2) == 0)
+			? ((buf += 2), TLogEntryStyle::italic)
+			: TLogEntryStyle::plain;
+		fprintf( stdout, "%s\n", buf0);
+		_error_log.emplace_back( buf, style);
+	}
+	if ( np != -1 )
+		free( (void*)buf0);
 
 	va_end (ap);
+}
+
+
+string
+agh::CExpDesign::
+error_log_serialize() const
+{
+	string ret;
+	for ( const auto& E : _error_log )
+		ret += E.first + '\n';
+	return ret;
 }
 
 

@@ -159,14 +159,14 @@ register_intree_source( sigfile::CTypedSource&& F,
 
 		// refuse to register sources of wrong subjects
 		if ( j_name != F().subject().id ) {
-			log_message( "%s: file belongs to subject %s (\"%s\"), is misplaced here under subject \"%s\"\n",
+			log_message( "%s: file belongs to subject %s (\"%s\"), is misplaced here under subject \"%s\"",
 				     F().filename(), F().subject().id.c_str(), F().subject().name.c_str(), j_name.c_str());
 			return -1;
 		}
 		try {
 			auto existing_group = group_of( F().subject().id.c_str());
 			if ( g_name != existing_group ) {
-				log_message( "%s: subject %s (\"%s\") belongs to a different group (\"%s\")\n",
+				log_message( "%s: subject %s (\"%s\") belongs to a different group (\"%s\")",
 					     F().filename(), F().subject().id.c_str(), F().subject().name.c_str(), existing_group);
 				return -1;
 			}
@@ -176,12 +176,12 @@ register_intree_source( sigfile::CTypedSource&& F,
 
 		// but correct session/episode fields
 		if ( d_name != F().session() ) {
-			log_message( "%s: correcting embedded session \"%s\" to match placement in the tree (\"%s\")\n",
+			log_message( "%s: correcting embedded session \"%s\" to match placement in the tree (\"%s\")",
 				     F().filename(), F().session(), d_name.c_str());
 			F().set_session( d_name.c_str());
 		}
 		if ( e_name != F().episode() ) {
-			log_message( "%s: correcting embedded episode \"%s\" to match file name\n",
+			log_message( "%s: correcting embedded episode \"%s\" to match file name",
 				     F().filename(), F().episode());
 			F().set_episode( e_name.c_str());
 		}
@@ -213,11 +213,11 @@ register_intree_source( sigfile::CTypedSource&& F,
 		switch ( J->measurements[F().session()].add_one(
 				 move(F), fft_params, swu_params, mc_params) ) {  // this will do it
 		case AGH_EPSEQADD_OVERLAP:
-			log_message( "%s: not added as it overlaps with existing episodes\n",
+			log_message( "%s: not added as it overlaps with existing episodes",
 				     F().filename());
 			return -1;
 		case AGH_EPSEQADD_TOOFAR:
-			log_message( "%s: not added as it is too far removed from the rest\n",
+			log_message( "%s: not added as it is too far removed from the rest",
 				     F().filename());
 			return -1;
 		default:
@@ -225,12 +225,12 @@ register_intree_source( sigfile::CTypedSource&& F,
 		}
 
 	} catch (invalid_argument ex) {
-		log_message( ex.what() + '\n');
+		log_message( ex.what());
 		if ( reason_if_failed_p )
 			*reason_if_failed_p = ex.what();
 		return -1;
 	} catch (int status) {
-		log_message( "Bad edf header or data\n");
+		log_message( "Bad edf header or data");
 		if ( reason_if_failed_p )
 			*reason_if_failed_p = "Bad edf header or data";
 		return -1;
@@ -286,13 +286,15 @@ edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW 
 				using namespace sigfile;
 				CTypedSource F {fname, (size_t)roundf(__expdesign->fft_params.pagesize)};
 				string st = F().explain_status();
-				if ( not st.empty() )
-					__expdesign->log_message( "In %s:\n%s\n", fname, st.c_str());
+				if ( not st.empty() ) {
+					__expdesign->log_message( "$$%s:", fname);
+					__expdesign->log_message( "%s", st.c_str());
+				}
 				// we only support edf and edfplus/edf_c
 				if ( agh::CExpDesign::is_supported_source(F) )
 					__expdesign -> register_intree_source( move(F));
 				else
-					__expdesign -> log_message( "File %s: unsupported format\n", fname);
+					__expdesign -> log_message( "File %s: unsupported format", fname);
 
 			} catch ( invalid_argument ex) {
 				__expdesign->log_message(ex.what());
@@ -359,7 +361,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 			for ( auto &D : J.measurements )
 				if ( D.second.episodes.size() < n_episodes &&
 				     complete_episode_set.front() != D.second.episodes.begin()->name() ) { // the baseline is missing
-					log_message( "No Baseline episode in %s's %s: skip this session\n",
+					log_message( "No Baseline episode in %s's %s: skip this session",
 						     J.id.c_str(), D.first.c_str());
 					J.measurements.erase(D.first);
 					goto startover;

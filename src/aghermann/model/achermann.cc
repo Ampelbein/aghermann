@@ -105,7 +105,7 @@ setup_modrun( const string& j, const string& d, const string& h,
 		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j.c_str(), d.c_str(), h.c_str(), ex.what());
 		return -1;
 	} catch (int ex) { // thrown by CModelRun ctor
-		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j.c_str(), d.c_str(), h.c_str(), CProfile::explain_status(ex).c_str());
+		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s", j.c_str(), d.c_str(), h.c_str(), CProfile::explain_status(ex).c_str());
 		return ex;
 	}
 

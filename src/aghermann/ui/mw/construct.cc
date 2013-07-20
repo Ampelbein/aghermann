@@ -315,6 +315,17 @@ SExpDesignUIWidgets ()
 		throw runtime_error ("Failed to construct widgets");
 
 	gtk_widget_override_font( (GtkWidget*)tScanLog, font_desc);
+	gtk_text_buffer_create_tag(
+		gtk_text_view_get_buffer( tScanLog),
+		"bold",
+		"weight", PANGO_WEIGHT_BOLD,
+		NULL);
+	gtk_text_buffer_create_tag(
+		gtk_text_view_get_buffer( tScanLog),
+		"italic",
+		"style", PANGO_STYLE_ITALIC,
+		NULL);
+
 	// free? unref? leak some?
 
       // ****************** settings
