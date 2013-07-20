@@ -90,6 +90,8 @@ struct SScoringFacility::SArtifactsDialog
 
 	SArtifactsDialog (SScoringFacility&);
 
+	SScoringFacility::SChannel
+		*using_channel;
 	metrics::mc::SArtifactDetectionPP
 		P;
 	sigfile::SArtifacts

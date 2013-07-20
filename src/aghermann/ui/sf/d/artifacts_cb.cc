@@ -146,12 +146,13 @@ bSFADCancel_clicked_cb(
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
+	SF.artifacts_dialog_shown = false;
 
 	gtk_widget_hide( (GtkWidget*)AD.wSFAD);
 
 	if ( gtk_toggle_button_get_active(AD.bSFADPreview) ) {
-		SF.using_channel -> artifacts = AD.artifacts_backup;
-		SF.using_channel -> get_signal_filtered();
+		AD.using_channel->artifacts = AD.artifacts_backup;
+		AD.using_channel->get_signal_filtered();
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -177,11 +178,11 @@ bSFADPreview_toggled_cb(
 	if ( gtk_toggle_button_get_active(b) ) {
 		SBusyBlock bb (AD.wSFAD);
 
-		AD.orig_signal_visible_backup = SF.using_channel->draw_original_signal;
-		AD.artifacts_backup = SF.using_channel->artifacts;
+		AD.orig_signal_visible_backup = AD.using_channel->draw_original_signal;
+		AD.artifacts_backup = AD.using_channel->artifacts;
 
-		SF.using_channel -> detect_artifacts( (AD.W_V.down(), AD.P));
-		SF.using_channel -> draw_original_signal = true;
+		AD.using_channel->detect_artifacts( (AD.W_V.down(), AD.P));
+		AD.using_channel->draw_original_signal = true;
 		gtk_widget_set_sensitive( (GtkWidget*)AD.bSFADApply, TRUE);
 
 		AD.channels_visible_backup.clear();
@@ -189,15 +190,15 @@ bSFADPreview_toggled_cb(
 			for ( auto& H : SF.channels ) {
 				AD.channels_visible_backup.emplace_back(
 					&H, H.hidden);
-				if ( &H != SF.using_channel )
+				if ( &H != AD.using_channel )
 					H.hidden = true;
 			}
 
 	} else {
-		SF.using_channel->artifacts = AD.artifacts_backup;
+		AD.using_channel->artifacts = AD.artifacts_backup;
 		for ( auto& H : AD.channels_visible_backup )
 			H.first->hidden = H.second;
-		SF.using_channel->draw_original_signal = AD.orig_signal_visible_backup;
+		AD.using_channel->draw_original_signal = AD.orig_signal_visible_backup;
 		gtk_widget_set_sensitive( (GtkWidget*)AD.bSFADApply, FALSE);
 	}
 
@@ -205,7 +206,7 @@ bSFADPreview_toggled_cb(
 
 	gtk_label_set_markup(
 		AD.lSFADDirtyPercent,
-		snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100));
+		snprintf_buf( "%4.2f%% marked", AD.using_channel->calculate_dirty_percent() * 100));
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -220,6 +221,9 @@ wSFAD_show_cb(
 {
 	auto& AD = *(SScoringFacility::SArtifactsDialog*)userdata;
 	auto& SF = AD._p;
+	SF.artifacts_dialog_shown = true;
+
+	AD.using_channel = AD._p.using_channel;  // because the latter is mutable, and AD isn't modal
 
 	AD.W_V.up();
 	AD.populate_mSFADProfiles();
@@ -237,10 +241,10 @@ wSFAD_show_cb(
 
 	gtk_label_set_text(
 		AD.lSFADInfo,
-		snprintf_buf( "Artifact detection in channel %s", SF.using_channel->name()));
+		snprintf_buf( "Artifact detection in channel %s", AD.using_channel->name()));
 	gtk_label_set_text(
 		AD.lSFADDirtyPercent,
-		snprintf_buf( "%4.2f%% marked", SF.using_channel->calculate_dirty_percent() * 100));
+		snprintf_buf( "%4.2f%% marked", AD.using_channel->calculate_dirty_percent() * 100));
 }
 
 

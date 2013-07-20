@@ -539,7 +539,7 @@ update_channel_menu_items( const double x)
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawPSDSpectrum, is_eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawSWUProfile,  is_eeg);
 
-	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageArtifactsDetect, is_eeg);
+	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageArtifactsDetect, is_eeg and not _p.artifacts_dialog_shown);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawMCProfile,   is_eeg);
 	gtk_widget_set_visible( (GtkWidget*)_p.iSFPageDrawEMGProfile,  is_emg);
 

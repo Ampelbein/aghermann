@@ -25,7 +25,8 @@ artifacts_d()
 
 aghui::SScoringFacility::SArtifactsDialog::
 SArtifactsDialog (aghui::SScoringFacility& p_)
-      : _p (p_)
+      : using_channel (nullptr),
+	_p (p_)
 {
 	W_V.reg( eSFADScope,		&P.scope);
 	W_V.reg( eSFADUpperThr,		&P.upper_thr);

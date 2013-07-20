@@ -347,7 +347,8 @@ class SScoringFacility
       // state and flags
 	// volatile
 	bool	suppress_redraw:1,
-		hypnogram_button_down:1;
+		hypnogram_button_down:1,
+		artifacts_dialog_shown:1;
 	enum TMode {
 		scoring,
 		marking,
