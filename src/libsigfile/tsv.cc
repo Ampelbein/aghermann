@@ -258,34 +258,82 @@ int
 CTSVFile::
 _read_data()
 {
-	vector<vector<double>> c2 (channels.size());
-
 	// _line0 contains the first row of data already (it is the
 	// first line not beginning with a #)
+
+	vector<vector<double>> c2 (channels.size());
 	size_t r, ll = 0;
-	do {
-		for ( r = 0; r < channels.size(); ++r ) {
-			double x;
-			if ( 1 != sscanf( _line0, "%lg%*[,\t]", &x) )
-				goto outer_break;
-			c2[r].push_back( x);
+
+	if ( metadata["series"] == "irregular" ) {
+		vector<unsigned long> offsets;
+		do {
+			double ts;
+			if ( 1 != sscanf( _line0, "%lg%*[,\t]", &ts) ) {
+				fprintf( stderr, "Bad offset (at data line %zu)\n", ll);
+				_status |= bad_offset;
+				return -1;
+			}
+			if ( ll > 0 && ts * _samplerate <= offsets.back() ) {
+				fprintf( stderr, "Offsets not increasing (at data line %zu)\n", ll);
+				_status |= offsets_not_incteasing;
+				return -1;
+			}
+
+			offsets.push_back( ts * _samplerate);
+
+			for ( r = 0; r < channels.size(); ++r ) {
+				double x;
+				if ( 1 != sscanf( _line0, "%lg%*[,\t]", &x) )
+					goto outer_break1;
+				c2[r].push_back( x);
+			}
+			++ll;
+		} while ( getline( &_line0, &_line0_mallocked_bytes, _f) > 0 );
+	outer_break1:
+
+		if ( r != 0 && r != channels.size() ) {
+			fprintf( stderr, "Number of data read (%zu) not a multiple of channel count (%zu)\n", r, channels.size());
+			_status |= bad_channel_count;
+			return -1;
 		}
-		++ll;
-	} while ( getline( &_line0, &_line0_mallocked_bytes, _f) > 0 );
 
-outer_break:
+	      // interpolate and resample
+		for ( size_t h = 0; h < channels.size(); ++h ) {
+			valarray<TFloat> interpolated =
+				sigproc::interpolate<TFloat>(
+					offsets,
+					_samplerate,
+					c2[h],
+					1./_samplerate);
+			channels[h].data.resize( interpolated.size());
+			channels[h].data = interpolated;
+		}
 
-	if ( r != 0 && r != channels.size() ) {
-		fprintf( stderr, "Number of data read (%zu) not a multiple of channel count (%zu)\n", r, channels.size());
-		_status |= bad_channel_count;
-		return -1;
-	}
 
-	// vector -> valarray
-	for ( size_t h = 0; h < channels.size(); ++h ) {
-		channels[h].data.resize( ll);
-		for ( size_t i = 0; i < ll; ++i )
-			channels[h].data[i] = c2[h][i];
+	} else {
+		do {
+			for ( r = 0; r < channels.size(); ++r ) {
+				double x;
+				if ( 1 != sscanf( _line0, "%lg%*[,\t]", &x) )
+					goto outer_break2;
+				c2[r].push_back( x);
+			}
+			++ll;
+		} while ( getline( &_line0, &_line0_mallocked_bytes, _f) > 0 );
+	outer_break2:
+
+		if ( r != 0 && r != channels.size() ) {
+			fprintf( stderr, "Number of data read (%zu) not a multiple of channel count (%zu)\n", r, channels.size());
+			_status |= bad_channel_count;
+			return -1;
+		}
+
+		// vector -> valarray
+		for ( size_t h = 0; h < channels.size(); ++h ) {
+			channels[h].data.resize( ll);
+			for ( size_t i = 0; i < ll; ++i )
+				channels[h].data[i] = c2[h][i];
+		}
 	}
 
 
@@ -377,6 +425,10 @@ explain_status( const int status)
 	list<string> recv;
 	if ( status & bad_channel_count )
 		recv.emplace_back( "Number of channels declared in header different from number of columns of data");
+	if ( status & bad_offset )
+		recv.emplace_back( "Bad offset");
+	if ( status & offsets_not_incteasing )
+		recv.emplace_back( "Offsets in an irregular-series data not increasing");
 	return CSource::explain_status(status) + (recv.empty() ? "" : (join(recv, "\n") + '\n'));
 }
 

@@ -333,12 +333,16 @@ class CTSVFile
 
 	enum TStatus : int_least32_t {
 		bad_channel_count        = (1 << (COMMON_STATUS_BITS + 1)),
+		bad_offset		 = (1 << (COMMON_STATUS_BITS + 2)),
+		offsets_not_incteasing	 = (1 << (COMMON_STATUS_BITS + 3)),
 		inoperable		 = (bad_header
 					   | bad_numfld
 					   | bad_datetime
 					   | dup_channels
 					   | sysfail
-					   | too_many_channels)
+					   | too_many_channels
+					   | bad_offset
+					   | offsets_not_incteasing)
 	};
 	static string explain_status( int);
 
