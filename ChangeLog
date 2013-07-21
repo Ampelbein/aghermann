@@ -9,7 +9,9 @@ v.0.9.1 (2013-xx-xx)
 	* New tool agh-profile-gen, a standalone profile generator.
 	* ascii (tsv) format support, including irregular, timestamped
 	  time series data.
-	* Score assistant now uses delta and theta ranges as defined by user.
+	* Score assistant now uses delta and theta ranges as defined by
+	  user.
+	* MW: Change pixels-per-hour with Shift+Scroll.
 
 v.0.9.0.4 (2013-05-18)
 	* Remove stray AC_CHECK_FUNC(mremap).

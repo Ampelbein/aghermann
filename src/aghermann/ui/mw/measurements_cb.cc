@@ -129,16 +129,20 @@ daSubjectTimeline_scroll_event_cb(
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
 	auto& ED = J._p._p;
 
-	if ( event->state & GDK_CONTROL_MASK &&
-	     event->state & GDK_SHIFT_MASK ) {
-		ED.modify_profile_scales( event->direction);
+	if ( event->state & GDK_SHIFT_MASK ) {
+		switch ( event->direction ) {
+		case GDK_SCROLL_UP:   --ED.tl_pph; break;
+		case GDK_SCROLL_DOWN: ++ED.tl_pph; break;
+		default: break;
+		}
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 		return TRUE;
 
 	} else if ( event->state & GDK_CONTROL_MASK ) {
-		ED.modify_active_profile_scale( event->direction);
+		ED.modify_profile_scales( event->direction);
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 		return TRUE;
+
 	} else
 		return FALSE;
 }
