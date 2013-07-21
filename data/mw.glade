@@ -35,7 +35,7 @@
       <object class="GtkMenuItem" id="iSubjectTimelineEDFInfo">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Show _EDF file header</property>
+        <property name="label" translatable="yes">Show file header</property>
         <property name="use_underline">True</property>
       </object>
     </child>
@@ -7113,6 +7113,12 @@ dragging individual signals with &lt;i&gt;Alt&lt;/i&gt;.&lt;/small&gt;</property
                                         <property name="top_attach">1</property>
                                         <property name="bottom_attach">2</property>
                                       </packing>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                     <child>
                                       <placeholder/>
