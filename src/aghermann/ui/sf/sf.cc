@@ -671,7 +671,11 @@ aghui::SScoringFacility::
 load_montage()
 {
 	libconfig::Config conf;
-	string montage_file = (agh::fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage");
+	string montage_file =
+		agh::fs::make_fname_base(
+			channels.front().crecording.F().filename(),
+			sigfile::supported_sigfile_extensions,
+			agh::fs::TMakeFnameOption::hidden) + ".montage";
 	try {
 		conf.readFile (montage_file.c_str());
 	} catch (libconfig::ParseException ex) {
@@ -721,7 +725,12 @@ save_montage()
 		agh::confval::put( h.config_keys_g, conf);
 	}
 	try {
-		conf.writeFile ((agh::fs::make_fname_base( channels.front().crecording.F().filename(), ".edf", true) + ".montage").c_str());
+		conf.writeFile (
+			(agh::fs::make_fname_base(
+				channels.front().crecording.F().filename(),
+				sigfile::supported_sigfile_extensions,
+				agh::fs::TMakeFnameOption::hidden)
+			 + ".montage").c_str() );
 	} catch (...) {
 		;
 	}

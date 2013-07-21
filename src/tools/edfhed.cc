@@ -282,7 +282,7 @@ set_session_and_episode_from_tree( sigfile::CEDFFile& F)
 	// filename can be anything, including a symlink
 	bool	is_path_absolute = (F.filename()[0] == '/');
 	list<string> pe = agh::fs::path_elements( string (is_path_absolute ? "" : "./") + F.filename());
-	string	episode = agh::fs::make_fname_base( pe.back(), ".edf", false);
+	string	episode = agh::fs::make_fname_base( pe.back(), ".edf", agh::fs::TMakeFnameOption::normal);
 
 	string	in_dir = string (is_path_absolute ? "/" : "") + agh::str::join( list<string> (pe.begin(), prev(pe.end())), "/") + "/.";
 	// a symlink from ./filename.edf would resolve somewhere else,

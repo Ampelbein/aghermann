@@ -377,7 +377,7 @@ exec_prune( const SOperation::SObject& obj)
 	}
 	printf( "Keeping %zu channel(s)\n", selected_channels.size());
 
-	sigfile::CEDFFile G ((agh::fs::make_fname_base( obj, ".edf", false) + "-mod.edf").c_str(),
+	sigfile::CEDFFile G ((agh::fs::make_fname_base( obj, ".edf", agh::fs::TMakeFnameOption::normal) + "-mod.edf").c_str(),
 			     sigfile::CEDFFile::TSubtype::edf,
 			     sigfile::CSource::no_ancillary_files,
 			     selected_channels,

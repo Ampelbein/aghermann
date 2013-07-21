@@ -18,6 +18,25 @@
 using namespace std;
 using namespace sigfile;
 
+const char*
+	sigfile::supported_sigfile_extensions = ".edf .tsv .csv";
+
+bool
+sigfile::
+is_fname_ext_supported( const string& fname)
+{
+	for ( const auto& X : agh::str::tokens( supported_sigfile_extensions, " ") )
+		if ( fname.size() < X.size() )
+			continue;
+		else
+			if ( strcasecmp( &fname[fname.size()-4], X.c_str()) == 0 )
+				return true;
+	return false;
+}
+
+
+
+
 void
 SArtifacts::
 mark_artifact( const double aa, const double az)

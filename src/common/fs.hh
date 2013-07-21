@@ -27,32 +27,18 @@ using namespace std;
 namespace agh {
 namespace fs {
 
-template<class T>
+enum class TMakeFnameOption { normal, hidden };
 string
-make_fname_base( const T& _filename, const char *suffix, bool hidden)
-{
-	string	fname_ (_filename);
-	auto	slen = strlen( suffix);
-	if ( fname_.size() > slen && strcasecmp( &fname_[fname_.size()-slen], suffix) == 0 )
-		fname_.erase( fname_.size()-slen, slen);
-	if ( hidden ) {
-		size_t slash_at = fname_.rfind('/');
-		if ( slash_at < fname_.size() )
-			fname_.insert( slash_at+1, ".");
-	}
-	return fname_;
-}
+make_fname_base( const string& fname_, const string& suffices, TMakeFnameOption);
 
-template<class T>
-list<string>
-path_elements( const T& _filename)
+inline list<string>
+path_elements( const string& _filename)
 {
 	return agh::str::tokens( _filename, "/");
 }
 
-template<class T>
-string
-dirname( const T& _filename)
+inline string
+dirname( const string& _filename)
 {
 	string pre = (_filename[0] == '/') ? "/" : "";
 	auto ee = agh::str::tokens( _filename, "/");
@@ -64,11 +50,9 @@ dirname( const T& _filename)
 
 
 
-template<class T>
-bool
-exists_and_is_writable( const T& _dir)
+inline bool
+exists_and_is_writable( const string& dir)
 {
-	string dir (_dir);
 	struct stat attr;
 	return stat( dir.c_str(), &attr) == 0 &&
 		S_ISDIR (attr.st_mode) &&
@@ -77,14 +61,13 @@ exists_and_is_writable( const T& _dir)
 }
 
 
-template<class T>
-int
-mkdir_with_parents( const T& dir)
+inline int
+mkdir_with_parents( const string& dir)
 {
 	return system(
 		agh::str::sasprintf(
 			"mkdir -p '%s'",
-			string (dir).c_str())
+			dir.c_str())
 		.c_str());
 }
 
@@ -94,8 +77,8 @@ mkdir_with_parents( const T& dir)
 
 
 // this is another global
-int edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw);
-extern size_t __n_edf_files;
+int supported_sigfile_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw);
+extern size_t total_supported_sigfiles;
 
 
 

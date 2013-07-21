@@ -13,6 +13,7 @@
 #define AGH_SIGFILE_SOURCE_H_
 
 #include "source-base.hh"
+#include "forward-decls.hh"
 #include "page.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -61,6 +62,10 @@ class CTypedSource
 	const CSource& operator()() const
 		{ return *_obj; }
 
+	// specialisations for the two known sigfile types
+	template <class T> T& obj();
+	template <class T> const T& obj() const;
+
       // filenames
 	string make_fname_hypnogram() const
 		{
@@ -69,6 +74,13 @@ class CTypedSource
 
 	static TType source_file_type( const string& fname) __attribute__ ((pure));
 };
+
+
+template <> inline	 CTSVFile& CTypedSource::obj()       { return *(CTSVFile*)_obj; }
+template <> inline	 CEDFFile& CTypedSource::obj()       { return *(CEDFFile*)_obj; }
+template <> inline const CTSVFile& CTypedSource::obj() const { return *(CTSVFile*)_obj; }
+template <> inline const CEDFFile& CTypedSource::obj() const { return *(CEDFFile*)_obj; }
+
 
 
 template <typename T = int>

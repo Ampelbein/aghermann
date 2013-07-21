@@ -48,7 +48,8 @@ class CTSVFile
 
     public:
 	// subtype
-	enum TSubtype {
+	enum class TSubtype {
+		invalid,
 		csv,
 		tsv,
 	};
@@ -58,8 +59,8 @@ class CTSVFile
 	subtype_s( TSubtype t)
 		{
 			switch (t) {
-			case csv: return "csv";
-			case tsv: return "tsv";
+			case TSubtype::csv: return "csv";
+			case TSubtype::tsv: return "tsv";
 			default:  return "(invalid)";
 			}
 		}
@@ -331,7 +332,7 @@ class CTSVFile
 
 
 	enum TStatus : int_least32_t {
-		bad_channel_count         = (1 << (COMMON_STATUS_BITS + 1)),
+		bad_channel_count        = (1 << (COMMON_STATUS_BITS + 1)),
 		inoperable		 = (bad_header
 					   | bad_numfld
 					   | bad_datetime

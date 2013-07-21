@@ -142,8 +142,12 @@ register_intree_source( sigfile::CTypedSource&& F,
 		list<string>::iterator pe = broken_path.begin();
 		string& g_name = (pe = next(pe), *pe),
 			j_name = (pe = next(pe), *pe),
-			d_name = (pe = next(pe), *pe),
-			e_name = fs::make_fname_base(*next(pe), ".edf", false);
+			d_name = (pe = next(pe), *pe);
+		string	e_name =
+			fs::make_fname_base(
+				*next(pe),
+				sigfile::supported_sigfile_extensions,
+				agh::fs::TMakeFnameOption::normal);
 		// take care of the case of episode-2.edf
 		{
 			auto subf = agh::str::tokens_trimmed(e_name, "-");
@@ -159,15 +163,17 @@ register_intree_source( sigfile::CTypedSource&& F,
 
 		// refuse to register sources of wrong subjects
 		if ( j_name != F().subject().id ) {
-			log_message( "%s: file belongs to subject %s (\"%s\"), is misplaced here under subject \"%s\"",
-				     F().filename(), F().subject().id.c_str(), F().subject().name.c_str(), j_name.c_str());
+			log_message( "$$%s:", F().filename());
+			log_message( "file belongs to subject %s (\"%s\"), is misplaced here under subject \"%s\"",
+				     F().subject().id.c_str(), F().subject().name.c_str(), j_name.c_str());
 			return -1;
 		}
 		try {
 			auto existing_group = group_of( F().subject().id.c_str());
 			if ( g_name != existing_group ) {
-				log_message( "%s: subject %s (\"%s\") belongs to a different group (\"%s\")",
-					     F().filename(), F().subject().id.c_str(), F().subject().name.c_str(), existing_group);
+				log_message( "$$%s:", F().filename());
+				log_message( "subject %s (\"%s\") belongs to a different group (\"%s\")",
+					     F().subject().id.c_str(), F().subject().name.c_str(), existing_group);
 				return -1;
 			}
 		} catch (invalid_argument) {
@@ -176,13 +182,14 @@ register_intree_source( sigfile::CTypedSource&& F,
 
 		// but correct session/episode fields
 		if ( d_name != F().session() ) {
-			log_message( "%s: correcting embedded session \"%s\" to match placement in the tree (\"%s\")",
-				     F().filename(), F().session(), d_name.c_str());
+			log_message( "$$%s:", F().filename());
+			log_message( "correcting embedded session \"%s\" to match placement in the tree (\"%s\")",
+				     F().session(), d_name.c_str());
 			F().set_session( d_name.c_str());
 		}
 		if ( e_name != F().episode() ) {
-			log_message( "%s: correcting embedded episode \"%s\" to match file name",
-				     F().filename(), F().episode());
+			log_message( "correcting embedded episode \"%s\" to match file name",
+				     F().episode());
 			F().set_episode( e_name.c_str());
 		}
 
@@ -225,7 +232,7 @@ register_intree_source( sigfile::CTypedSource&& F,
 		}
 
 	} catch (invalid_argument ex) {
-		log_message( ex.what());
+		log_message( "%s", ex.what());
 		if ( reason_if_failed_p )
 			*reason_if_failed_p = ex.what();
 		return -1;
@@ -252,12 +259,12 @@ is_supported_source( sigfile::CTypedSource& F)
 		CTSVFile::TSubtype t;
 	} u;
 	return (F.type() == CTypedSource::TType::edf and
-		(u.e = static_cast<CEDFFile*>(&F()) -> subtype(),
+		(u.e = F.obj<CEDFFile>().subtype(),
 		 (u.e == CEDFFile::TSubtype::edf ||
 		  u.e == CEDFFile::TSubtype::edfplus_c)))
 		or
 		(F.type() == CTypedSource::TType::ascii and
-		 (u.t = static_cast<CTSVFile*>(&F()) -> subtype(),
+		 (u.t = F.obj<CTSVFile>().subtype(),
 		  (u.t == CTSVFile::TSubtype::csv ||
 		   u.t == CTSVFile::TSubtype::tsv)));
 }
@@ -265,39 +272,39 @@ is_supported_source( sigfile::CTypedSource& F)
 namespace {
 
 size_t
-	__cur_edf_file;
+	current_sigfile_source;
 agh::CExpDesign
-	*__expdesign;
+	*only_expdesign;
 
 agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 	only_progress_fun;
 
 int
-edf_file_processor( const char *fname, const struct stat*, int flag, struct FTW *ftw)
+supported_sigfile_processor( const char *fname, const struct stat*, int flag, struct FTW *ftw)
 {
 	if ( flag == FTW_F && ftw->level == 4 ) {
 		int fnlen = strlen(fname); // - ftw->base;
 		if ( fnlen < 5 )
 			return 0;
-		if ( strcasecmp( &fname[fnlen-4], ".edf") == 0 ) {
-			++__cur_edf_file;
-			only_progress_fun( fname, agh::fs::__n_edf_files, __cur_edf_file);
+		if ( sigfile::is_fname_ext_supported( fname) ) {
+			++current_sigfile_source;
+			only_progress_fun( fname, agh::fs::total_supported_sigfiles, current_sigfile_source);
 			try {
 				using namespace sigfile;
-				CTypedSource F {fname, (size_t)roundf(__expdesign->fft_params.pagesize)};
+				CTypedSource F {fname, (size_t)roundf(only_expdesign->fft_params.pagesize)};
 				string st = F().explain_status();
 				if ( not st.empty() ) {
-					__expdesign->log_message( "$$%s:", fname);
-					__expdesign->log_message( "%s", st.c_str());
+					only_expdesign->log_message( "$$%s:", fname);
+					only_expdesign->log_message( "%s", st.c_str());
 				}
 				// we only support edf and edfplus/edf_c
 				if ( agh::CExpDesign::is_supported_source(F) )
-					__expdesign -> register_intree_source( move(F));
+					only_expdesign -> register_intree_source( move(F));
 				else
-					__expdesign -> log_message( "File %s: unsupported format", fname);
+					only_expdesign -> log_message( "File %s: unsupported format", fname);
 
 			} catch ( invalid_argument ex) {
-				__expdesign->log_message(ex.what());
+				only_expdesign->log_message( "%s", ex.what());
 			}
 		}
 	}
@@ -335,17 +342,17 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	groups.clear();
 
       // glob it!
-	agh::fs::__n_edf_files = 0;
-	nftw( "./", agh::fs::edf_file_counter, 20, 0);
+	agh::fs::total_supported_sigfiles = 0;
+	nftw( "./", agh::fs::supported_sigfile_counter, 20, 0);
 	printf( "CExpDesign::scan_tree(\"%s\"): %zu edf file(s) found\n",
-		session_dir().c_str(), agh::fs::__n_edf_files);
-	if ( agh::fs::__n_edf_files == 0 )
+		session_dir().c_str(), agh::fs::total_supported_sigfiles);
+	if ( agh::fs::total_supported_sigfiles == 0 )
 		return;
 
-	__cur_edf_file = 0;
+	current_sigfile_source = 0;
 	only_progress_fun = user_progress_fun;
-	__expdesign = this;
-	nftw( "./", edf_file_processor, 10, 0);
+	only_expdesign = this;
+	nftw( "./", supported_sigfile_processor, 10, 0);
 	printf( "CExpDesign::scan_tree(): recordings collected\n");
 
 	compute_profiles(); // in an SMP fashion

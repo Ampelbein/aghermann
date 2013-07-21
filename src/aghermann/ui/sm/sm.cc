@@ -30,10 +30,10 @@ void
 aghui::SSession::
 get_session_stats()
 {
-	agh::fs::__n_edf_files = 0;
+	agh::fs::total_supported_sigfiles = 0;
 	string path = agh::str::tilda2homedir(c_str());
-	nftw( path.c_str(), agh::fs::edf_file_counter, 20, 0);
-	n_recordings = agh::fs::__n_edf_files;
+	nftw( path.c_str(), agh::fs::supported_sigfile_counter, 20, 0);
+	n_recordings = agh::fs::total_supported_sigfiles;
 
 	{
 		struct stat stat0;

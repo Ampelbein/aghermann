@@ -45,7 +45,8 @@ class CEDFFile
 
     public:
 	// subtype
-	enum TSubtype {
+	enum class TSubtype {
+		invalid,
 		edf,
 		edfplus_c,  // continuous
 		edfplus_d   // discontinuous
@@ -56,9 +57,9 @@ class CEDFFile
 	subtype_s( TSubtype t)
 		{
 			switch (t) {
-			case edf:       return "edf";
-			case edfplus_c: return "edf+c";
-			case edfplus_d: return "edf+d";
+			case TSubtype::edf:       return "edf";
+			case TSubtype::edfplus_c: return "edf+c";
+			case TSubtype::edfplus_d: return "edf+d";
 			default:        return "(invalid)";
 			}
 		}

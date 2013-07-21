@@ -1,9 +1,14 @@
-v.1.0 (2013-xx-xx)
+v.0.9.1 (2013-xx-xx)
 	* Reorg source tree around main executable, libs, & tools.
-	* Properly use libsigfile.so.
+	* Properly use our own lib*.so (previously aghermann turned out
+	  static despite libsigfile.so being installed).
 	* Plug a memory leak after early unique_ptr acquisition.
 	* SF: Move selection on montage (with Alt).
+	* SF: Artifact Detection dialog will now not get confused after
+	  clicking outside it on other channels.
 	* New tool agh-profile-gen, a standalone profile generator.
+	* ascii (tsv) format support.
+	* Score assistant now uses delta and theta ranges as defined by user.
 
 v.0.9.0.4 (2013-05-18)
 	* Remove stray AC_CHECK_FUNC(mremap).

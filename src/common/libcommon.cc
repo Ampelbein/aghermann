@@ -123,6 +123,7 @@ decompose_double( double value, double *mantissa, int *exponent)
 
 
 
+
 string&
 agh::str::
 homedir2tilda( string& inplace)
@@ -296,19 +297,45 @@ from_wstring( const wstring& in, const char* charset)
 
 
 
+
+// fs
+
+string
+agh::fs::
+make_fname_base( const string& fname_, const string& suffices, const TMakeFnameOption option)
+{
+	string	fname (fname_);
+	for ( const auto& X : agh::str::tokens( suffices, ",; ") )
+		if ( fname.size() > X.size() &&
+		     strcasecmp( &fname[fname.size()-X.size()], X.c_str()) == 0 ) {
+			fname.erase( fname.size()-X.size(), X.size());
+			break;
+		}
+
+	if ( option == TMakeFnameOption::hidden ) {
+		size_t slash_at = fname.rfind('/');
+		if ( slash_at < fname.size() )
+			fname.insert( slash_at+1, ".");
+	}
+	return move(fname);
+}
+
+
+
 // found to be of use elsewhere
-size_t	agh::fs::__n_edf_files;
+size_t	agh::fs::total_supported_sigfiles;
+
 int
 agh::fs::
-edf_file_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw)
+supported_sigfile_counter( const char *fname, const struct stat*, int flag, struct FTW *ftw)
 {
 	if ( flag == FTW_F && ftw->level == 4 ) {
 		int fnlen = strlen(fname); // - ftw->base;
 		if ( fnlen < 5 )
 			return 0;
-		if ( strcasecmp( &fname[fnlen-4], ".edf") == 0 ) {
-			++__n_edf_files;
-		}
+		if ( strcasecmp( &fname[fnlen-4], ".edf") == 0 ||
+		     strcasecmp( &fname[fnlen-4], ".tsv") == 0 )
+			++total_supported_sigfiles;
 	}
 	return 0;
 }

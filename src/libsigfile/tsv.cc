@@ -49,6 +49,11 @@ CTSVFile (const string& fname_, const int flags_)
 	_f = fopen( fname_.c_str(), "r");
 	if ( !_f )
 		throw invalid_argument (explain_status(_status |= sysfail));
+	_subtype =
+		(strcasecmp( &fname_[fname_.size()-4], ".csv") == 0)
+		? TSubtype::csv
+		: (strcasecmp( &fname_[fname_.size()-4], ".tsv") == 0) ? TSubtype::tsv
+		: TSubtype::invalid;
 
       // parse header
 	if ( _parse_header() ) {  // creates channels list
@@ -189,6 +194,8 @@ _parse_header()
 		_status |= CSource::missing_patient_id;;
 		return -1;
 	}
+	_status |=
+		_subject.parse_recording_id_edf_style( metadata["patient_id"]);
 
 	if ( metadata.find( "recording_date") == metadata.end() ||
 	     metadata.find( "recording_time") == metadata.end() ) {
@@ -259,7 +266,7 @@ _read_data()
 	do {
 		for ( r = 0; r < channels.size(); ++r ) {
 			double x;
-			if ( 1 != fscanf( _f, "%lg", &x) )
+			if ( 1 != sscanf( _line0, "%lg%*[,\t]", &x) )
 				goto outer_break;
 			c2[r].push_back( x);
 		}
@@ -335,7 +342,7 @@ details( const int which) const
 		" Duration\t: %s\n"
 		" # of channels\t: %zu\n"
 		" Sample rate\t: %zu\n",
-		filename(),
+		agh::str::homedir2tilda( filename()).c_str(),
 		subtype_s(),
 		patient_id(),
 		recording_id(),

@@ -466,10 +466,10 @@ _parse_header()
 
 		_subtype =
 			(strncasecmp( header.reserved, "edf+c", 5) == 0)
-			? edfplus_c
+			? TSubtype::edfplus_c
 			: (strncasecmp( header.reserved, "edf+d", 5) == 0)
-			? edfplus_d
-			: edf;
+			? TSubtype::edfplus_d
+			: TSubtype::edf;
 
 		size_t	header_length;
 
@@ -771,7 +771,7 @@ details( const int which) const
 			  " Record size\t: %g sec\n"
 			  " # of discontinuities\t: %zu\n"
 			  " # of embedded annotations\t: %zu\n",
-			  filename(),
+			  agh::str::homedir2tilda( filename()).c_str(),
 			  subtype_s(),
 			  patient_id(),
 			  trim( string (header.recording_id, 80)).c_str(),

@@ -22,6 +22,7 @@ using sigfile::CTSVFile;
 using sigfile::CEDFFile;
 
 
+
 CTypedSource::
 CTypedSource (const string& fname,
 	      const size_t pagesize,

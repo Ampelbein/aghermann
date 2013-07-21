@@ -28,31 +28,46 @@ using namespace std;
 
 namespace sigfile {
 
+extern const char* supported_sigfile_extensions;
+bool is_fname_ext_supported( const string&);
+
+
 inline string
-make_fname_hypnogram( const string& _filename, size_t pagesize)
+make_fname_hypnogram( const string& filename, size_t pagesize)
 {
-	return agh::fs::make_fname_base( _filename, ".edf", true)
+	return agh::fs::make_fname_base(
+		filename,
+		supported_sigfile_extensions,
+		agh::fs::TMakeFnameOption::hidden)
 		+ "-" + to_string( (long long unsigned)pagesize) + ".hypnogram";
 }
 
 inline string
-make_fname_artifacts( const string& _filename, const SChannel& channel)
+make_fname_artifacts( const string& filename, const SChannel& channel)
 {
-	return agh::fs::make_fname_base( _filename, ".edf", true)
+	return agh::fs::make_fname_base(
+		filename,
+		supported_sigfile_extensions,
+		agh::fs::TMakeFnameOption::hidden)
 		+ "-" + channel.name() + ".af";
 }
 
 inline string
-make_fname_annotations( const string& _filename, const SChannel& channel)
+make_fname_annotations( const string& filename, const SChannel& channel)
 {
-	return agh::fs::make_fname_base( _filename, ".edf", true)
+	return agh::fs::make_fname_base(
+		filename,
+		supported_sigfile_extensions,
+		agh::fs::TMakeFnameOption::hidden)
 		+ "-" + channel.name() + ".annotations";
 }
 
 inline string
 make_fname_filters( const string& _filename)
 {
-	return agh::fs::make_fname_base( _filename, ".edf", true)
+	return agh::fs::make_fname_base( _filename,
+		supported_sigfile_extensions,
+		agh::fs::TMakeFnameOption::hidden)
 		+ ".filters";
 }
 

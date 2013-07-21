@@ -322,7 +322,7 @@ class CExpDesign {
 	string error_log_serialize() const;
 	size_t error_log_n_messages() const
 		{ return _error_log.size(); }
-	void log_message( const char* fmt, ...);
+	void log_message( const char* fmt, ...)  __attribute__ (( format (printf, 2, 3) ));
 
       // contains
 	typedef map<string, CJGroup> TJGroups;
