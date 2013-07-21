@@ -18,6 +18,8 @@
 #include <stdexcept>
 
 #include <gsl/gsl_math.h>
+#include <gsl/gsl_interp.h>
+#include <gsl/gsl_spline.h>
 #include <samplerate.h>
 
 #include "common/lang.hh"
@@ -67,24 +69,14 @@ resample( const valarray<double>& signal,
 	  int alg);
 
 
-valarray<double>
-interpolate_d( const vector<size_t>&,
-	       unsigned, const valarray<double>&, float);
 
-valarray<float>
-interpolate( const vector<size_t>& xi,
-	     unsigned samplerate,
-	     const valarray<float>& y,
-	     float dx);
 
-inline valarray<double>
-interpolate( const vector<size_t>& xi,
-	     size_t samplerate,
-	     const valarray<double>& y,
-	     float dx)
-{
-	return interpolate_d( xi, samplerate, y, dx);
-}
+
+
+template <typename T, class Container>
+valarray<T>
+interpolate( const vector<unsigned long>& xi,
+	     unsigned samplerate, const Container& y, double dt);
 
 
 

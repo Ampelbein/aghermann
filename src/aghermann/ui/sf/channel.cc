@@ -216,7 +216,7 @@ get_psd_course()
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
 			xi[i] = i;
-		psd.course = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 3./3600);
+		psd.course = sigproc::interpolate<TFloat>( xi, 3600/_p.pagesize(), tmp, 3./3600);
 	} else
 		psd.course = tmp;
 }
@@ -235,9 +235,10 @@ get_psd_in_bands()
 				_upto = _p._p.ED->freq_bands[b][1];
 			auto tmp = crecording.psd_profile.course( _from, _upto);
 			psd.course_in_bands[b] =
-				sigproc::interpolate( xi, 3600/_p.pagesize(),
-						      tmp,
-						      3./3600);
+				sigproc::interpolate<TFloat>(
+					xi, 3600/_p.pagesize(),
+					tmp,
+					3./3600);
 		}
 	} else
 		for ( size_t b = 0; b <= psd.uppermost_band; ++b ) {
@@ -260,7 +261,7 @@ get_swu_course()
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
 			xi[i] = i;
-		swu.course = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 3./3600);
+		swu.course = sigproc::interpolate<TFloat>( xi, 3600/_p.pagesize(), tmp, 3./3600);
 	} else
 		swu.course = tmp;
 }
@@ -277,7 +278,8 @@ get_mc_course()
 		auto xi = vector<size_t> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
 			xi[i] = i;
-		mc.course = sigproc::interpolate( xi, 3600/_p.pagesize(), tmp, 3./3600);
+		mc.course = sigproc::interpolate<TFloat>(
+			xi, 3600/_p.pagesize(), tmp, 3./3600);
 	} else
 		mc.course = tmp;
 }

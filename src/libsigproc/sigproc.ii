@@ -59,9 +59,46 @@ derivative( const valarray<T>& a)
 	valarray<T> out (a.size());
 	for ( size_t i = 1; i < a.size(); ++i )
 		out[i-1] = a[i] - a[i-1];
-	return out;
+	return move( out);
 }
 
+
+
+
+
+
+template <typename T, class Container>
+valarray<T>
+interpolate( const vector<unsigned long>& xi,
+	     unsigned samplerate, const Container& y, double dt)
+{
+	size_t i;
+	valarray<double>
+		x_known (xi.size()),
+		y_known (xi.size());
+	for ( i = 0; i < xi.size(); ++i ) {
+		x_known[i] = (double)xi[i] / samplerate;
+		y_known[i] = y[ xi[i] ];
+	}
+
+	gsl_spline *spline = gsl_spline_alloc( gsl_interp_akima, xi.size());
+	gsl_interp_accel *acc = gsl_interp_accel_alloc();
+
+	gsl_spline_init( spline, &x_known[0], &y_known[0], xi.size());
+
+	double	t;
+	size_t	pad = (1./samplerate / dt) // this I understand
+			/ 2;                // this, I don't
+	valarray<T>
+		out (ceilf((x_known[x_known.size()-1] - x_known[0] + 1./samplerate) / dt) + 1);
+	for ( i = pad, t = x_known[0]; t < x_known[x_known.size()-1]; ++i, t += dt )
+		out[i] = gsl_spline_eval( spline, t, acc);
+
+	gsl_interp_accel_free( acc);
+	gsl_spline_free( spline);
+
+	return move( out);
+}
 
 
 
@@ -114,9 +151,9 @@ envelope( const SSignalRef<T>& in,
 
 	if ( mini.size() > 5 && maxi.size() > 5 ) {
 		if ( env_lp )
-			*env_lp = interpolate( mini, in.samplerate, in.signal, dt_);
+			*env_lp = interpolate<T>( mini, in.samplerate, in.signal, dt_);
 		if ( env_up )
-			*env_up = interpolate( maxi, in.samplerate, in.signal, dt_);
+			*env_up = interpolate<T>( maxi, in.samplerate, in.signal, dt_);
 		if ( mini_p )
 			*mini_p = mini;
 		if ( maxi_p )
@@ -191,7 +228,7 @@ dzcdf( const SSignalRef<T>& in,
 		}
 		I = J;
 	}
-	return interpolate( xi, in.samplerate, y, 1./in.samplerate);
+	return move( interpolate<T>( xi, in.samplerate, y, 1./in.samplerate));
 }
 
 
