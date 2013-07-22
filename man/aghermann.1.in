@@ -8,7 +8,7 @@
 
 .SH DESCRIPTION
 .PP
-\fBAghermann\fR is GTK+ program designed to run Process S simulations
+\fBAghermann\fR is a GTK+ program designed to run Process S simulations
 on Slow-Wave Activity profiles from EEG recordings as outlined in
 Achermann et al (1993).  In this capacity, \fBAghermann\fR produces a
 set of sleep homeostat parameters which can be used to describe and
