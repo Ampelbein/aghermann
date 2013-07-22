@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 9), dh-autoreconf, hardening-wrapper, hardening-inc
 Standards-Version: 3.9.4
 Homepage: http://johnhommer.com/academic/code/aghermann
 Vcs-Git: git://git.debian.org/git/debian-med/aghermann.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=debian-med/aghermann.git;a=summary
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=debian-med/aghermann.git
 
 Package: aghermann
 Architecture: any
