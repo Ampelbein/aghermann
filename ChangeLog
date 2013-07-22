@@ -1,4 +1,4 @@
-v.0.9.1 (2013-xx-xx)
+v.0.9.1 (2013-07-23)
 	* Reorg source tree around main executable, libs, & tools.
 	* Properly use our own lib*.so (previously aghermann turned out
 	  static despite libsigfile.so being installed).

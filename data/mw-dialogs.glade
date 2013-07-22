@@ -328,7 +328,7 @@
                     <property name="xalign">0</property>
                     <property name="xpad">5</property>
                     <property name="ypad">15</property>
-                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.9.1 &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;
+                    <property name="label">&lt;b&gt;&lt;big&gt;&lt;big&gt;Aghermann 0.9.1 &lt;/big&gt;&lt;/big&gt;&lt;/b&gt;Larry
 &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;johnhommer.com/academic/code/aghermann&lt;/a&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -424,7 +424,23 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
                             <property name="yalign">0</property>
                             <property name="xpad">10</property>
                             <property name="ypad">10</property>
-                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.9.0.4&lt;/b&gt;&lt;/big&gt; (2013-05-18)
+                            <property name="label">&lt;big&gt;&lt;b&gt;v. 0.9.1&lt;/b&gt;&lt;/big&gt; (2013-07-23)
+&lt;span font="monospace"&gt;
+	* Reorg source tree around main executable, libs, and tools.
+	* Properly use our own lib*.so (previously aghermann turned out
+	  static despite libsigfile.so being installed).
+	* Plug a memory leak after early unique_ptr acquisition.
+	* SF: Move selection on montage (with Alt).
+	* SF: Artifact Detection dialog will now not get confused after
+	  clicking outside it on other channels.
+	* New tool agh-profile-gen, a standalone profile generator.
+	* ascii (tsv) format support, including irregular, timestamped
+	  time series data.
+	* Score assistant now uses delta and theta ranges as defined by
+	  user.
+	* MW: Change pixels-per-hour with Shift+Scroll.
+&lt;/span&gt;
+&lt;big&gt;&lt;b&gt;v. 0.9.0.4&lt;/b&gt;&lt;/big&gt; (2013-05-18)
 &lt;span font="monospace"&gt;
 	* Remove stray AC_CHECK_FUNC(mremap).
 &lt;/span&gt;
@@ -457,15 +473,6 @@ With bug reports, either send yours to &lt;a href="mailto:aghermann-users@lists.
 	  settings tab.
 	* Bind F1..3 to cycle thru profile, session and channel on
 	  measurements overview.
-&lt;/span&gt;
-&lt;big&gt;&lt;b&gt;v. 0.8.2&lt;/b&gt;&lt;/big&gt; (2013-04-07)
-&lt;span font="monospace"&gt;
-	* Fix GtkScrolledWindow issue in Annotations dialog.
-	* Fix those random omp-related freezes on tree rescan.
-	* Make main window busy if profile regeneration
-	  needs to happen.
-	* URL fix for SWU page on jh.com/aghermann.
-	* Enable subject sort.
 &lt;/span&gt;
 
 (for older entries, see &lt;a href="http://johnhommer.com/academic/code/aghermann"&gt;full changelog&lt;/a&gt;)</property>
