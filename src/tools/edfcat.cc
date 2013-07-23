@@ -229,7 +229,7 @@ preprocess( const valarray<TFloat>& x_, size_t samplerate,
 	valarray<TFloat>
 		x = x_ - x_.sum()/x_.size(); // zeromean
 
-	vector<size_t>
+	vector<unsigned long>
 		mini, maxi;
 	sigproc::envelope(
 		{x, samplerate}, samplerate/4, .25,
