@@ -213,7 +213,7 @@ get_psd_course()
 	auto tmp = crecording.course(
 		agh::make_profile_paramset<metrics::TType::psd>( psd.from, psd.upto));
 	if ( resample_power ) {
-		auto xi = vector<size_t> (tmp.size());
+		auto xi = vector<unsigned long> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
 			xi[i] = i;
 		psd.course = sigproc::interpolate<TFloat>( xi, 3600/_p.pagesize(), tmp, 3./3600);
@@ -227,7 +227,7 @@ get_psd_in_bands()
 {
 	crecording.psd_profile.compute();
 	if ( resample_power ) {
-		auto xi = vector<size_t> (crecording.psd_profile.steps());
+		auto xi = vector<unsigned long> (crecording.psd_profile.steps());
 		for ( size_t i = 0; i < xi.size(); ++i )
 			xi[i] = i;
 		for ( size_t b = 0; b <= psd.uppermost_band; ++b ) {
@@ -258,7 +258,7 @@ get_swu_course()
 	auto tmp = crecording.course(
 		agh::make_profile_paramset<metrics::TType::swu>( swu.f0));
 	if ( resample_power ) {
-		auto xi = vector<size_t> (tmp.size());
+		auto xi = vector<unsigned long> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
 			xi[i] = i;
 		swu.course = sigproc::interpolate<TFloat>( xi, 3600/_p.pagesize(), tmp, 3./3600);
@@ -275,7 +275,7 @@ get_mc_course()
 	auto tmp = crecording.course(
 		agh::make_profile_paramset<metrics::TType::mc>( mc.f0));
 	if ( resample_power ) {
-		auto xi = vector<size_t> (tmp.size());
+		auto xi = vector<unsigned long> (tmp.size());
 		for ( size_t i = 0; i < tmp.size(); ++i )
 			xi[i] = i;
 		mc.course = sigproc::interpolate<TFloat>(
