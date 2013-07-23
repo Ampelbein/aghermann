@@ -101,8 +101,8 @@ envelope( const SSignalRef<T>& in,
 	  double dt,
 	  valarray<T>* env_lp = nullptr,  // return interpolated
 	  valarray<T>* env_up = nullptr,  // return vector of points
-	  vector<size_t> *mini_p = nullptr,
-	  vector<size_t> *maxi_p = nullptr);
+	  vector<unsigned long> *mini_p = nullptr,
+	  vector<unsigned long> *maxi_p = nullptr);
 
 template <typename T>
 valarray<T>
