@@ -131,10 +131,18 @@ daSubjectTimeline_scroll_event_cb(
 
 	if ( event->state & GDK_SHIFT_MASK ) {
 		switch ( event->direction ) {
-		case GDK_SCROLL_UP:   --ED.tl_pph; break;
-		case GDK_SCROLL_DOWN: ++ED.tl_pph; break;
+		case GDK_SCROLL_UP:   if ( ED.tl_pph > 3 ) --ED.tl_pph; break;
+		case GDK_SCROLL_DOWN:                      ++ED.tl_pph; break;
 		default: break;
 		}
+		ED.tl_width = (ED.timeline_end - ED.timeline_start) / 3600 * ED.tl_pph;
+		for ( auto &G : ED.groups )
+			for ( auto &J : G )
+				g_object_set(
+					(GObject*)J.da,
+					"width-request", ED.tl_width + ED.tl_left_margin + ED.tl_right_margin,
+					NULL);
+
 		gtk_widget_queue_draw( (GtkWidget*)ED.cMeasurements);
 		return TRUE;
 
