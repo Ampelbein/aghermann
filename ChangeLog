@@ -1,3 +1,6 @@
+v.0.9.1.1 (2013-07-24)
+	* Fix 32-bit builds where sizeof(size_t) != sizeof(unsigned long).
+	* MW: take care to recalculate profile drawing area width on Shift+Scroll.
 v.0.9.1 (2013-07-23)
 	* Reorg source tree around main executable, libs, & tools.
 	* Properly use our own lib*.so (previously aghermann turned out
