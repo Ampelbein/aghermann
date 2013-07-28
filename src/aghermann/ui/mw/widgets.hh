@@ -260,6 +260,8 @@ struct SExpDesignUIWidgets {
 	// edf header
 	GtkDialog
 		*wEDFFileDetails;
+	GtkLabel
+		*lEDFFileDetails;
 	GtkTextView
 		*lEDFFileDetailsReport;
 	GtkTextBuffer

@@ -222,9 +222,12 @@ iSubjectTimelineEDFInfo_activate_cb(
 	gtk_text_buffer_set_text(
 		ED.tEDFFileDetailsReport,
 		F().details( 0|sigfile::CSource::TDetails::with_channels).c_str(), -1);
-	gtk_window_set_title(
-		(GtkWindow*)ED.wEDFFileDetails,
-		snprintf_buf( "%s header", F().filename()));
+	gtk_label_set_markup(
+		ED.lEDFFileDetails,
+		snprintf_buf(
+			"<big>Header of\n"
+			"<i>%s</i></big>",
+			F().filename()));
 	gtk_widget_show_all( (GtkWidget*)ED.wEDFFileDetails);
 }
 

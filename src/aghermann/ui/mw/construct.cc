@@ -546,6 +546,7 @@ SExpDesignUIWidgets ()
 
       // ------- wEDFFileDetails
 	if ( !AGH_GBGETOBJ (GtkDialog,		wEDFFileDetails) ||
+	     !AGH_GBGETOBJ (GtkLabel,		lEDFFileDetails) ||
 	     !AGH_GBGETOBJ (GtkTextView,	lEDFFileDetailsReport) )
 		throw runtime_error ("Failed to construct widgets");
 
