@@ -21,11 +21,11 @@ extern "C" {
 
 void
 cGroupExpander_activate_cb(
-	GtkExpander *w,
+	GtkExpander *wid,
 	const gpointer userdata)
 {
 	auto& G = *(SExpDesignUI::SGroupPresentation*)userdata;
-	G._p.group_unvisibility[G.name()] = gtk_expander_get_expanded(w);
+	G._p.group_unvisibility[G.name()] = gtk_expander_get_expanded(wid);
 }
 
 // individual channel callbacks
@@ -36,8 +36,10 @@ daSubjectTimeline_draw_cb(
 	cairo_t *cr,
 	const gpointer userdata)
 {
-	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
+	const auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
+
 	J.draw_timeline( cr);
+
 	return TRUE;
 }
 
@@ -49,35 +51,43 @@ daSubjectTimeline_motion_notify_event_cb(
 	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
+
 	auto e_before = J.using_episode;
+
 	if ( J.get_episode_from_timeline_click( event->x), J.using_episode != e_before )
 		gtk_widget_queue_draw( wid);
+
 	return TRUE;
 }
 gboolean
 daSubjectTimeline_leave_notify_event_cb(
 	GtkWidget *wid,
-	GdkEventCrossing *event,
+	const GdkEventCrossing *event,
 	const gpointer userdata)
 {
 	if ( event->mode != GDK_CROSSING_NORMAL )
 		return TRUE;
+
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
+
 	J.is_focused = false;
 	J.using_episode = nullptr;
 	gtk_widget_queue_draw( wid);
+
 	return TRUE;
 }
 gboolean
 daSubjectTimeline_enter_notify_event_cb(
 	GtkWidget *wid,
-	GdkEventCrossing *event,
+	const GdkEventCrossing *event,
 	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
+
 	J.is_focused = true;
 	J.get_episode_from_timeline_click( event->x);
 	gtk_widget_queue_draw( wid);
+
 	return TRUE;
 }
 
@@ -85,8 +95,8 @@ daSubjectTimeline_enter_notify_event_cb(
 
 gboolean
 daSubjectTimeline_button_press_event_cb(
-	GtkWidget*,
-	GdkEventButton *event,
+	const GtkWidget*,
+	const GdkEventButton *event,
 	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
@@ -122,8 +132,8 @@ daSubjectTimeline_button_press_event_cb(
 
 gboolean
 daSubjectTimeline_scroll_event_cb(
-	GtkWidget*,
-	GdkEventScroll *event,
+	const GtkWidget*,
+	const GdkEventScroll *event,
 	const gpointer userdata)
 {
 	auto& J = *(SExpDesignUI::SSubjectPresentation*)userdata;
@@ -135,6 +145,7 @@ daSubjectTimeline_scroll_event_cb(
 		case GDK_SCROLL_DOWN:                      ++ED.tl_pph; break;
 		default: break;
 		}
+
 		ED.tl_width = (ED.timeline_end - ED.timeline_start) / 3600 * ED.tl_pph;
 		for ( auto &G : ED.groups )
 			for ( auto &J : G )
@@ -161,11 +172,11 @@ daSubjectTimeline_scroll_event_cb(
 // context cMeasurements menus
 void
 iiSubjectTimeline_show_cb(
-	GtkWidget*,
+	const GtkWidget*,
 	const gpointer userdata)
 {
-	auto& ED = *(SExpDesignUI*)userdata;
-	auto J = ED.using_subject;
+	const auto& ED = *(SExpDesignUI*)userdata;
+	const auto J = ED.using_subject;
 	gtk_widget_set_sensitive(
 		(GtkWidget*)ED.iSubjectTimelineScore,
 		J->is_episode_focused());
@@ -258,8 +269,8 @@ iSubjectTimelineResetMontage_activate_cb(
 	GtkMenuItem*,
 	const gpointer userdata)
 {
-	auto& ED = *(SExpDesignUI*)userdata;
-	auto J = ED.using_subject;
+	const auto& ED = *(SExpDesignUI*)userdata;
+	const auto J = ED.using_subject;
 
 	if ( not J->is_episode_focused() )
 		snprintf_buf(
