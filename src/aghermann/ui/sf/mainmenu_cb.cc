@@ -185,7 +185,8 @@ iSFMontageScoreImport_activate_cb(
 	gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	
+
+	SF.do_dialog_import_hypnogram();
 }
 
 void
@@ -194,7 +195,8 @@ iSFMontageScoreExport_activate_cb(
 	const gpointer userdata)
 {
 	const auto& SF = *(SScoringFacility*)userdata;
-	
+
+	SF.do_dialog_export_hypnogram();
 }
 
 void
@@ -203,8 +205,11 @@ iSFMontageScoreClear_activate_cb(
 	gpointer userdata)
 {
 	auto& SF = *(SScoringFacility*)userdata;
-	
+
+	SF.do_clear_hypnogram();
 }
+
+
 
 
 

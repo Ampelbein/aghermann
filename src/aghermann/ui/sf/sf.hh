@@ -497,8 +497,10 @@ class SScoringFacility
   // main montage menu
     public:
 	void update_main_menu_items();
+	void do_dialog_import_hypnogram();
+	void do_dialog_export_hypnogram() const;
+	void do_clear_hypnogram();
 
-    public:
 	void do_score_forward( char score_ch);
 	void do_score_back( char score_ch);
 

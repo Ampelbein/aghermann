@@ -10,7 +10,7 @@
  */
 
 
-
+#include <fstream>
 
 #include <cairo/cairo.h>
 
@@ -115,6 +115,88 @@ draw_hypnogram( cairo_t *cr)
 
       // hour ticks
 	_draw_hour_ticks( cr, 0, HypnogramHeight);
+}
+
+
+
+
+
+
+
+void
+aghui::SScoringFacility::
+do_dialog_import_hypnogram()
+{
+	GtkWidget *f_chooser =
+		gtk_file_chooser_dialog_new(
+			"Import Scores",
+			NULL,
+			GTK_FILE_CHOOSER_ACTION_OPEN,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+			NULL);
+	if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
+		gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
+		// count lines first
+		ifstream f (fname);
+		string t;
+		size_t c = 0;
+		while ( not getline(f, t).eof() )
+			++c;
+		size_t our_pages = sepisode().sources.front().pages();
+		if ( c != our_pages && // allow for last page scored but discarded in CHypnogram as incomplete
+		     c != our_pages+1 )
+			pop_ok_message(
+				wSF,
+				"Page count in current hypnogram (%zu,"
+				" even allowing for one incomplete extra) is not equal"
+				" to the number of lines in <i>%s</i> (%zu).\n\n"
+				"Please trim the file contents and try again.",
+				fname, c, our_pages);
+		else {
+			for ( auto &F : sepisode().sources )
+				F.load_canonical( fname, _p.ext_score_codes);
+			get_hypnogram();
+			calculate_scored_percent();
+			queue_redraw_all();
+		}
+	}
+	gtk_widget_destroy( f_chooser);
+}
+
+
+void
+aghui::SScoringFacility::
+do_dialog_export_hypnogram() const
+{
+	GtkWidget *f_chooser =
+		gtk_file_chooser_dialog_new(
+			"Export Scores",
+			NULL,
+			GTK_FILE_CHOOSER_ACTION_SAVE,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+			NULL);
+	if ( gtk_dialog_run( (GtkDialog*)f_chooser) == GTK_RESPONSE_ACCEPT ) {
+		gchar *fname = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
+		// put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources // do this elsewhere
+		sepisode().sources.front().save_canonical( fname);
+	}
+	gtk_widget_destroy( f_chooser);
+}
+
+
+
+void
+aghui::SScoringFacility::
+do_clear_hypnogram()
+{
+	hypnogram.assign(
+		hypnogram.size(),
+		sigfile::SPage::score_code( sigfile::SPage::TScore::none));
+	put_hypnogram();  // side-effect being, implicit flash of SScoringFacility::sepisode.sources
+	calculate_scored_percent();
+	queue_redraw_all();
 }
 
 
