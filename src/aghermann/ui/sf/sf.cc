@@ -9,6 +9,7 @@
  *         License:  GPL
  */
 
+#include <forward_list>
 #include <stdexcept>
 
 #include "common/config-validate.hh"
@@ -804,34 +805,34 @@ update_main_menu_items()
 		all_draw_filtered[2] = {true, true},
 		all_draw_fast    [2] = {true, true},
 		all_draw_zeroline[2] = {true, true};
-	for ( const auto& H : channels ) {
-		all_draw_original[0]  = all_draw_original[0] && H.draw_original_signal,
-		all_draw_filtered[0]  = all_draw_filtered[0] && H.draw_filtered_signal,
-		all_draw_fast    [0]  = all_draw_fast    [0] && H.resample_signal,
-		all_draw_zeroline[0]  = all_draw_zeroline[0] && H.draw_zeroline;
 
-		all_draw_original[1]  = all_draw_original[1] && !H.draw_original_signal,
-		all_draw_filtered[1]  = all_draw_filtered[1] && !H.draw_filtered_signal,
-		all_draw_fast    [1]  = all_draw_fast    [1] && !H.resample_signal,
-		all_draw_zeroline[1]  = all_draw_zeroline[1] && !H.draw_zeroline;
+	for ( const auto& H : channels ) {
+		all_draw_original[0] = all_draw_original[0] &&  H.draw_original_signal,
+		all_draw_filtered[0] = all_draw_filtered[0] &&  H.draw_filtered_signal,
+		all_draw_fast    [0] = all_draw_fast    [0] &&  H.resample_signal,
+		all_draw_zeroline[0] = all_draw_zeroline[0] &&  H.draw_zeroline;
+
+		all_draw_original[1] = all_draw_original[1] && !H.draw_original_signal,
+		all_draw_filtered[1] = all_draw_filtered[1] && !H.draw_filtered_signal,
+		all_draw_fast    [1] = all_draw_fast    [1] && !H.resample_signal,
+		all_draw_zeroline[1] = all_draw_zeroline[1] && !H.draw_zeroline;
 	}
 
 	suppress_redraw = true;
 
-#define KEKE(A,B)						\
-	if ( A[0] )						\
-		gtk_check_menu_item_set_active( B, TRUE);	\
-	else if ( A[1] )					\
-		gtk_check_menu_item_set_active( B, FALSE);	\
-	else							\
-		gtk_check_menu_item_set_inconsistent( B, TRUE);
+	for ( auto& A : forward_list<pair<bool*, GtkCheckMenuItem*>>
+		      ({{all_draw_original, iSFMontageDrawOriginalSignal},
+			{all_draw_filtered, iSFMontageDrawProcessedSignal},
+			{all_draw_fast,     iSFMontageDrawFast},
+			{all_draw_zeroline, iSFMontageDrawZeroLine}}) ) {
 
-	KEKE (all_draw_original, iSFMontageDrawOriginalSignal);
-	KEKE (all_draw_filtered, iSFMontageDrawProcessedSignal);
-	KEKE (all_draw_fast,     iSFMontageDrawFast);
-	KEKE (all_draw_zeroline, iSFMontageDrawZeroLine);
+		if ( A.first[0] )
+			gtk_check_menu_item_set_active( A.second, TRUE);
+		else if ( A.first[1] )
+			gtk_check_menu_item_set_active( A.second, FALSE);
 
-#undef KEKE
+		gtk_check_menu_item_set_inconsistent( A.second, not (A.first[0] xor A.first[1]));
+	}
 
 	suppress_redraw = false;
 }

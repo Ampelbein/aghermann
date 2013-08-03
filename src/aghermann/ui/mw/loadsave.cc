@@ -27,7 +27,8 @@ forward_list<pair<const char*, aghui::SExpDesignUI::TColour>>
 saving_colors()
 {
 	using namespace aghui;
-	return forward_list<pair<const char*, SExpDesignUI::TColour>>
+	return move(
+		forward_list<pair<const char*, SExpDesignUI::TColour>>
 		({
 			{"MWNight",	SExpDesignUI::TColour::mw_night	   },
 			{"MWDay",	SExpDesignUI::TColour::mw_day	   },
@@ -73,7 +74,7 @@ saving_colors()
 			{"MFPaper",	SExpDesignUI::TColour::mf_paper      },
 			{"MFTicks",	SExpDesignUI::TColour::mf_ticks      },
 			{"MFLabels",	SExpDesignUI::TColour::mf_labels     }
-		});
+		}));
 }
 } // namespace
 
