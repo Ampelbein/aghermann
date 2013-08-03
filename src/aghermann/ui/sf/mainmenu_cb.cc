@@ -92,6 +92,8 @@ iSFMontageDrawFast_toggled_cb(
 		H.resample_signal = indeed;
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+
+	SF.update_main_menu_items();
 }
 
 
@@ -110,6 +112,8 @@ iSFMontageDrawZeroLine_toggled_cb(
 		H.draw_zeroline = indeed;
 
 	gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
+
+	SF.update_main_menu_items();
 }
 
 
