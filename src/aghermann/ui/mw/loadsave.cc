@@ -157,11 +157,8 @@ save_settings()
 {
 	libconfig::Config conf;
 
-	_geometry_placeholder.assign(
-		to_string( geometry.w) + 'x'
-		+ to_string( geometry.h) + '+'
-		+ to_string( geometry.x) + '+'
-		+ to_string( geometry.y));
+	_geometry_placeholder = agh::str::sasprintf(
+		"%dx%d+%d+%d", geometry.w, geometry.h, geometry.x, geometry.y);
 	_aghtt_placeholder = AghT();
 	_aghdd_placeholder = AghD();
 
