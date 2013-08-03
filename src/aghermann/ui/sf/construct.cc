@@ -50,12 +50,27 @@ SScoringFacilityWidgets ()
 	     !AGH_GBGETOBJ (GtkButton,		bSFGotoNextUnscored) ||
 	     !AGH_GBGETOBJ (GtkButton,		bSFGotoPrevArtifact) ||
 	     !AGH_GBGETOBJ (GtkButton,		bSFGotoNextArtifact) ||
+	     !AGH_GBGETOBJ (GtkToggleButton,	bSFDrawCrosshair) )
+		throw runtime_error ("Failed to construct SF widgets (0)");
 
-	     !AGH_GBGETOBJ (GtkToggleButton,	bSFShowFindDialog) ||
-	     !AGH_GBGETOBJ (GtkToggleButton,	bSFShowPhaseDiffDialog) ||
-	     !AGH_GBGETOBJ (GtkToggleButton,	bSFDrawCrosshair) ||
-	     !AGH_GBGETOBJ (GtkButton,		bSFRunICA) )
+	if ( !AGH_GBGETOBJ (GtkMenuItem,	iSFMontageMenu) ||
+	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iSFMontageDrawOriginalSignal) ||
+	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iSFMontageDrawProcessedSignal) ||
+	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iSFMontageDrawZeroLine) ||
+	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iSFMontageDrawFast) ||
+//	     !AGH_GBGETOBJ (GtkCheckMenuItem,	iSFMontageDraw) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontagePatterns) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontageICA) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontagePhaseDiff) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontageScoreAssist) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontageScoreImport) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontageScoreExport) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontageScoreClear) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontageClose) ||
+	     !AGH_GBGETOBJ (GtkMenuItem,	iSFMontageCloseAndNext) )
 		throw runtime_error ("Failed to construct SF widgets (1)");
+
+	G_CONNECT_1 (iSFMontageMenu, activate);
 
 	G_CONNECT_2 (wSF, delete, event);
 	G_CONNECT_3 (wSF, key, press, event);
@@ -77,9 +92,20 @@ SScoringFacilityWidgets ()
 	G_CONNECT_1 (bSFGotoPrevArtifact, clicked);
 
 	G_CONNECT_1 (bSFDrawCrosshair, toggled);
-	G_CONNECT_1 (bSFShowFindDialog, toggled);
-	G_CONNECT_1 (bSFShowPhaseDiffDialog, toggled);
-	G_CONNECT_1 (bSFRunICA, clicked);
+
+	G_CONNECT_1 (iSFMontageDrawOriginalSignal, toggled);
+	G_CONNECT_1 (iSFMontageDrawProcessedSignal, toggled);
+	G_CONNECT_1 (iSFMontageDrawFast, toggled);
+	G_CONNECT_1 (iSFMontageDrawZeroLine, toggled);
+	G_CONNECT_1 (iSFMontagePatterns, activate);
+	G_CONNECT_1 (iSFMontagePhaseDiff, activate);
+	G_CONNECT_1 (iSFMontageICA, activate);
+	G_CONNECT_1 (iSFMontageScoreAssist, activate);
+	G_CONNECT_1 (iSFMontageScoreImport, activate);
+	G_CONNECT_1 (iSFMontageScoreExport, activate);
+	G_CONNECT_1 (iSFMontageScoreClear, activate);
+	G_CONNECT_1 (iSFMontageClose, activate);
+	G_CONNECT_1 (iSFMontageCloseAndNext, activate);
 
 	if ( !(AGH_GBGETOBJ (GtkButton,		bSFScoreClear)) ||
 	     !(AGH_GBGETOBJ (GtkButton,		bSFScoreNREM1)) ||
@@ -105,9 +131,6 @@ SScoringFacilityWidgets ()
 
 	if ( !(AGH_GBGETOBJ (GtkDrawingArea,	daSFMontage)) ||
 	     !(AGH_GBGETOBJ (GtkDrawingArea,	daSFHypnogram)) ||
-	     !(AGH_GBGETOBJ (GtkMenuToolButton,	bSFAccept)) ||
-	     !(AGH_GBGETOBJ (GtkMenu,		iiSFAccept)) ||
-	     !(AGH_GBGETOBJ (GtkMenuItem,	iSFAcceptAndTakeNext)) ||
 	     !(AGH_GBGETOBJ (GtkStatusbar,	sbSF)) )
 		throw runtime_error ("Failed to construct SF widgets (3)");
 
@@ -125,11 +148,6 @@ SScoringFacilityWidgets ()
 	G_CONNECT_3 (daSFHypnogram, button, press, event);
 	G_CONNECT_3 (daSFHypnogram, button, release, event);
 	G_CONNECT_3 (daSFHypnogram, motion, notify, event);
-
-	gtk_menu_tool_button_set_menu( bSFAccept, (GtkWidget*)iiSFAccept);
-
-	G_CONNECT_1 (bSFAccept, clicked);
-	G_CONNECT_1 (iSFAcceptAndTakeNext, activate);
 
 	// ICA
 	if ( !(AGH_GBGETOBJ (GtkComboBox,	eSFICARemixMode)) ||

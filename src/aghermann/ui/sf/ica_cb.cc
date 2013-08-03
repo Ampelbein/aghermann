@@ -19,29 +19,6 @@ using namespace aghui;
 
 extern "C" {
 
-void
-bSFRunICA_clicked_cb(
-	GtkButton*,
-	gpointer userdata)
-{
-	auto& SF = *(SScoringFacility*)userdata;
-	if ( SF.setup_ica() == 0 ) {
-		SF.mode = SScoringFacility::TMode::showing_ics;
-		gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, FALSE);
-		gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, TRUE);
-
-		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICATry, TRUE);
-		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAShowMatrix, FALSE);
-		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAPreview, FALSE);
-		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFICAApply, FALSE);
-
-		gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, FALSE);
-		SF.set_tooltip( SScoringFacility::TTipIdx::ica_mode);
-		SF.queue_redraw_all();
-	}
-}
-
-
 
 void
 eSFICANonlinearity_changed_cb(
@@ -303,7 +280,8 @@ bSFICAApply_clicked_cb(
 	SF.mode = SScoringFacility::TMode::scoring;
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, FALSE);
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.iSFMontageClose, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.iSFMontageCloseAndNext, TRUE);
 	SF.set_tooltip( SScoringFacility::TTipIdx::scoring_mode);
 
 	SF.queue_redraw_all();
@@ -324,7 +302,8 @@ bSFICACancel_clicked_cb(
 	SF.mode = SScoringFacility::TMode::scoring;
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFScoringModeContainer, TRUE);
 	gtk_widget_set_visible( (GtkWidget*)SF.cSFICAModeContainer, FALSE);
-	gtk_widget_set_sensitive( (GtkWidget*)SF.bSFAccept, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.iSFMontageClose, TRUE);
+	gtk_widget_set_sensitive( (GtkWidget*)SF.iSFMontageCloseAndNext, TRUE);
 	SF.set_tooltip( SScoringFacility::TTipIdx::scoring_mode);
 
 	SF.queue_redraw_all();

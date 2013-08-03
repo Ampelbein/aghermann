@@ -490,8 +490,6 @@ wSFFD_hide_cb(
 			SF.queue_redraw_all();
 		}
 	}
-
-	gtk_toggle_button_set_active( (GtkToggleButton*)FD.field_channel->_p.bSFShowFindDialog, FALSE);
 }
 
 

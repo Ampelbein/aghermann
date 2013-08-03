@@ -47,10 +47,21 @@ void bSFGotoNextUnscored_clicked_cb( GtkButton*, gpointer);
 void bSFGotoPrevArtifact_clicked_cb( GtkButton*, gpointer);
 void bSFGotoNextArtifact_clicked_cb( GtkButton*, gpointer);
 void bSFDrawCrosshair_toggled_cb( GtkToggleButton*, gpointer);
-void bSFShowFindDialog_toggled_cb( GtkToggleButton*, gpointer);
-void bSFShowPhaseDiffDialog_toggled_cb( GtkToggleButton*, gpointer);
-void bSFRunICA_clicked_cb( GtkButton*, gpointer);
-//void bSFResetMontage_clicked_cb( GtkButton*, gpointer);
+
+void iSFMontageMenu_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontageDrawOriginalSignal_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFMontageDrawProcessedSignal_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFMontageDrawFast_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFMontageDrawZeroLine_toggled_cb( GtkCheckMenuItem*, gpointer);
+void iSFMontagePatterns_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontagePhaseDiff_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontageICA_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontageScoreAssist_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontageScoreImport_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontageScoreExport_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontageScoreClear_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontageClose_activate_cb( GtkMenuItem*, gpointer);
+void iSFMontageCloseAndNext_activate_cb( GtkMenuItem*, gpointer);
 
 
 void eSFICARemixMode_changed_cb( GtkComboBox*, gpointer);
@@ -74,9 +85,6 @@ void wSFICAMatrix_hide_cb( GtkWidget*, gpointer);
 void bSFICAApply_clicked_cb( GtkButton*, gpointer);
 void bSFICACancel_clicked_cb( GtkButton*, gpointer);
 
-
-void bSFAccept_clicked_cb( GtkToolButton*, gpointer);
-void iSFAcceptAndTakeNext_activate_cb( GtkMenuItem*, gpointer);
 
 void iSFPageShowOriginal_toggled_cb( GtkCheckMenuItem*, gpointer);
 void iSFPageShowProcessed_toggled_cb( GtkCheckMenuItem*, gpointer);

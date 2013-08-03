@@ -244,6 +244,7 @@ class SScoringFacility
 		forward_list<agh::confval::SValidator<bool>>	config_keys_b;
 		forward_list<agh::confval::SValidator<int>>	config_keys_d;
 		forward_list<agh::confval::SValidator<double>>	config_keys_g;
+
 		void update_channel_menu_items( double x);
 		void update_power_menu_items();
 		void selectively_enable_selection_menu_items();
@@ -349,7 +350,7 @@ class SScoringFacility
 	bool	suppress_redraw:1,
 		hypnogram_button_down:1,
 		artifacts_dialog_shown:1;
-	enum TMode {
+	enum class TMode {
 		scoring,
 		marking,
 		shuffling_channels,
@@ -469,16 +470,18 @@ class SScoringFacility
 	float	zeroy_before_shuffling;
 	float	moving_selection_handle_offset;
 
+  // montage
+  // load/save/reset
     public:
-      // montage
-	// load/save/reset
 	forward_list<agh::confval::SValidator<bool>>	config_keys_b;
 	forward_list<agh::confval::SValidator<int>>	config_keys_d;
 	forward_list<agh::confval::SValidator<float>>	config_keys_g;
 	void load_montage();
 	void save_montage(); // using libconfig
 	void reset_montage();
-	// draw
+
+  // draw
+    public:
 	void draw_montage( cairo_t*);
 	void draw_montage( const string& fname); // to a file (uses da_wd and da_ht
     private:
@@ -491,6 +494,11 @@ class SScoringFacility
 	void draw_current_pos( double) const;
 	void queue_redraw_all() const;
 
+  // main montage menu
+    public:
+	void update_main_menu_items();
+
+    public:
 	void do_score_forward( char score_ch);
 	void do_score_back( char score_ch);
 

@@ -191,9 +191,9 @@ wSFPD_hide_cb(
 	GtkWidget *wid,
 	const gpointer userdata)
 {
-	auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
+	// auto& PD = *(SScoringFacility::SPhasediffDialog*)userdata;
 
-	gtk_toggle_button_set_active( PD._p.bSFShowPhaseDiffDialog, FALSE);
+	
 }
 
 } // extern "C"

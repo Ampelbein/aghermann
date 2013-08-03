@@ -10,18 +10,20 @@ noinst_LIBRARIES := liba.a
 liba_a_SOURCES := \
 	channel.cc \
 	construct.cc \
+	controls_cb.cc \
 	hypnogram.cc \
 	hypnogram_cb.cc \
 	ica.cc \
 	ica_cb.cc \
-	montage.cc \
+	mainmenu_cb.cc \
 	montage-overlays.cc \
+	montage.cc \
 	montage_cb.cc \
-	widgets.hh \
 	sf.cc \
 	sf.hh \
-	sf_cb.hh \
 	sf_cb.cc \
+	sf_cb.hh \
+	widgets.hh \
 	d/artifacts.hh \
 	d/artifacts.cc \
 	d/artifacts-construct.cc \

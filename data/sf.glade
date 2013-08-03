@@ -80,7 +80,7 @@
       <object class="GtkMenuItem" id="iSFPageView">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">_View</property>
+        <property name="label" translatable="yes">_Draw</property>
         <property name="use_underline">True</property>
         <child type="submenu">
           <object class="GtkMenu" id="menu1">
@@ -107,8 +107,8 @@
               <object class="GtkCheckMenuItem" id="iSFPageUseResample">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Downsample signal</property>
-                <property name="label" translatable="yes">Fast dra_w</property>
+                <property name="tooltip_text" translatable="yes">Decimate to fit one sample per horizontal pixel</property>
+                <property name="label" translatable="yes">_Downsample</property>
                 <property name="use_underline">True</property>
                 <property name="active">True</property>
               </object>
@@ -159,79 +159,74 @@
                 </child>
               </object>
             </child>
-            <child>
-              <object class="GtkSeparatorMenuItem" id="menuitem2">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="iSFPageUseThisScale">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Use current display scale for all other channels</property>
-                <property name="label" translatable="yes">_Set scale to current</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="iSFPageLocateSelection">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Locate selection</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
           </object>
         </child>
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="iSFPageFilter">
+      <object class="GtkMenuItem" id="iSFPageUseThisScale">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="tooltip_text" translatable="yes">Low-pass and high-pass</property>
-        <property name="label" translatable="yes">_Filters...</property>
+        <property name="tooltip_text" translatable="yes">Use current display scale for all other channels</property>
+        <property name="label" translatable="yes">_Set scale to current</property>
         <property name="use_underline">True</property>
       </object>
     </child>
     <child>
-      <object class="GtkSeparatorMenuItem" id="menuitem10">
+      <object class="GtkMenuItem" id="iSFPageLocateSelection">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="label" translatable="yes">_Locate selection</property>
+        <property name="use_underline">True</property>
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="menuitem9">
+      <object class="GtkMenuItem" id="iiSFPageProfiles">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Ar_tifacts</property>
+        <property name="label" translatable="yes">_Profile</property>
         <property name="use_underline">True</property>
         <child type="submenu">
-          <object class="GtkMenu" id="menu3">
+          <object class="GtkMenu" id="menu5">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkMenuItem" id="iSFPageArtifactsDetect">
+              <object class="GtkCheckMenuItem" id="iSFPageDrawPSDProfile">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Detect...</property>
+                <property name="label" translatable="yes">_PSD profile</property>
                 <property name="use_underline">True</property>
               </object>
             </child>
             <child>
-              <object class="GtkMenuItem" id="iSFPageArtifactsMarkFlat">
+              <object class="GtkCheckMenuItem" id="iSFPageDrawPSDSpectrum">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Mark flat regions...</property>
+                <property name="label" translatable="yes">PSD spectr_um</property>
                 <property name="use_underline">True</property>
               </object>
             </child>
             <child>
-              <object class="GtkMenuItem" id="iSFPageArtifactsClear">
+              <object class="GtkCheckMenuItem" id="iSFPageDrawSWUProfile">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Clear all</property>
+                <property name="label" translatable="yes">_SWU profile</property>
+                <property name="use_underline">True</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkCheckMenuItem" id="iSFPageDrawMCProfile">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">µ_Continuity profile</property>
+                <property name="use_underline">True</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkCheckMenuItem" id="iSFPageDrawEMGProfile">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">E_MG profile</property>
                 <property name="use_underline">True</property>
               </object>
             </child>
@@ -243,7 +238,7 @@
       <object class="GtkMenuItem" id="iiSFPageAnnotation">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">_Annotations</property>
+        <property name="label" translatable="yes">A_nnotations</property>
         <property name="use_underline">True</property>
         <child type="submenu">
           <object class="GtkMenu" id="menu2">
@@ -306,6 +301,59 @@
       </object>
     </child>
     <child>
+      <object class="GtkSeparatorMenuItem" id="menuitem2">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="iSFPageFilter">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="tooltip_text" translatable="yes">Low-pass and high-pass</property>
+        <property name="label" translatable="yes">_Filters...</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="menuitem9">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">_Artifacts</property>
+        <property name="use_underline">True</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="menu3">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkMenuItem" id="iSFPageArtifactsDetect">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_Detect...</property>
+                <property name="use_underline">True</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="iSFPageArtifactsMarkFlat">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_Mark flat regions...</property>
+                <property name="use_underline">True</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="iSFPageArtifactsClear">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_Clear all</property>
+                <property name="use_underline">True</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
       <object class="GtkSeparatorMenuItem" id="menuitem3">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
@@ -349,7 +397,7 @@
               <object class="GtkMenuItem" id="iSFPageExportSignal">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_Export signal</property>
+                <property name="label" translatable="yes">_Export signal...</property>
                 <property name="use_underline">True</property>
               </object>
             </child>
@@ -357,7 +405,7 @@
               <object class="GtkMenuItem" id="iSFPageSaveChannelAsSVG">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Save cha_nnel as SVG</property>
+                <property name="label" translatable="yes">Save cha_nnel as SVG...</property>
                 <property name="use_underline">True</property>
               </object>
             </child>
@@ -365,7 +413,7 @@
               <object class="GtkMenuItem" id="iSFPageSaveMontageAsSVG">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Save m_ontage as SVG</property>
+                <property name="label" translatable="yes">Save _montage as SVG...</property>
                 <property name="use_underline">True</property>
               </object>
             </child>
@@ -377,60 +425,6 @@
       <object class="GtkSeparatorMenuItem" id="iSFPageProfilesSubmenuSeparator">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="iiSFPageProfiles">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">_Profiles</property>
-        <property name="use_underline">True</property>
-        <child type="submenu">
-          <object class="GtkMenu" id="menu5">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkCheckMenuItem" id="iSFPageDrawPSDProfile">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_PSD profile</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkCheckMenuItem" id="iSFPageDrawPSDSpectrum">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">PSD spectr_um</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkCheckMenuItem" id="iSFPageDrawSWUProfile">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">_SWU profile</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkCheckMenuItem" id="iSFPageDrawMCProfile">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">µ_Continuity profile</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkCheckMenuItem" id="iSFPageDrawEMGProfile">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">E_MG profile</property>
-                <property name="use_underline">True</property>
-              </object>
-            </child>
-          </object>
-        </child>
       </object>
     </child>
   </object>
@@ -839,13 +833,196 @@
             <property name="can_focus">False</property>
             <property name="border_width">2</property>
             <child>
-              <object class="GtkLabel" id="lSFHint">
+              <object class="GtkBox" id="box7">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="valign">center</property>
-                <property name="label" translatable="yes">&lt;i&gt;hint&lt;/i&gt;</property>
-                <property name="use_markup">True</property>
-                <property name="angle">90</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
+                <child>
+                  <object class="GtkMenuBar" id="iiSFMontag">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkMenuItem" id="iSFMontageMenu">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Montage</property>
+                        <property name="use_underline">True</property>
+                        <child type="submenu">
+                          <object class="GtkMenu" id="menu7">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkMenuItem" id="menuitem11">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">_Draw</property>
+                                <property name="use_underline">True</property>
+                                <child type="submenu">
+                                  <object class="GtkMenu" id="menu8">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkCheckMenuItem" id="iSFMontageDrawOriginalSignal">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_Original signal</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckMenuItem" id="iSFMontageDrawProcessedSignal">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_Processed signal</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckMenuItem" id="iSFMontageDrawFast">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="tooltip_text" translatable="yes">Decimate to fit one sample per horizontal pixel</property>
+                                        <property name="label" translatable="yes">_Downsample</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckMenuItem" id="iSFMontageDrawZeroLine">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_Zero line</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSeparatorMenuItem" id="menuitem12">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="iSFMontagePatterns">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">_Patterns...</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="iSFMontageICA">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="tooltip_text" translatable="yes">Independent Component Analysis</property>
+                                <property name="label" translatable="yes">_ICA</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="menuitem13">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">_Score</property>
+                                <property name="use_underline">True</property>
+                                <child type="submenu">
+                                  <object class="GtkMenu" id="menu9">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkMenuItem" id="iSFMontageScoreAssist">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_Assist...</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkMenuItem" id="iSFMontageScoreImport">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_Import...</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkMenuItem" id="iSFMontageScoreExport">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">_Export...</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkMenuItem" id="iSFMontageScoreClear">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">Clear...</property>
+                                        <property name="use_underline">True</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="iSFMontagePhaseDiff">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Phase di_fference...</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSeparatorMenuItem" id="menuitem10">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="iSFMontageClose">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">_Close</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="iSFMontageCloseAndNext">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Close and take _next</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="lSFHint">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="valign">center</property>
+                    <property name="label" translatable="yes">&lt;i&gt;hint&lt;/i&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -855,21 +1032,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkMenuToolButton" id="bSFAccept">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="valign">center</property>
-                <property name="label">Score</property>
-                <property name="use_underline">True</property>
-                <property name="stock_id">gtk-apply</property>
-                <accelerator key="Return" signal="clicked" modifiers="GDK_MOD1_MASK"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="pack_type">end</property>
-                <property name="position">1</property>
-              </packing>
+              <placeholder/>
             </child>
             <child>
               <object class="GtkGrid" id="grid3">
@@ -1062,9 +1225,6 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
                       <object class="GtkTable" id="table2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -1139,11 +1299,60 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">1</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkGrid" id="grid2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="valign">center</property>
+                        <property name="hexpand">True</property>
+                        <property name="row_spacing">2</property>
+                        <child>
+                          <object class="GtkLabel" id="lSFOverChannel">
+                            <property name="can_focus">False</property>
+                            <property name="valign">start</property>
+                            <property name="hexpand">True</property>
+                            <property name="xalign">0</property>
+                            <attributes>
+                              <attribute name="scale" value="0.69999999999999996"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">0</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkStatusbar" id="sbSF">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="valign">end</property>
+                            <property name="hexpand">True</property>
+                            <property name="spacing">2</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">2</property>
+                            <property name="width">1</property>
+                            <property name="height">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                     <child>
                       <object class="GtkButton" id="bSFScoreNREM1">
@@ -1159,7 +1368,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">3</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
@@ -1176,7 +1385,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">5</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
@@ -1193,7 +1402,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">6</property>
+                        <property name="position">4</property>
                       </packing>
                     </child>
                     <child>
@@ -1210,7 +1419,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">7</property>
+                        <property name="position">5</property>
                       </packing>
                     </child>
                     <child>
@@ -1227,24 +1436,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">9</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="bSFScoreClear">
-                        <property name="label" translatable="yes">⌫</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="tooltip_markup" translatable="yes">Clear (&lt;b&gt;q&lt;/b&gt;)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="q" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">10</property>
+                        <property name="position">6</property>
                       </packing>
                     </child>
                     <child>
@@ -1261,7 +1453,24 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">10</property>
+                        <property name="position">7</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="bSFScoreClear">
+                        <property name="label" translatable="yes">⌫</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="tooltip_markup" translatable="yes">Clear (&lt;b&gt;q&lt;/b&gt;)</property>
+                        <property name="valign">center</property>
+                        <property name="focus_on_click">False</property>
+                        <accelerator key="q" signal="activate"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">8</property>
                       </packing>
                     </child>
                     <child>
@@ -1393,7 +1602,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">11</property>
+                        <property name="position">9</property>
                       </packing>
                     </child>
                     <child>
@@ -1405,75 +1614,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">12</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkGrid" id="grid2">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="valign">center</property>
-                        <property name="hexpand">True</property>
-                        <property name="row_spacing">2</property>
-                        <child>
-                          <object class="GtkLabel" id="lSFOverChannel">
-                            <property name="can_focus">False</property>
-                            <property name="valign">start</property>
-                            <property name="hexpand">True</property>
-                            <property name="xalign">0</property>
-                            <attributes>
-                              <attribute name="scale" value="0.69999999999999996"/>
-                            </attributes>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">0</property>
-                            <property name="width">1</property>
-                            <property name="height">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkStatusbar" id="sbSF">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="valign">end</property>
-                            <property name="hexpand">True</property>
-                            <property name="spacing">2</property>
-                          </object>
-                          <packing>
-                            <property name="left_attach">0</property>
-                            <property name="top_attach">2</property>
-                            <property name="width">1</property>
-                            <property name="height">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">14</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="bSFRunICA">
-                        <property name="label" translatable="yes">I_CA</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="valign">center</property>
-                        <property name="use_underline">True</property>
-                        <property name="focus_on_click">False</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">14</property>
+                        <property name="position">9</property>
                       </packing>
                     </child>
                     <child>
@@ -1487,48 +1628,7 @@
                         <property name="fill">True</property>
                         <property name="padding">3</property>
                         <property name="pack_type">end</property>
-                        <property name="position">15</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkToggleButton" id="bSFShowFindDialog">
-                        <property name="label" translatable="yes">_Find</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">Find/manage patterns (&lt;b&gt;F3&lt;/b&gt;)</property>
-                        <property name="tooltip_text" translatable="yes">Find/manage patterns (F3)</property>
-                        <property name="valign">center</property>
-                        <property name="use_underline">True</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="F3" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">17</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkToggleButton" id="bSFShowPhaseDiffDialog">
-                        <property name="label" translatable="yes">Δφ</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">Interchannel signal shift (&lt;b&gt;F4&lt;/b&gt;)</property>
-                        <property name="tooltip_text" translatable="yes">Interchannel signal shift (F4)</property>
-                        <property name="valign">center</property>
-                        <property name="focus_on_click">False</property>
-                        <accelerator key="F4" signal="activate"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="pack_type">end</property>
-                        <property name="position">17</property>
+                        <property name="position">11</property>
                       </packing>
                     </child>
                     <child>
@@ -1548,7 +1648,7 @@
                         <property name="expand">False</property>
                         <property name="fill">False</property>
                         <property name="pack_type">end</property>
-                        <property name="position">18</property>
+                        <property name="position">12</property>
                       </packing>
                     </child>
                   </object>

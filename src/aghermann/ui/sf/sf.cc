@@ -227,12 +227,12 @@ SScoringFacility (agh::CSubject& J,
 
 	// grey out phasediff button if there are fewer than 2 EEG channels
 	gtk_widget_set_sensitive(
-		(GtkWidget*)bSFShowPhaseDiffDialog,
+		(GtkWidget*)iSFMontagePhaseDiff,
 		(n_eeg_channels >= 2));
 
 	// desensitize iSFAcceptAndTakeNext unless there are more episodes
 	gtk_widget_set_sensitive(
-		(GtkWidget*)iSFAcceptAndTakeNext,
+		(GtkWidget*)iSFMontageCloseAndNext,
 		J.measurements.at(D).episodes.back().name() != E);
 	// (de)sensitize various toolbar toggle buttons
 	gtk_toggle_button_set_active(
@@ -793,6 +793,49 @@ set_tooltip( TTipIdx i) const
 {
 	gtk_widget_set_tooltip_markup( (GtkWidget*)lSFHint, tooltips[i]);
 }
+
+
+
+void
+aghui::SScoringFacility::
+update_main_menu_items()
+{
+	bool	all_draw_original[2] = {true, true},
+		all_draw_filtered[2] = {true, true},
+		all_draw_fast    [2] = {true, true},
+		all_draw_zeroline[2] = {true, true};
+	for ( const auto& H : channels ) {
+		all_draw_original[0]  = all_draw_original[0] && H.draw_original_signal,
+		all_draw_filtered[0]  = all_draw_filtered[0] && H.draw_filtered_signal,
+		all_draw_fast    [0]  = all_draw_fast    [0] && H.resample_signal,
+		all_draw_zeroline[0]  = all_draw_zeroline[0] && H.draw_zeroline;
+
+		all_draw_original[1]  = all_draw_original[1] && !H.draw_original_signal,
+		all_draw_filtered[1]  = all_draw_filtered[1] && !H.draw_filtered_signal,
+		all_draw_fast    [1]  = all_draw_fast    [1] && !H.resample_signal,
+		all_draw_zeroline[1]  = all_draw_zeroline[1] && !H.draw_zeroline;
+	}
+
+	suppress_redraw = true;
+
+#define KEKE(A,B)						\
+	if ( A[0] )						\
+		gtk_check_menu_item_set_active( B, TRUE);	\
+	else if ( A[1] )					\
+		gtk_check_menu_item_set_active( B, FALSE);	\
+	else							\
+		gtk_check_menu_item_set_inconsistent( B, TRUE);
+
+	KEKE (all_draw_original, iSFMontageDrawOriginalSignal);
+	KEKE (all_draw_filtered, iSFMontageDrawProcessedSignal);
+	KEKE (all_draw_fast,     iSFMontageDrawFast);
+	KEKE (all_draw_zeroline, iSFMontageDrawZeroLine);
+
+#undef KEKE
+
+	suppress_redraw = false;
+}
+
 
 
 // Local Variables:

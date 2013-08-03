@@ -49,6 +49,21 @@ struct SScoringFacilityWidgets {
 		*cSFScoringModeContainer,
 		*cSFICAModeContainer;
 	// 1. scoring mode
+	GtkCheckMenuItem
+		*iSFMontageDrawOriginalSignal,
+		*iSFMontageDrawProcessedSignal,
+		*iSFMontageDrawZeroLine,
+		*iSFMontageDrawFast;
+	GtkMenuItem
+		*iSFMontagePatterns,
+		*iSFMontageICA,
+		*iSFMontagePhaseDiff,
+		*iSFMontageScoreAssist,
+		*iSFMontageScoreImport,
+		*iSFMontageScoreExport,
+		*iSFMontageScoreClear,
+		*iSFMontageClose,
+		*iSFMontageCloseAndNext;
 	GtkButton  // acting label
 		*eSFCurrentPos;
 	GtkButton
@@ -58,11 +73,7 @@ struct SScoringFacilityWidgets {
 		*bSFGotoPrevUnscored, *bSFGotoNextUnscored,
 		*bSFGotoPrevArtifact, *bSFGotoNextArtifact;
 	GtkToggleButton
-		*bSFDrawCrosshair,
-		*bSFShowFindDialog, *bSFShowPhaseDiffDialog;
-	GtkButton
-	//*bSFResetMontage,
-		*bSFRunICA;
+		*bSFDrawCrosshair;
 	GtkTable
 		*cSFSleepStageStats;
 	GtkLabel
@@ -110,12 +121,6 @@ struct SScoringFacilityWidgets {
 	GtkDialog
 		*wSFICAMatrix;
 
-	// common controls (contd)
-	GtkMenuToolButton
-		*bSFAccept;
-	GtkMenu
-		*iiSFAccept;
-
 	// montage area
 	GtkDrawingArea
 		*daSFMontage,
@@ -135,6 +140,8 @@ struct SScoringFacilityWidgets {
 		*iiSFPower,
 		*iiSFScore,
 		*iiSFICAPage;
+	GtkMenuItem
+		*iSFMontageMenu;
 	GtkCheckMenuItem
 		*iSFPageShowOriginal, *iSFPageShowProcessed,
 		*iSFPageUseResample, *iSFPageDrawZeroline,
