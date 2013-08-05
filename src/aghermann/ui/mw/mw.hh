@@ -48,6 +48,9 @@ class SExpDesignUI
 		*ED;
 	aghui::SSessionChooser
 		*_p;
+      // ctor, dtor
+	SExpDesignUI (aghui::SSessionChooser *parent, const string& dir);
+       ~SExpDesignUI ();
 
       // forward decl
 	class SGroupPresentation;
@@ -65,16 +68,12 @@ class SExpDesignUI
 
 		list<agh::CSubject::SEpisode>&
 		sepisodesequence() const
-			{
-				return csubject.measurements[*_p._p._AghDi].episodes;
-			}
+			{ return csubject.measurements[*_p._p._AghDi].episodes; }
 
 		agh::CSubject::SEpisode
 			*using_episode;
 		bool is_episode_focused() const
-			{
-				return using_episode != nullptr;
-			}
+			{ return using_episode != nullptr; }
 		bool	is_focused;
 
 		bool get_episode_from_timeline_click( unsigned along);  // possibly sets episode_focused
@@ -112,13 +111,9 @@ class SExpDesignUI
 		friend class SExpDesignUI;
 
 		const char* name() const
-			{
-				return gi->first.c_str();
-			}
+			{ return gi->first.c_str(); }
 		agh::CJGroup& cjgroup()
-			{
-				return gi->second;
-			}
+			{ return gi->second; }
 		SGroupPresentation (agh::CExpDesign::TJGroups::iterator& gi_,
 				    SExpDesignUI& parent)
 		      : _p (parent),
@@ -141,10 +136,6 @@ class SExpDesignUI
 		*using_subject;
 	SSubjectPresentation*
 	subject_presentation_by_csubject( const agh::CSubject&);
-
-      // ctor, dtor
-	SExpDesignUI (aghui::SSessionChooser *parent, const string& dir);
-       ~SExpDesignUI ();
 
       // flags
 	bool	draw_nremrem_cycles;

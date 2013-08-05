@@ -22,6 +22,7 @@
 #include <libconfig.h++>
 
 #include "string.hh"
+#include "lang.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"

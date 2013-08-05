@@ -179,7 +179,8 @@ class CProfile {
 		_data;    // it is always double because it is saved/loaded in this form
 	size_t	_bins;
 
-	hash_t	_signature_when_mirrored;
+	agh::hash_t
+		_signature_when_mirrored;
 
 	const sigfile::CTypedSource& _using_F;
 	int _using_sig_no;

@@ -22,6 +22,30 @@
 
 using namespace std;
 
+namespace agh {
+
+
+
+
+typedef unsigned long hash_t;
+
+
+// g++ bits
+
+#define	MAKE_UNIQUE_CHARP(p)				\
+	unique_ptr<void,void(*)(void*)> p##_pp(p,free);
+
+
+#define DELETE_DEFAULT_METHODS(T)		\
+	T () = delete;				\
+	T (const T&) = delete;			\
+	void operator=( const T&) = delete;
+
+
+
+
+// gcc bits
+
 // # define __pure		__attribute__ ((pure))
 // # define __const		__attribute__ ((const))
 // # define __noreturn		__attribute__ ((noreturn))
@@ -38,24 +62,10 @@ using namespace std;
 #define ASPRINTF(...) \
 	assert (asprintf(__VA_ARGS__) > 0)
 
-
-#define	MAKE_UNIQUE_CHARP(p)				\
-	unique_ptr<void,void(*)(void*)> p##_pp(p,free);
-
-
-#define DELETE_DEFAULT_METHODS(T)		\
-	T () = delete;				\
-	T (const T&) = delete;			\
-	void operator=( const T&) = delete;
-
-
-typedef unsigned long hash_t;
-
-
-
 #define FABUF printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, __buf__);
 #define FAFA printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);
 
+} // namespace agh
 
 #endif
 

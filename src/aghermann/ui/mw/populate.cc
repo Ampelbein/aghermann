@@ -69,8 +69,9 @@ populate( bool do_load)
 		}
 	}
 
-	gtk_window_set_title( wMainWindow,
-			      (string ("Aghermann: ") + agh::str::homedir2tilda( ED->session_dir())).c_str());
+	gtk_window_set_title(
+		wMainWindow,
+		(string ("Aghermann: ") + agh::str::homedir2tilda( ED->session_dir())).c_str());
 
 	if ( ED->last_used_version != VERSION ) {
 		printf( "Upgrading from version %s, here's ChangeLog for you\n", ED->last_used_version.c_str());
@@ -83,9 +84,10 @@ populate( bool do_load)
 		snprintf_buf( "Smooth: %zu", smooth_profile));
 
 	if ( AghTT.empty() )
-		aghui::pop_ok_message( wMainWindow,
-				       "No EEG channels",
-				       "There are no EEG channels found in any recordings in the tree.");
+		aghui::pop_ok_message(
+			wMainWindow,
+			"No EEG channels",
+			"There are no EEG channels found in any recordings in the tree.");
 	if ( AghTT.empty() or AghGG.empty() ) {
 		show_empty_experiment_blurb();
 		set_controls_for_empty_experiment( true);
