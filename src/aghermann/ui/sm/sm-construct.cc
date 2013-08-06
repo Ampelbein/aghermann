@@ -20,7 +20,7 @@ using namespace std;
 
 
 int
-aghui::SSessionChooser::
+agh::ui::SSessionChooser::
 construct_widgets()
 {
       // load glade

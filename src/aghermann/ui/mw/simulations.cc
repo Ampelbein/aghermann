@@ -16,7 +16,7 @@ using namespace std;
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 populate_2()
 {
 	gtk_tree_store_clear( mSimulations);
@@ -121,7 +121,7 @@ populate_2()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 cleanup_2()
 {
 	ED->remove_untried_modruns();

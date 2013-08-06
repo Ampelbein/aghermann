@@ -21,7 +21,7 @@
 
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 namespace {
 unsigned short __score_hypn_depth[8] = {
@@ -30,7 +30,7 @@ unsigned short __score_hypn_depth[8] = {
 }
 
 
-aghui::SModelrunFacility::
+agh::ui::SModelrunFacility::
 SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
       : csimulation (csim),
 // subject is known only by name, so look up his full object now
@@ -111,7 +111,7 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 }
 
 
-aghui::SModelrunFacility::
+agh::ui::SModelrunFacility::
 ~SModelrunFacility()
 {
 	gtk_widget_destroy( (GtkWidget*)wModelrunFacility);
@@ -120,7 +120,7 @@ aghui::SModelrunFacility::
 
 
 void
-aghui::SModelrunFacility::
+agh::ui::SModelrunFacility::
 siman_param_printer( void *xp)
 {
 //	memcpy( __t_set.tunables, xp, __t_set.n_tunables * sizeof(double));
@@ -137,7 +137,7 @@ siman_param_printer( void *xp)
 
 
 void
-aghui::SModelrunFacility::
+agh::ui::SModelrunFacility::
 draw_timeline( cairo_t *cr)
 {
       // empirical SWA
@@ -213,14 +213,14 @@ draw_timeline( cairo_t *cr)
 
 
 
-size_t aghui::SModelrunFacility::swa_smoothover = 2;
+size_t agh::ui::SModelrunFacility::swa_smoothover = 2;
 
 
 
 
 
 void
-aghui::SModelrunFacility::
+agh::ui::SModelrunFacility::
 draw_episode( cairo_t *cr,
 	      const size_t ep,
 	      const size_t ep_start, const size_t ep_end,
@@ -342,7 +342,7 @@ draw_episode( cairo_t *cr,
 
 
 void
-aghui::SModelrunFacility::
+agh::ui::SModelrunFacility::
 draw_ticks( cairo_t *cr,
 	    size_t start, const size_t end)
 {
@@ -385,7 +385,7 @@ draw_ticks( cairo_t *cr,
 
 
 void
-aghui::SModelrunFacility::
+agh::ui::SModelrunFacility::
 update_infobar()
 {
 	_suppress_Vx_value_changed = true;

@@ -20,39 +20,39 @@
 
 using namespace std;
 
-char	aghui::__buf__[AGH_BUF_SIZE];
+char	agh::ui::__buf__[AGH_BUF_SIZE];
 
-GString	*aghui::__ss__;
+GString	*agh::ui::__ss__;
 
 GdkDevice
-	*aghui::__client_pointer__;
+	*agh::ui::__client_pointer__;
 
 UniqueApp
-	*aghui::__unique_app__;
+	*agh::ui::__unique_app__;
 
 GtkWindow
-	*aghui::__main_window__;
+	*agh::ui::__main_window__;
 
-double	aghui::__hdpmm__,
-	aghui::__vdpmm__;
+double	agh::ui::__hdpmm__,
+	agh::ui::__vdpmm__;
 
 #define AGH_UI_GRESOURCE_FILE "aghermann.gresource"
 
 // unique
 
 void
-aghui::
+agh::ui::
 set_unique_app_window( GtkWindow* w)
 {
 	unique_app_watch_window(
-		aghui::__unique_app__,
-		aghui::__main_window__ = w);
+		agh::ui::__unique_app__,
+		agh::ui::__main_window__ = w);
 }
 
 // own init
 
 int
-aghui::
+agh::ui::
 prepare_for_expdesign()
 {
 	__ss__ = g_string_new( "");
@@ -91,7 +91,7 @@ prepare_for_expdesign()
 
 // these are intended for durations, not timestamps
 void
-aghui::
+agh::ui::
 snprintf_buf_ts_d( const double d_)
 {
 	if ( d_ < 1. )
@@ -111,7 +111,7 @@ snprintf_buf_ts_d( const double d_)
 }
 
 void
-aghui::
+agh::ui::
 snprintf_buf_ts_h( const double h_)
 {
 	if ( h_ < 1. )
@@ -130,7 +130,7 @@ snprintf_buf_ts_h( const double h_)
 }
 
 void
-aghui::
+agh::ui::
 snprintf_buf_ts_m( const double m_)
 {
 	if ( m_ < 1. )
@@ -149,7 +149,7 @@ snprintf_buf_ts_m( const double m_)
 }
 
 void
-aghui::
+agh::ui::
 snprintf_buf_ts_s( const double s_)
 {
 	if ( s_ >= 60. )
@@ -168,7 +168,7 @@ snprintf_buf_ts_s( const double s_)
 // cairo
 
 void
-aghui::
+agh::ui::
 cairo_put_banner( cairo_t *cr, const float wd, const float ht,
 		  const char *text,
 		  const float font_size,
@@ -188,13 +188,13 @@ cairo_put_banner( cairo_t *cr, const float wd, const float ht,
 
 
 void
-aghui::
+agh::ui::
 cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 		   const ssize_t start, const ssize_t end,
 		   const size_t hspan, const float hoff, const float voff, const float scale,
 		   const unsigned short decimate,
-		   const aghui::TDrawSignalDirection direction,
-		   const aghui::TDrawSignalPathOption continue_path_option)
+		   const agh::ui::TDrawSignalDirection direction,
+		   const agh::ui::TDrawSignalPathOption continue_path_option)
 {
 	bool continue_path = continue_path_option == TDrawSignalPathOption::yes;
 	switch ( direction ) {
@@ -232,7 +232,7 @@ cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 
 
 void
-aghui::
+agh::ui::
 cairo_draw_envelope( cairo_t *cr, const valarray<TFloat>& V,
 		     ssize_t start, ssize_t end,
 		     const size_t hspan,
@@ -264,7 +264,7 @@ cairo_draw_envelope( cairo_t *cr, const valarray<TFloat>& V,
 
 
 void
-aghui::
+agh::ui::
 gtk_combo_box_set_model_properly( GtkComboBox *cb, GtkListStore *m)
 {
 	gtk_combo_box_set_model( cb, (GtkTreeModel*)m);
@@ -274,7 +274,7 @@ gtk_combo_box_set_model_properly( GtkComboBox *cb, GtkListStore *m)
 
 
 void
-aghui::
+agh::ui::
 gtk_cell_layout_set_renderer( GtkComboBox *cb)
 {
 	GtkCellRenderer *r = gtk_cell_renderer_text_new();
@@ -285,7 +285,7 @@ gtk_cell_layout_set_renderer( GtkComboBox *cb)
 }
 
 void
-aghui::
+agh::ui::
 pop_ok_message( GtkWindow *parent,
 		const char* primary_text,
 		const char* fmt, ...)
@@ -316,7 +316,7 @@ pop_ok_message( GtkWindow *parent,
 
 
 gint
-aghui::
+agh::ui::
 pop_question( GtkWindow* parent,
 	      const char* primary_text,
 	      const char* fmt, ...)
@@ -350,7 +350,7 @@ pop_question( GtkWindow* parent,
 
 
 void
-aghui::
+agh::ui::
 set_cursor_busy( bool busy, GtkWidget *wid)
 {
 	static GdkCursor *cursor_busy   = NULL,
@@ -364,7 +364,8 @@ set_cursor_busy( bool busy, GtkWidget *wid)
 }
 
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 template <> void
 SUIVar_<GtkListStore, list<string>>::up() const
@@ -395,7 +396,8 @@ SUIVar_<GtkListStore, list<string>>::down() const
 }
 
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 
 // Local Variables:

@@ -39,7 +39,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 class SScoringFacility
   : public SScoringFacilityWidgets {
@@ -772,9 +773,8 @@ channel_y0( const T& h) const
 }
 
 
-} // namespace aghui
-
-
+}
+} // namespace agh::ui
 
 #endif
 

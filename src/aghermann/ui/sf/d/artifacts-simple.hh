@@ -23,7 +23,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 struct SArtifactsSimpleDialogWidgets {
 
@@ -56,7 +57,8 @@ struct SScoringFacility::SArtifactsSimpleDialog
 		_p;
 };
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif // _AGH_UI_SF_FILTERS_H
 

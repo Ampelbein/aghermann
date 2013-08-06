@@ -26,7 +26,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 // ui structures everything is public, mainly to give access to the
 // bulk of extern "C" GTK callbacks
@@ -387,7 +388,8 @@ struct SExpDesignUIWidgets {
 		}
 };
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif // _AGHUI_EXPDESIGN_WIDGETS_H
 

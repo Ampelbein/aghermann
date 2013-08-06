@@ -13,8 +13,8 @@
 
 using namespace std;
 
-aghui::SScoringFacility::SArtifactsSimpleDialog&
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::SArtifactsSimpleDialog&
+agh::ui::SScoringFacility::
 artifacts_simple_d()
 {
 	if ( not _artifacts_simple_d )
@@ -23,8 +23,8 @@ artifacts_simple_d()
 }
 
 
-aghui::SScoringFacility::SArtifactsSimpleDialog::
-SArtifactsSimpleDialog (aghui::SScoringFacility& p_)
+agh::ui::SScoringFacility::SArtifactsSimpleDialog::
+SArtifactsSimpleDialog (agh::ui::SScoringFacility& p_)
       : min_size (0.5),
 	pad (),
 	_p (p_)

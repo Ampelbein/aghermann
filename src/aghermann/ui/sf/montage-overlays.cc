@@ -21,7 +21,7 @@ using namespace std;
 
 
 void
-aghui::SScoringFacility::SChannel::
+agh::ui::SScoringFacility::SChannel::
 draw_overlays( cairo_t* cr,
 	       const int wd, const float zeroy) const
 {
@@ -304,7 +304,7 @@ draw_overlays( cairo_t* cr,
 		cairo_set_source( cr, cp);
 
 		cairo_set_line_width( cr, .3);
-		aghui::cairo_draw_envelope(
+		agh::ui::cairo_draw_envelope(
 			cr,
 			raw_profile, 0, raw_profile.size(),
 			_p.da_wd, 0., pbot - EMGProfileHeight/2, signal_display_scale/2.); // half-signal scale, looks ok?
@@ -354,7 +354,7 @@ draw_overlays( cairo_t* cr,
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 _draw_hour_ticks( cairo_t *cr,
 		  const int htop, const int hbot,
 		  const bool with_cursor)

@@ -19,11 +19,11 @@
 #include "mw_cb.hh"
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 
 int
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 populate( bool do_load)
 {
 	printf( "\nSExpDesignUI::populate():\n");
@@ -84,7 +84,7 @@ populate( bool do_load)
 		snprintf_buf( "Smooth: %zu", smooth_profile));
 
 	if ( AghTT.empty() )
-		aghui::pop_ok_message(
+		agh::ui::pop_ok_message(
 			wMainWindow,
 			"No EEG channels",
 			"There are no EEG channels found in any recordings in the tree.");
@@ -174,7 +174,7 @@ populate( bool do_load)
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 depopulate( bool do_save)
 {
 	if ( do_save )
@@ -209,7 +209,7 @@ depopulate( bool do_save)
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 populate_mSessions()
 {
 	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
@@ -231,7 +231,7 @@ populate_mSessions()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 populate_mChannels()
 {
 	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
@@ -264,7 +264,7 @@ populate_mChannels()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 __reconnect_channels_combo()
 {
 	gtk_combo_box_set_model( eMsmtChannel, (GtkTreeModel*)mEEGChannels);
@@ -280,7 +280,7 @@ __reconnect_channels_combo()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 __reconnect_sessions_combo()
 {
 	gtk_combo_box_set_model( eMsmtSession, (GtkTreeModel*)mSessions);
@@ -305,7 +305,7 @@ annotation_type_s( const sigfile::SAnnotation::TType t)
 }
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 populate_mGlobalAnnotations()
 {
 	gtk_tree_store_clear( mGlobalAnnotations);
@@ -387,7 +387,7 @@ populate_mGlobalAnnotations()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 populate_mGlobalADProfiles()
 {
 	gtk_list_store_clear( mGlobalADProfiles);
@@ -404,7 +404,7 @@ populate_mGlobalADProfiles()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 populate_1()
 {
 	if ( ED->groups.empty() )
@@ -600,7 +600,7 @@ populate_1()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 sort_subjects()
 {
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -609,7 +609,7 @@ sort_subjects()
 
 
 bool
-aghui::SExpDesignUI::SSubjectPresentation::
+agh::ui::SExpDesignUI::SSubjectPresentation::
 operator<( const SSubjectPresentation& rv) const
 {
 	if ( _p._p.sort_segregate and csubject.gender != rv.csubject.gender )

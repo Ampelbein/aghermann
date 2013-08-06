@@ -37,7 +37,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 class SExpDesignUI
   : public SExpDesignUIWidgets {
@@ -46,10 +47,10 @@ class SExpDesignUI
     public:
 	agh::CExpDesign
 		*ED;
-	aghui::SSessionChooser
+	agh::ui::SSessionChooser
 		*_p;
       // ctor, dtor
-	SExpDesignUI (aghui::SSessionChooser *parent, const string& dir);
+	SExpDesignUI (agh::ui::SSessionChooser *parent, const string& dir);
        ~SExpDesignUI ();
 
       // forward decl
@@ -205,9 +206,9 @@ class SExpDesignUI
 	void save_artifact_detection_profiles() const;
 
       // currently open SF instances
-	list<aghui::SScoringFacility*>
+	list<agh::ui::SScoringFacility*>
 		open_scoring_facilities;
-	aghui::SScoringFacility
+	agh::ui::SScoringFacility
 		*close_this_SF_now;
 
       // displayed profile selector
@@ -323,7 +324,7 @@ class SExpDesignUI
 	void sb_message( const string&) const;
 	void sb_clear() const;
 	void sb_main_progress_indicator( const string&, size_t n, size_t i,
-					 aghui::TGtkRefreshMode);
+					 agh::ui::TGtkRefreshMode);
 
       // dnd
 	struct SDndIface {
@@ -385,7 +386,8 @@ SExpDesignUI::AghDi() const
 }
 
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif
 

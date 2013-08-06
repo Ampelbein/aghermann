@@ -23,7 +23,7 @@
 using namespace std;
 
 bool
-aghui::SExpDesignUI::SSubjectPresentation::
+agh::ui::SExpDesignUI::SSubjectPresentation::
 get_episode_from_timeline_click( unsigned along)
 {
 	try {
@@ -42,7 +42,7 @@ get_episode_from_timeline_click( unsigned along)
 }
 
 void
-aghui::SExpDesignUI::SSubjectPresentation::
+agh::ui::SExpDesignUI::SSubjectPresentation::
 draw_timeline( const string& fname) const
 {
 	cairo_surface_t *cs =
@@ -58,13 +58,13 @@ draw_timeline( const string& fname) const
 
 
 void
-aghui::SExpDesignUI::SSubjectPresentation::
+agh::ui::SExpDesignUI::SSubjectPresentation::
 draw_timeline( cairo_t *cr) const
 {
 	bool have_episodes = cprofile && not cprofile->mm_list().empty();
 
 	if ( not have_episodes )
-		aghui::cairo_put_banner(
+		agh::ui::cairo_put_banner(
 			cr, 400, tl_height(), "(no episodes)", 24);
 
 	if ( have_episodes ) {
@@ -300,7 +300,7 @@ draw_timeline( cairo_t *cr) const
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 modify_active_profile_scale( const GdkScrollDirection d)
 {
 	auto fac = (d == GDK_SCROLL_DOWN) ? 1/scroll_factor : scroll_factor;
@@ -313,7 +313,7 @@ modify_active_profile_scale( const GdkScrollDirection d)
 }
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 modify_profile_scales( const GdkScrollDirection d)
 {
 	auto fac = (d == GDK_SCROLL_DOWN) ? 1/scroll_factor : scroll_factor;

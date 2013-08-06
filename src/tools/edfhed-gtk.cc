@@ -146,7 +146,7 @@ main( int argc, char **argv)
 			printf( "Usage: %s file.edf\n", argv[0]);
 			return 0;
 		} else {
-			// aghui::pop_ok_message( NULL, "Usage: %s file.edf", argv[0]);
+			// agh::ui::pop_ok_message( NULL, "Usage: %s file.edf", argv[0]);
 			GtkWidget *f_chooser = gtk_file_chooser_dialog_new(
 				"edfhed-gtk: Choose a file to edit",
 				NULL,

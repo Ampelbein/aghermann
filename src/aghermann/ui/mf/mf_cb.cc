@@ -16,7 +16,7 @@
 #include "mf.hh"
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 extern "C" {
 
@@ -152,7 +152,7 @@ daMFProfile_scroll_event_cb(
 
 
 namespace {
-aghui::SModelrunFacility *this_mf = nullptr;
+agh::ui::SModelrunFacility *this_mf = nullptr;
 void this_mf_siman_param_printer(void *xp)
 {
 	this_mf -> siman_param_printer(xp);
@@ -166,7 +166,7 @@ bMFRun_clicked_cb(
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	aghui::SBusyBlock bb (MF.wModelrunFacility);
+	agh::ui::SBusyBlock bb (MF.wModelrunFacility);
 
 	void (*fun)(void*) = (this_mf == nullptr)
 		? (this_mf = &MF, this_mf_siman_param_printer)

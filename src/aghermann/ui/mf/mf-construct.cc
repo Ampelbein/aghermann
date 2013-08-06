@@ -14,7 +14,7 @@
 
 
 int
-aghui::SModelrunFacility::
+agh::ui::SModelrunFacility::
 construct_widgets()
 {
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,	wModelrunFacility)) ||

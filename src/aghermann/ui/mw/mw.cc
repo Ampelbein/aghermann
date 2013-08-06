@@ -27,12 +27,12 @@
 #include "mw_cb.hh"
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 
 
 
-aghui::SExpDesignUI::SSubjectPresentation::
+agh::ui::SExpDesignUI::SSubjectPresentation::
 SSubjectPresentation (agh::CSubject& _j,
 		      SGroupPresentation& parent)
       : csubject (_j),
@@ -47,7 +47,7 @@ SSubjectPresentation (agh::CSubject& _j,
 
 
 agh::SProfileParamSet
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 make_active_profile_paramset() const
 {
 	switch ( display_profile_type ) {
@@ -70,7 +70,7 @@ make_active_profile_paramset() const
 
 
 void
-aghui::SExpDesignUI::SSubjectPresentation::
+agh::ui::SExpDesignUI::SSubjectPresentation::
 create_cprofile()
 {
 	if ( cprofile )
@@ -89,7 +89,7 @@ create_cprofile()
 	}
 }
 
-aghui::SExpDesignUI::SSubjectPresentation::
+agh::ui::SExpDesignUI::SSubjectPresentation::
 ~SSubjectPresentation ()
 {
 	if ( cprofile )
@@ -100,7 +100,7 @@ aghui::SExpDesignUI::SSubjectPresentation::
 
 
 
-aghui::SExpDesignUI::SSubjectPresentation*
+agh::ui::SExpDesignUI::SSubjectPresentation*
 __attribute__ ((pure))
 SExpDesignUI::
 subject_presentation_by_csubject( const agh::CSubject& j)
@@ -115,16 +115,16 @@ subject_presentation_by_csubject( const agh::CSubject& j)
 
 
 const array<unsigned, 4>
-	aghui::SExpDesignUI::FFTPageSizeValues = {{4, 20, 30, 60}};
+	agh::ui::SExpDesignUI::FFTPageSizeValues = {{4, 20, 30, 60}};
 const array<double, 3>
-	aghui::SExpDesignUI::FFTBinSizeValues = {{.1, .25, .5}};
+	agh::ui::SExpDesignUI::FFTBinSizeValues = {{.1, .25, .5}};
 
-double aghui::SExpDesignUI::scroll_factor = 1.05;
+double agh::ui::SExpDesignUI::scroll_factor = 1.05;
 
 using agh::confval::SValidator;
 
-aghui::SExpDesignUI::
-SExpDesignUI (aghui::SSessionChooser *parent,
+agh::ui::SExpDesignUI::
+SExpDesignUI (agh::ui::SSessionChooser *parent,
 	      const string& dir)
       : // let ED and cgroups be initialized after the UI gets constructed
 	// so we could entertain the user with progress_indicator
@@ -219,7 +219,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 	ED = new agh::CExpDesign (sure_dir,
 				  bind( &SExpDesignUI::sb_main_progress_indicator, this,
 					placeholders::_1, placeholders::_2, placeholders::_3,
-					aghui::TGtkRefreshMode::gtk));
+					agh::ui::TGtkRefreshMode::gtk));
 	load_artifact_detection_profiles();
 	if ( global_artifact_detection_profiles.empty() )
 		global_artifact_detection_profiles["default"] = metrics::mc::SArtifactDetectionPP ();
@@ -316,7 +316,7 @@ SExpDesignUI (aghui::SSessionChooser *parent,
 }
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 load_artifact_detection_profiles()
 {
 	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "r");
@@ -356,7 +356,7 @@ load_artifact_detection_profiles()
 }
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 save_artifact_detection_profiles() const
 {
 	// libconfig::Config conf;
@@ -390,7 +390,7 @@ save_artifact_detection_profiles() const
 
 size_t
 __attribute__ ((pure))
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 figure_pagesize_item()
 {
 	size_t i = 0;
@@ -400,7 +400,7 @@ figure_pagesize_item()
 }
 size_t
 __attribute__ ((pure))
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 figure_binsize_item()
 {
 	size_t i = 0;
@@ -411,7 +411,7 @@ figure_binsize_item()
 
 
 
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 ~SExpDesignUI ()
 {
 	if ( dl_pid > 0 )
@@ -433,17 +433,17 @@ aghui::SExpDesignUI::
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 do_rescan_tree( const bool with_update)
 {
-	aghui::SBusyBlock bb (wMainWindow);
+	agh::ui::SBusyBlock bb (wMainWindow);
 
 	depopulate( false);
 	ED -> sync();
 	if ( with_update )
 		ED -> scan_tree( bind (&SExpDesignUI::sb_main_progress_indicator, this,
 				       placeholders::_1, placeholders::_2, placeholders::_3,
-				       aghui::TGtkRefreshMode::gdk));
+				       agh::ui::TGtkRefreshMode::gdk));
 	else
 		ED -> scan_tree();
 	populate( false);
@@ -451,10 +451,10 @@ do_rescan_tree( const bool with_update)
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 do_purge_computed()
 {
-	aghui::SBusyBlock bb (wMainWindow);
+	agh::ui::SBusyBlock bb (wMainWindow);
 
 	if ( ED->purge_cached_profiles() ) {
 		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
@@ -466,7 +466,7 @@ do_purge_computed()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 do_detect_ultradian_cycle( agh::CRecording& M)
 {
 	gsl_siman_params_t siman_params;
@@ -492,7 +492,7 @@ do_detect_ultradian_cycle( agh::CRecording& M)
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 adjust_op_freq_spinbuttons()
 {
 	suppress_redraw = true;
@@ -516,7 +516,7 @@ adjust_op_freq_spinbuttons()
 
 
 double
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 calculate_profile_scale()
 {
 	double	avg_profile_height = 0.;
@@ -555,7 +555,7 @@ calculate_profile_scale()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 show_changelog()
 {
 	gtk_widget_show_all( (GtkWidget*)wAbout);
@@ -567,7 +567,7 @@ show_changelog()
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 sb_message( const string& msg) const
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
@@ -575,7 +575,7 @@ sb_message( const string& msg) const
 }
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 sb_clear() const
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
@@ -584,16 +584,16 @@ sb_clear() const
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 sb_main_progress_indicator( const string& current,
 			    const size_t n, const size_t i,
-			    const aghui::TGtkRefreshMode mode)
+			    const agh::ui::TGtkRefreshMode mode)
 {
 	sb_message( agh::str::sasprintf( "(%zu of %zu) %s", i, n, current.c_str()));
 
 	switch ( mode ) {
 	case TGtkRefreshMode::gtk:
-		aghui::gtk_flush();  // this brings down the whole of GTK if called from a callback
+		agh::ui::gtk_flush();  // this brings down the whole of GTK if called from a callback
 		break;
 	case TGtkRefreshMode::gdk:
 		gdk_window_process_all_updates(); // this, however, fails to do the update if called *not* from a callback

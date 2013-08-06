@@ -22,7 +22,7 @@
 
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 extern "C" {
 
@@ -1189,7 +1189,7 @@ iSFPageSelectionAnnotate_activate_cb(
 			: SAnnotation::TType::plain;
 
 		if ( strlen( new_ann) == 0 && type == SAnnotation::TType::plain ) {
-			aghui::pop_ok_message( SF.wSF, "Give a plain annotation a name", "and try again.");
+			agh::ui::pop_ok_message( SF.wSF, "Give a plain annotation a name", "and try again.");
 			return;
 		}
 

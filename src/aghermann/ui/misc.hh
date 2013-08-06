@@ -21,7 +21,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 #define snprintf_buf(...) (snprintf( __buf__, AGH_BUF_SIZE-1, __VA_ARGS__), __buf__)
 
@@ -30,7 +31,8 @@ void snprintf_buf_ts_h( double h);
 void snprintf_buf_ts_m( double m);
 void snprintf_buf_ts_s( double s);
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif
 

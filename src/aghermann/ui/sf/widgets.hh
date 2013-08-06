@@ -15,7 +15,8 @@
 #include <gtk/gtk.h>
 
 // stow this crowd away from first-class gents
-namespace aghui {
+namespace agh {
+namespace ui {
 
 struct SScoringFacilityWidgets {
 
@@ -202,7 +203,8 @@ struct SScoringFacilityWidgets {
 
 };
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif
 

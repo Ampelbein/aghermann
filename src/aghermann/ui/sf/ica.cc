@@ -21,10 +21,10 @@
 using namespace std;
 
 const char
-	*aghui::SScoringFacility::ica_unmapped_menu_item_label = "(not mapped)";
+	*agh::ui::SScoringFacility::ica_unmapped_menu_item_label = "(not mapped)";
 
 int
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 setup_ica()
 {
 	if ( ica )
@@ -135,13 +135,13 @@ setup_ica()
 
 
 int
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 run_ica()
 {
 	if ( ica == nullptr )
 		return 1;
 
-	aghui::SBusyBlock bb (wSF);
+	agh::ui::SBusyBlock bb (wSF);
 
 	ica_components = itpp::mat (0, 0); // free up couple of hundred megs
 	ica->obj() . separate();
@@ -155,13 +155,13 @@ run_ica()
 
 
 int
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 remix_ics()
 {
 	if ( ica == nullptr )
 		return 1;
 
-	aghui::SBusyBlock bb (wSF);
+	agh::ui::SBusyBlock bb (wSF);
 
 	switch ( remix_mode ) {
 	case TICARemixMode::map:
@@ -228,7 +228,7 @@ remix_ics()
 }
 
 int
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 restore_ics()
 {
 	if ( ica == nullptr )
@@ -250,7 +250,7 @@ restore_ics()
 
 
 int
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 apply_remix( const bool do_backup)
 {
 	if ( ica == nullptr )
@@ -298,7 +298,7 @@ apply_remix( const bool do_backup)
 
 int
 __attribute__ ((pure))
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 ic_near( const double y) const
 {
 	int nearest = INT_MAX, thisd;
@@ -324,7 +324,7 @@ ic_near( const double y) const
 
 int
 __attribute__ ((pure))
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 ic_of( const SChannel* ch) const
 {
 	int h = 0;
@@ -333,7 +333,7 @@ ic_of( const SChannel* ch) const
 			return h;
 		++h;
 	}
-	throw out_of_range ("aghui::SScoringFacility::ic_of(): bad channel");
+	throw out_of_range ("agh::ui::SScoringFacility::ic_of(): bad channel");
 }
 
 

@@ -31,7 +31,8 @@
 using namespace std;
 
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 
 struct SGeometry {
@@ -189,7 +190,8 @@ void set_cursor_busy( bool busy, GtkWidget *wid);
 #define G_CONNECT_3(W, A1, A2, A3)					\
 	g_signal_connect(W, #A1 "-" #A2 "-" #A3, (GCallback)W ## _ ## A1 ## _ ## A2 ## _ ## A3 ## _cb, this)
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif
 

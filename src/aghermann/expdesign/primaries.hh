@@ -171,7 +171,7 @@ class CSubject : public SSubjectId {
 
 	    // private:
 	    // 	friend class agh::CSubject;
-	    // 	friend class aghui::SScoringFacility;
+	    // 	friend class agh::ui::SScoringFacility;
 	      // allow multiple sources (possibly supplying different channels)
 		list<sigfile::CTypedSource>
 			sources;

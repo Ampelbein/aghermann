@@ -19,7 +19,7 @@
 using namespace std;
 
 
-aghui::SScoringFacilityWidgets::
+agh::ui::SScoringFacilityWidgets::
 SScoringFacilityWidgets ()
 {
 	builder = gtk_builder_new();
@@ -354,7 +354,7 @@ SScoringFacilityWidgets ()
 
 
 
-aghui::SScoringFacilityWidgets::
+agh::ui::SScoringFacilityWidgets::
 ~SScoringFacilityWidgets ()
 {
 	// destroy toplevels

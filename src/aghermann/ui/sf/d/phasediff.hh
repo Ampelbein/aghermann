@@ -20,7 +20,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 struct SPhasediffDialogWidgets {
 
@@ -84,7 +85,8 @@ struct SScoringFacility::SPhasediffDialog
 		_p;
 };
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 extern "C" {
 void eSFPDChannelA_changed_cb( GtkComboBox*, gpointer);

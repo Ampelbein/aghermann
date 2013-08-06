@@ -29,7 +29,7 @@ unsigned short __score_hypn_depth[8] = {
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 draw_hypnogram( cairo_t *cr)
 {
       // bg
@@ -124,7 +124,7 @@ draw_hypnogram( cairo_t *cr)
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 do_dialog_import_hypnogram()
 {
 	GtkWidget *f_chooser =
@@ -166,7 +166,7 @@ do_dialog_import_hypnogram()
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 do_dialog_export_hypnogram() const
 {
 	GtkWidget *f_chooser =
@@ -188,7 +188,7 @@ do_dialog_export_hypnogram() const
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 do_clear_hypnogram()
 {
 	hypnogram.assign(

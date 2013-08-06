@@ -30,7 +30,7 @@ bDownload_clicked_cb(
 	GtkButton*,
 	const gpointer userdata)
 {
-	auto& ED = *(aghui::SExpDesignUI*)userdata;
+	auto& ED = *(agh::ui::SExpDesignUI*)userdata;
 	ED.try_download();
 }
 
@@ -39,18 +39,18 @@ download_process_child_exited_cb(
 	VteTerminal *terminal,
 	const gpointer userdata)
 {
-	auto& ED = *(aghui::SExpDesignUI*)userdata;
+	auto& ED = *(agh::ui::SExpDesignUI*)userdata;
 	ED.set_wMainWindow_interactive( true, true);
 	int exit_status = vte_terminal_get_child_exit_status( terminal);
 	if ( exit_status != 0 )
-		aghui::pop_ok_message(
+		agh::ui::pop_ok_message(
 			ED.wMainWindow,
 			"Download failed",
 			"Exit status %d. Try again next time.", exit_status);
 	ED.dl_pid = -1;
-	ED.ED->scan_tree( bind (&aghui::SExpDesignUI::sb_main_progress_indicator, &ED,
+	ED.ED->scan_tree( bind (&agh::ui::SExpDesignUI::sb_main_progress_indicator, &ED,
 				placeholders::_1, placeholders::_2, placeholders::_3,
-				aghui::TGtkRefreshMode::gdk));
+				agh::ui::TGtkRefreshMode::gdk));
 	ED.populate( false);
 }
 
@@ -61,7 +61,7 @@ download_process_child_exited_cb(
 
 
 void
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 show_empty_experiment_blurb()
 {
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
@@ -111,7 +111,7 @@ show_empty_experiment_blurb()
 
 
 int
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 try_download()
 {
 	gtk_container_foreach( (GtkContainer*)cMeasurements,
@@ -148,7 +148,7 @@ try_download()
 		&dl_pid,
 		&Error); // GError **error);
 	if ( Error ) {
-		aghui::pop_ok_message(
+		agh::ui::pop_ok_message(
 			wMainWindow,
 			"Error",
 			"%s\n", Error->message);

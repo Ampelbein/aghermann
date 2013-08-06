@@ -15,7 +15,7 @@
 
 using namespace std;
 
-aghui::SPhasediffDialogWidgets::
+agh::ui::SPhasediffDialogWidgets::
 SPhasediffDialogWidgets (SScoringFacility& SF)
 {
 	builder = gtk_builder_new();
@@ -67,7 +67,7 @@ SPhasediffDialogWidgets (SScoringFacility& SF)
 }
 
 
-aghui::SPhasediffDialogWidgets::
+agh::ui::SPhasediffDialogWidgets::
 ~SPhasediffDialogWidgets ()
 {
 	gtk_widget_destroy( (GtkWidget*)wSFPD);

@@ -28,7 +28,8 @@
 using namespace std;
 
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 class SBusyBlock {
 	DELETE_DEFAULT_METHODS (SBusyBlock);
@@ -214,7 +215,8 @@ class SUIVarCollection {
 };
 
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif
 

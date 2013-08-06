@@ -23,7 +23,8 @@
 using namespace std;
 
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 extern UniqueApp
 	*__unique_app__;
@@ -51,7 +52,8 @@ int prepare_for_expdesign();
 
 void set_unique_app_window( GtkWindow*);
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif
 

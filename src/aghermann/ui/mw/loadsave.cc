@@ -16,17 +16,17 @@
 #include "mw.hh"
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 #define CONF_FILE ".aghermann.conf"
 
 
 namespace {
 
-forward_list<pair<const char*, aghui::SExpDesignUI::TColour>>
+forward_list<pair<const char*, agh::ui::SExpDesignUI::TColour>>
 saving_colors()
 {
-	using namespace aghui;
+	using namespace agh::ui;
 	return move(
 		forward_list<pair<const char*, SExpDesignUI::TColour>>
 		({
@@ -79,7 +79,7 @@ saving_colors()
 } // namespace
 
 int
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 load_settings()
 {
 	libconfig::Config conf;
@@ -152,7 +152,7 @@ load_settings()
 
 
 int
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 save_settings()
 {
 	libconfig::Config conf;

@@ -21,7 +21,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 
 struct SPatternsDialogWidgets {
@@ -186,12 +187,13 @@ struct SScoringFacility::SPatternsDialog
 	void set_thing_da_width( int);
 	void set_field_da_width( int);
 
-	aghui::SScoringFacility&
+	agh::ui::SScoringFacility&
 		_p;
 };
 
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 extern "C" {
 void eSFFDPatternList_changed_cb( GtkComboBox*, gpointer);

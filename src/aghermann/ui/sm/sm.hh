@@ -27,7 +27,8 @@
 using namespace std;
 
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 struct SSession : public string {
 	size_t	n_groups,
@@ -58,7 +59,7 @@ struct SSessionChooser {
 	list<SSession>
 		sessions;
 
-	aghui::SExpDesignUI* ed;
+	agh::ui::SExpDesignUI* ed;
 
 	string get_selected_dir(); // and assign last_dir_no
 	void read_sessionrc();
@@ -100,7 +101,8 @@ struct SSessionChooser {
 };
 
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif
 

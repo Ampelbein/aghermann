@@ -18,7 +18,7 @@
 #include "sm_cb.hh"
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 
 extern "C" {
@@ -72,7 +72,7 @@ bSessionChooserOpen_clicked_cb(
 {
 	auto& SC = *(SSessionChooser*)userdata;
 
-	aghui::SBusyBlock bb (SC.wSessionChooser);
+	agh::ui::SBusyBlock bb (SC.wSessionChooser);
 
 	int ret = SC.open_selected_session();
 
@@ -207,7 +207,7 @@ bSessionChooserRemove_clicked_cb(
 	gtk_tree_model_get( model, &iter,
 			    0, &entry,
 			    -1);
-	// SC.sessions.remove_if( [&entry]( aghui::SSession& S) { return S == entry; });
+	// SC.sessions.remove_if( [&entry]( agh::ui::SSession& S) { return S == entry; });
 	gtk_list_store_remove( SC.mSessionChooserList, &iter);
 	SC._sync_model_to_list();
 

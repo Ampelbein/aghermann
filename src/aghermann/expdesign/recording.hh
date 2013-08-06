@@ -168,7 +168,7 @@ class CRecording {
 		}
 	sigfile::CSource& F()  // although we shouldn't want to access CEDFFile writably from CRecording,
 		{      // this shortcut saves us the trouble of AghCC->subject_by_x(,,,).measurements...
-			return _source();  // on behalf of aghui::SChannelPresentation
+			return _source();  // on behalf of agh::ui::SChannelPresentation
 		}
 	const sigfile::CHypnogram&
 	hypnogram() const

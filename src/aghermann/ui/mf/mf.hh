@@ -21,7 +21,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 struct SModelrunFacility {
 
@@ -119,7 +120,8 @@ struct SModelrunFacility {
 };
 
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 #endif // _AGH_UI_MODELRUN_FACILITY_H
 

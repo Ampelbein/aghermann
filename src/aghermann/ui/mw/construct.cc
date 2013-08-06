@@ -16,11 +16,11 @@
 #include "mw_cb.hh"
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 
 
-aghui::SExpDesignUIWidgets::
+agh::ui::SExpDesignUIWidgets::
 SExpDesignUIWidgets ()
 {
       // load glade
@@ -685,7 +685,7 @@ SExpDesignUIWidgets ()
 }
 
 
-aghui::SExpDesignUIWidgets::
+agh::ui::SExpDesignUIWidgets::
 ~SExpDesignUIWidgets ()
 {
 	g_object_unref( (GObject*)builder);
@@ -724,7 +724,7 @@ aghui::SExpDesignUIWidgets::
 
 
 void
-aghui::SExpDesignUIWidgets::
+agh::ui::SExpDesignUIWidgets::
 set_wMainWindow_interactive( const bool indeed, const bool flush)
 {
 	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
@@ -749,7 +749,7 @@ set_wMainWindow_interactive( const bool indeed, const bool flush)
 }
 
 void
-aghui::SExpDesignUIWidgets::
+agh::ui::SExpDesignUIWidgets::
 set_controls_for_empty_experiment( bool indeed, const bool flush)
 {
 	indeed = not indeed;

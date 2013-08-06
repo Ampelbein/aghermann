@@ -15,8 +15,8 @@
 
 using namespace std;
 
-aghui::SScoringFacility::SPatternsDialog&
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::SPatternsDialog&
+agh::ui::SScoringFacility::
 patterns_d()
 {
 	if ( not _patterns_d )
@@ -24,7 +24,7 @@ patterns_d()
 	return *_patterns_d;
 }
 
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 SPatternsDialog (SScoringFacility& parent)
       : SPatternsDialogWidgets (parent),
 	Pp2 {.25,  0., 1.5, 1,  .1, .5, 3},
@@ -55,7 +55,7 @@ SPatternsDialog (SScoringFacility& parent)
 	load_patterns();
 }
 
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 ~SPatternsDialog ()
 {
 	save_patterns();
@@ -68,7 +68,7 @@ aghui::SScoringFacility::SPatternsDialog::
 
 
 list<pattern::SPattern<TFloat>>::iterator
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 pattern_by_idx( size_t idx)
 {
 	size_t i = 0;
@@ -84,7 +84,7 @@ pattern_by_idx( size_t idx)
 
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 search()
 {
 	assert (field_channel and current_pattern != patterns.end());
@@ -108,7 +108,7 @@ search()
 
 
 size_t
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 find_occurrences()
 {
 	if ( unlikely (current_pattern == patterns.end()) )
@@ -132,7 +132,7 @@ find_occurrences()
 
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 occurrences_to_annotations( sigfile::SAnnotation::TType t)
 {
 	for ( size_t o = 0; o < occurrences.size(); ++o )
@@ -145,14 +145,14 @@ occurrences_to_annotations( sigfile::SAnnotation::TType t)
 }
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 save_annotations()
 {
 	saved_annotations = field_channel->annotations;
 }
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 restore_annotations()
 {
 	field_channel->annotations = saved_annotations;
@@ -163,7 +163,7 @@ restore_annotations()
 
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 setup_controls_for_find()
 {
 	bool	have_any = current_pattern != patterns.end();
@@ -185,7 +185,7 @@ setup_controls_for_find()
 }
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 setup_controls_for_wait()
 {
 	gtk_widget_set_visible( (GtkWidget*)cSFFDSearchButton, FALSE);
@@ -203,7 +203,7 @@ setup_controls_for_wait()
 }
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 setup_controls_for_tune()
 {
 	gtk_widget_set_visible( (GtkWidget*)cSFFDSearchButton, FALSE);
@@ -223,7 +223,7 @@ setup_controls_for_tune()
 
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 set_profile_manage_buttons_visibility()
 {
 	bool	have_any = current_pattern != patterns.end(),
@@ -236,7 +236,7 @@ set_profile_manage_buttons_visibility()
 
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 preselect_channel( const int h) const
 {
 	if ( h < 0 ) {
@@ -250,7 +250,7 @@ preselect_channel( const int h) const
 
 
 size_t
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 nearest_occurrence( const double x) const
 {
 	double shortest = INFINITY;
@@ -269,7 +269,7 @@ nearest_occurrence( const double x) const
 
 
 void
-aghui::SScoringFacility::SPatternsDialog::
+agh::ui::SScoringFacility::SPatternsDialog::
 update_field_check_menu_items()
 {
 	suppress_redraw = true;

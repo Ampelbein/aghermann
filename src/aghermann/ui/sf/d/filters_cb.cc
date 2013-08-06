@@ -15,7 +15,7 @@
 #include "filters.hh"
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 
 extern "C" {

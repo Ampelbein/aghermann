@@ -18,7 +18,7 @@
 using namespace std;
 
 
-aghui::SArtifactsDialogWidgets::
+agh::ui::SArtifactsDialogWidgets::
 SArtifactsDialogWidgets ()
 {
 	builder = gtk_builder_new();
@@ -78,7 +78,7 @@ SArtifactsDialogWidgets ()
 }
 
 
-aghui::SArtifactsDialogWidgets::
+agh::ui::SArtifactsDialogWidgets::
 ~SArtifactsDialogWidgets ()
 {
 	gtk_widget_destroy( (GtkWidget*)wSFAD);

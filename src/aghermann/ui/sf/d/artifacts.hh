@@ -27,7 +27,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 struct SArtifactsDialogWidgets {
 
@@ -110,7 +111,8 @@ struct SScoringFacility::SArtifactsDialog
 };
 
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 
 extern "C" {

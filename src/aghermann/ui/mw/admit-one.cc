@@ -15,11 +15,11 @@
 #include "mw.hh"
 
 using namespace std;
-using namespace aghui;
+using namespace agh::ui;
 
 
 int
-aghui::SExpDesignUI::
+agh::ui::SExpDesignUI::
 dnd_maybe_admit_one( const char* fname)
 {
 	try {

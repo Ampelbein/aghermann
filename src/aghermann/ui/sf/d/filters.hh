@@ -23,7 +23,8 @@
 
 using namespace std;
 
-namespace aghui {
+namespace agh {
+namespace ui {
 
 struct SFiltersDialogWidgets {
 
@@ -64,7 +65,8 @@ struct SScoringFacility::SFiltersDialog
 		_p;
 };
 
-} // namespace aghui
+}
+} // namespace agh::ui
 
 extern "C" {
 void eSFFilterHighPassCutoff_value_changed_cb( GtkSpinButton*, gpointer);

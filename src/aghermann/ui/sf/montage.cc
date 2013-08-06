@@ -29,7 +29,7 @@ unsigned short PageTicks[] = {
 
 
 void
-aghui::SScoringFacility::SChannel::
+agh::ui::SScoringFacility::SChannel::
 draw_signal( const valarray<TFloat>& signal,
 	     size_t width, int vdisp, cairo_t *cr) const
 {
@@ -37,7 +37,7 @@ draw_signal( const valarray<TFloat>& signal,
 		end    = _p.cur_vpage_end()    * samplerate(),
 		run    = end - start,
 		half_pad = run * _p.skirting_run_per1;
-	aghui::cairo_draw_signal( cr, signal,
+	agh::ui::cairo_draw_signal( cr, signal,
 				  start - half_pad,
 				  end + half_pad,
 				  width, 0, vdisp, signal_display_scale,
@@ -48,7 +48,7 @@ draw_signal( const valarray<TFloat>& signal,
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 estimate_montage_height()
 {
 	da_ht = channels.size() * interchannel_gap;
@@ -59,8 +59,8 @@ estimate_montage_height()
 
 
 struct SChHolder {
-	aghui::SScoringFacility::SChannel* ch;
-	SChHolder( aghui::SScoringFacility::SChannel& ini) : ch (&ini) {}
+	agh::ui::SScoringFacility::SChannel* ch;
+	SChHolder( agh::ui::SScoringFacility::SChannel& ini) : ch (&ini) {}
 	bool operator<( const SChHolder& rv) const
 		{
 			return ch->zeroy < rv.ch->zeroy;
@@ -70,7 +70,7 @@ struct SChHolder {
 
 
 sigfile::SAnnotation*
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 interactively_choose_annotation() const
 {
 	// do some on-the-fly construcion
@@ -102,7 +102,7 @@ interactively_choose_annotation() const
 
 
 int
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 find_free_space()
 {
 	vector<SChHolder> thomas;
@@ -134,7 +134,7 @@ find_free_space()
 }
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 space_evenly()
 {
 	vector<SChHolder> thomas;
@@ -157,7 +157,7 @@ space_evenly()
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 expand_by_factor( const double fac)
 {
 	for ( auto &H : channels ) {
@@ -182,7 +182,7 @@ expand_by_factor( const double fac)
 
 
 void
-aghui::SScoringFacility::SChannel::
+agh::ui::SScoringFacility::SChannel::
 draw_for_montage( const string& fname,
 		  const int width, const int height) // to a file
 {
@@ -197,7 +197,7 @@ draw_for_montage( const string& fname,
 }
 
 void
-aghui::SScoringFacility::SChannel::
+agh::ui::SScoringFacility::SChannel::
 draw_for_montage( cairo_t* cr)
 {
 	if ( !hidden ) {
@@ -209,7 +209,7 @@ draw_for_montage( cairo_t* cr)
 
 
 void
-aghui::SScoringFacility::SChannel::
+agh::ui::SScoringFacility::SChannel::
 draw_page( cairo_t *cr,
 	   const int wd, const float y0,
 	   bool draw_marquee) const
@@ -227,7 +227,7 @@ draw_page( cairo_t *cr,
 	}
 
       // marquee, goes first, not to obscure waveforms
-	if ( _p.mode != aghui::SScoringFacility::TMode::shuffling_channels
+	if ( _p.mode != agh::ui::SScoringFacility::TMode::shuffling_channels
 	     and draw_marquee // possibly undesired (such as when drawing for unfazer (what unfazer?))
 	     && agh::alg::overlap(
 		     selection_start_time, selection_end_time,
@@ -287,15 +287,15 @@ draw_page( cairo_t *cr,
 
 					cairo_set_source_rgba( cr, 1, 1, 1, .6);
 					cairo_set_line_width( cr, 1);
-					aghui::cairo_draw_signal(
+					agh::ui::cairo_draw_signal(
 						cr, env_u, 0, env_u.size(),
 						me-ma, ma, y0, signal_display_scale);
-					aghui::cairo_draw_signal(
+					agh::ui::cairo_draw_signal(
 						cr, env_l, 0, env_l.size(),
 						me-ma, ma, y0, signal_display_scale,
 						1,
-						aghui::TDrawSignalDirection::backward,
-						aghui::TDrawSignalPathOption::yes);
+						agh::ui::TDrawSignalDirection::backward,
+						agh::ui::TDrawSignalPathOption::yes);
 					cairo_close_path( cr);
 					cairo_fill( cr);
 					cairo_stroke( cr);
@@ -312,7 +312,7 @@ draw_page( cairo_t *cr,
 
 				cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 				cairo_set_line_width( cr, 3.);
-				aghui::cairo_draw_signal(
+				agh::ui::cairo_draw_signal(
 					cr, course, 0, course.size(),
 					me-ma, ma, y0, signal_display_scale);
 				cairo_stroke( cr);
@@ -330,7 +330,7 @@ draw_page( cairo_t *cr,
 
 					cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
 					cairo_set_line_width( cr, 1.);
-					aghui::cairo_draw_signal(
+					agh::ui::cairo_draw_signal(
 						cr, dzcdf, 0, dzcdf.size(),
 						me-ma, ma, y0, dzcdf_display_scale);
 					cairo_stroke( cr);
@@ -385,7 +385,7 @@ draw_page( cairo_t *cr,
 		draw_signal_filtered( wd, y0, cr);
 		cairo_stroke( cr);
 
-		if ( _p.mode == aghui::SScoringFacility::TMode::scoring ) {
+		if ( _p.mode == agh::ui::SScoringFacility::TMode::scoring ) {
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-88, y0 - 15);
 			cairo_set_font_size( cr, 10);
@@ -407,7 +407,7 @@ draw_page( cairo_t *cr,
 		draw_signal_original( wd, y0, cr);
 		cairo_stroke( cr);
 
-		if ( _p.mode == aghui::SScoringFacility::TMode::scoring ) {
+		if ( _p.mode == agh::ui::SScoringFacility::TMode::scoring ) {
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-88, y0 - 25);
 			cairo_set_font_size( cr, 10);
@@ -417,7 +417,7 @@ draw_page( cairo_t *cr,
 	}
 
       // waveform: signal_reconstituted
-	if ( _p.mode == aghui::SScoringFacility::TMode::showing_remixed &&
+	if ( _p.mode == agh::ui::SScoringFacility::TMode::showing_remixed &&
 	     signal_reconstituted.size() != 0 ) {
 		if ( apply_reconstituted ) {
 			cairo_set_line_width( cr, fine_line() * 1.3);
@@ -477,7 +477,7 @@ draw_page( cairo_t *cr,
 	}
 
       // annotations
-	if ( _p.mode == aghui::SScoringFacility::TMode::scoring
+	if ( _p.mode == agh::ui::SScoringFacility::TMode::scoring
 	     and not annotations.empty() ) {
 		double last_label_end = 0;
 		int overlap_count = 0;
@@ -633,7 +633,7 @@ draw_page( cairo_t *cr,
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 draw_montage( const string& fname) // to a file
 {
 	cairo_surface_t *cs = cairo_svg_surface_create( fname.c_str(), da_wd, da_ht);
@@ -647,7 +647,7 @@ draw_montage( const string& fname) // to a file
 
 template <class T>
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 {
 	int gap = da_ht/mat.rows();
@@ -705,7 +705,7 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 			run   = end - start,
 			half_pad = run * skirting_run_per1;
 
-		aghui::cairo_draw_signal( cr, mat, r,
+		agh::ui::cairo_draw_signal( cr, mat, r,
 					  start - half_pad,
 					  end + half_pad,
 					  da_wd, 0, our_y, our_display_scale);
@@ -716,7 +716,7 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 
 
 void
-aghui::SScoringFacility::
+agh::ui::SScoringFacility::
 draw_montage( cairo_t* cr)
 {
 	double	true_frac = 1. - 1. / (1. + 2*skirting_run_per1),
@@ -727,7 +727,7 @@ draw_montage( cairo_t* cr)
 	switch ( mode ) {
 	case TMode::showing_ics:
 		if ( ica_components.size() == 0 ) {
-			aghui::cairo_put_banner(
+			agh::ui::cairo_put_banner(
 				cr, da_wd, da_ht,
 				"Now set up ICA parameters, then press [Compute ICs]");
 		} else
@@ -735,7 +735,7 @@ draw_montage( cairo_t* cr)
 			// draw ignoring channels' zeroy
 	    break;
 	case TMode::separating:
-		aghui::cairo_put_banner(
+		agh::ui::cairo_put_banner(
 			cr, da_wd, da_ht,
 			"Separating...");
 	    break;
