@@ -24,15 +24,16 @@ using namespace std;
 namespace agh {
 namespace alg {
 
-template <typename T>
-inline void
-__attribute__ ((pure))
-pod_swap( T&& a, T&& b)
-{
-	T tmp = move(a);
-	a = move(b);
-	b = move(tmp);
-}
+/// uncomment on demand
+// template <typename T>
+// inline void
+// __attribute__ ((pure))
+// pod_swap( T&& a, T&& b)
+// {
+// 	T&& tmp = move(a);
+// 	a = move(b);
+// 	b = move(tmp);
+// }
 
 
 
@@ -59,6 +60,7 @@ between( const T& a, const T& b, const T&c)
 template <typename T>
 struct SSpan {
 	T a, z;
+	typedef T value_type;
 	SSpan (const T& a_, const T& z_)
 	      : a (a_), z (z_)
 		{}
@@ -191,4 +193,5 @@ double sensible_scale_reduction_factor( double display_scale,
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:
