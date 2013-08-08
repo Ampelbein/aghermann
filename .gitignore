@@ -1,37 +1,43 @@
-.DirIcon
-.backups
-doxygen
-Doxyfile
-.libs
-.deps
-autom4te*
+# emacs
+TAGS
+.backups/
+*~
+cscope.*
+
+# generated files
+*.gch
+*.a
+*.o
+*.la
+*.lo
+*.pc
+/*.tar.bz2
+
+# autotools
+.deps/
+.libs/
+Makefile
+Makefile.in
 aclocal*
+autom4te*
+compile
+config.guess
 config.h
 config.h.in
-config.guess
 config.log
-config.sub
 config.status
+config.sub
 configure
 depcomp
-libtool
 install-sh
+libtool
 ltmain.sh
 m4
 missing
 stamp-h1
-Makefile
-Makefile.in
-*.o
-*.lo
-*.la
-*.a
-*.pc
-*.gch
-cscope.*
-TAGS
-*.tar.bz2
-NewExperiment
-doc/html
 
-*~
+# rest
+doc/html
+doxygen
+Doxyfile
+.DirIcon
