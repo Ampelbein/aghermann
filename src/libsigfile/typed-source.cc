@@ -102,4 +102,5 @@ source_file_type( const string& fname)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

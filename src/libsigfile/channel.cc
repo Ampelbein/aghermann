@@ -145,4 +145,5 @@ figure_type_and_name( const string& h_)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

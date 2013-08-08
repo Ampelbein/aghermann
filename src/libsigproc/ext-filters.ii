@@ -78,4 +78,5 @@ apply( const valarray<T>& in, bool use_first_sample_to_reset)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

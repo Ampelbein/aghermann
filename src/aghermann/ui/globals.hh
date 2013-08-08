@@ -61,4 +61,5 @@ void set_unique_app_window( GtkWindow*);
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

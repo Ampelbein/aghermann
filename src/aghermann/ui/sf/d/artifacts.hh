@@ -134,4 +134,5 @@ void bSFADCancel_clicked_cb( GtkButton*, gpointer);
 // Local Variables:
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

@@ -232,4 +232,5 @@ void iSFFD_any_field_profile_type_toggled_cb( GtkRadioMenuItem*, gpointer);
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

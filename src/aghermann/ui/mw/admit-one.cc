@@ -324,5 +324,6 @@ cMeasurements_drag_drop_cb( GtkWidget      *widget,
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:
 

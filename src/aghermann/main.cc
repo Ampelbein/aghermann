@@ -135,4 +135,5 @@ print_usage( const char* argv0)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

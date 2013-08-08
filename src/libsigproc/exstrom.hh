@@ -770,4 +770,5 @@ extern template valarray<TFloat> band_stop( const valarray<TFloat>&, size_t, flo
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

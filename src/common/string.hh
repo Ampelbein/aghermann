@@ -92,4 +92,5 @@ string from_wstring( const wstring&, const char* charset = "UTF-8");
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

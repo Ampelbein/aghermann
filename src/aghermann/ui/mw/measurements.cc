@@ -326,4 +326,5 @@ modify_profile_scales( const GdkScrollDirection d)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

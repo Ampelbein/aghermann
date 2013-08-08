@@ -318,4 +318,5 @@ wSF_key_press_event_cb( GtkWidget *wid, GdkEventKey *event, gpointer userdata)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

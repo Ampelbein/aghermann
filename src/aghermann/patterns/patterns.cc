@@ -211,4 +211,5 @@ load_patterns_from_location<TFloat>( const string& loc, pattern::TOrigin origin)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

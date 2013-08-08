@@ -25,4 +25,5 @@ template valarray<double>  sigproc::CFilterIIR<double>::apply( const valarray<do
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

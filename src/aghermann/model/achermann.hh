@@ -140,4 +140,5 @@ _which_gc( size_t p) const // selects episode egc by page, or returns &gc if !AZ
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

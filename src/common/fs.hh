@@ -92,4 +92,5 @@ extern size_t total_supported_sigfiles;
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

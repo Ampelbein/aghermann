@@ -775,4 +775,5 @@ set_controls_for_empty_experiment( bool indeed, const bool flush)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

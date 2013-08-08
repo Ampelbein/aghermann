@@ -82,4 +82,5 @@ estimate_E( const valarray<T>& sssu_diff,
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

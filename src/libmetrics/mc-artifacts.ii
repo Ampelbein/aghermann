@@ -57,4 +57,5 @@ detect_artifacts( const valarray<T>& signal, size_t sr,
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

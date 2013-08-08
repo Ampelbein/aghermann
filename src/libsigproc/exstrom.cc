@@ -29,4 +29,5 @@ template valarray<TFloat> exstrom::band_stop( const valarray<TFloat>&, size_t, f
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:

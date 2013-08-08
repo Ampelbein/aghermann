@@ -891,4 +891,5 @@ parse_recording_id_edf_style( const string& s)
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
+// c-basic-offset: 8
 // End:
