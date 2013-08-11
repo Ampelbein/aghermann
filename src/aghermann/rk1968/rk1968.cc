@@ -22,9 +22,10 @@
 
 
 using namespace std;
+using namespace agh::rk1968;
 
 int
-agh::rk1968::
+CScoreAssistant::
 score( agh::CSubject::SEpisode& E)
 {
 	forward_list<agh::CRecording*> HH;

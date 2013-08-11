@@ -105,7 +105,7 @@ iSFScoreAssist_activate_cb(
 {
 	auto& SF = *(SScoringFacility*)userdata;
 
-	if ( agh::rk1968::score( SF.sepisode()) == 0 ) {
+	if ( agh::rk1968::CScoreAssistant().score( SF.sepisode()) == 0 ) {
 		SF.get_hypnogram();
 		SF.calculate_scored_percent();
 		//SF.repaint_score_stats();

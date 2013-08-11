@@ -17,7 +17,16 @@
 namespace agh {
 namespace rk1968 {
 
-int score( agh::CSubject::SEpisode&);
+struct SScoreAssistantPPack {
+};
+
+class CScoreAssistant {
+
+    public:
+	int score( agh::CSubject::SEpisode&);
+
+};
+
 
 } // namespace rk1968
 } // namespace agh
