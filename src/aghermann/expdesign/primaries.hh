@@ -65,15 +65,14 @@ class CSubject : public SSubjectId {
 		{}
 
       // identification
-	const string&
+	const char*
 	dir() const
-		{ return _dir; }
+		{ return _dir.c_str(); }
 
 	int try_update_subject_details( const agh::SSubjectId& j)
 		{
 			return SSubjectId::update_from( j);
 		}
-
 
 	float age( const string& d) const // age when recordings in this session were made
 		{
@@ -101,9 +100,13 @@ class CSubject : public SSubjectId {
 		}
 
       // contents
-	class SEpisodeSequence;
-	class SEpisode {
-	    public:
+	struct SEpisodeSequence;
+	struct SEpisode {
+		SEpisode (sigfile::CTypedSource&&,
+			  const metrics::psd::SPPack&,
+			  const metrics::swu::SPPack&,
+			  const metrics::mc::SPPack&);
+
 		time_t start_time() const	{ return sources.front()().start_time(); }
 		time_t end_time() const		{ return sources.front()().end_time();	 }
 		time_t start_time()		{ return sources.front()().start_time(); }
@@ -115,11 +118,6 @@ class CSubject : public SSubjectId {
 		typedef map<sigfile::SChannel, CRecording> TRecordingSet;
 		TRecordingSet
 			recordings; // one per channel, naturally
-
-		SEpisode (sigfile::CTypedSource&& Fmc,
-			  const metrics::psd::SPPack&,
-			  const metrics::swu::SPPack&,
-			  const metrics::mc::SPPack&);
 
 		const char*
 		name() const
@@ -139,15 +137,16 @@ class CSubject : public SSubjectId {
 			}
 
 		struct SAnnotation
-		      : public sigfile::SAnnotation {
-			const sigfile::CSource& _source;
-			int _h;
-			SAnnotation( const sigfile::CSource& _si, int _hi,
+		  : public sigfile::SAnnotation {
+			SAnnotation (const sigfile::CSource& _si, int _hi,
 				     const sigfile::SAnnotation& _a)
 			      : sigfile::SAnnotation (_a),
 				_source (_si), _h (_hi)
 				{}
 			SAnnotation( const SAnnotation&) = default;
+
+			const sigfile::CSource& _source;
+			int _h;
 
 			bool
 			operator<( const SAnnotation& rv) const
@@ -248,12 +247,7 @@ class CSubject : public SSubjectId {
 	bool
 	have_session( const string& d) const
 		{
-			try {
-				measurements.at(d);
-				return true;
-			} catch (...) {
-				return false;
-			}
+			return measurements.find(d) != measurements.end();
 		}
 
     private:
