@@ -103,7 +103,7 @@ make_user_patterns_location()
 string
 make_experiment_patterns_location( const agh::CExpDesign& ED)
 {
-	return agh::str::sasprintf( "%s/.patterns", ED.session_dir().c_str());
+	return agh::str::sasprintf( "%s/.patterns", ED.session_dir());
 }
 
 string

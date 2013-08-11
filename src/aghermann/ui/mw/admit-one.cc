@@ -157,7 +157,7 @@ dnd_maybe_admit_one( const char* fname)
 			using agh::str::sasprintf;
 			dest_path = sasprintf(
 				"%s/%s/%s/%s",
-				ED->session_dir().c_str(), selected_group,
+				ED->session_dir(), selected_group,
 				F.subject().id.c_str(), selected_session);
 			dest = sasprintf(
 				"%s/%s.edf",

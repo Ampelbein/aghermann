@@ -317,7 +317,7 @@ void
 SExpDesignUI::
 load_artifact_detection_profiles()
 {
-	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "r");
+	FILE *domien = fopen( (string(ED->session_dir()) + "/.AD_profiles").c_str(), "r");
 	if ( domien ) {
 		while ( !feof (domien) ) {
 			metrics::mc::SArtifactDetectionPP P;
@@ -363,7 +363,7 @@ save_artifact_detection_profiles() const
 	if ( global_artifact_detection_profiles.size() == 0 )
 		return;
 
-	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "w");
+	FILE *domien = fopen( (string(ED->session_dir()) + "/.AD_profiles").c_str(), "w");
 	if ( domien ) {
 		for ( auto &P : global_artifact_detection_profiles ) {
 			fprintf( domien, "%s\n", P.first.c_str());

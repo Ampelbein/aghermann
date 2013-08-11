@@ -394,7 +394,7 @@ bGlobalMontageResetAll_clicked_cb(
 	auto& ED = *(SExpDesignUI*)userdata;
 
 	snprintf_buf( "find '%s' -name '.*.montage' -delete",
-		      ED.ED->session_dir().c_str());
+		      ED.ED->session_dir());
 	if ( system( global::buf) )
 		pop_ok_message(
 			ED.wMainWindow,

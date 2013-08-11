@@ -345,7 +345,7 @@ scan_tree( TMsmtCollectProgressIndicatorFun user_progress_fun)
 	agh::fs::total_supported_sigfiles = 0;
 	nftw( "./", agh::fs::supported_sigfile_counter, 20, 0);
 	printf( "CExpDesign::scan_tree(\"%s\"): %zu edf file(s) found\n",
-		session_dir().c_str(), agh::fs::total_supported_sigfiles);
+		session_dir(), agh::fs::total_supported_sigfiles);
 	if ( agh::fs::total_supported_sigfiles == 0 )
 		return;
 

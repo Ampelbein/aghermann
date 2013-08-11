@@ -242,7 +242,7 @@ iSubjectTimelineSaveAsSVG_activate_cb(
 
 	string tmp = agh::str::sasprintf(
 		"%s/%s/%s/%s/%s.svg",
-		ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(),
+		ED.ED->session_dir(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(),
 		ED.AghD(), ED.AghT());
 	J->is_focused = true;
 	J->draw_timeline( tmp);
@@ -263,7 +263,7 @@ iSubjectTimelineBrowse_activate_cb(
 	if ( system( agh::str::sasprintf(
 			     "%s '%s/%s/%s/%s' &",
 			     ED.browse_command.c_str(),
-			     ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD())
+			     ED.ED->session_dir(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD())
 		     .c_str()) ) {
 		pop_ok_message(
 			ED.wMainWindow,
@@ -284,10 +284,10 @@ iSubjectTimelineResetMontage_activate_cb(
 	string exec = (not J->is_episode_focused())
 		? agh::str::sasprintf(
 			"find '%s/%s/%s/%s' -name '.*.montage' -delete",
-			ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD())
+			ED.ED->session_dir(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD())
 		: agh::str::sasprintf(
 			"rm -f '%s/%s/%s/%s/.%s.montage'",
-			ED.ED->session_dir().c_str(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD(), ED.AghE());
+			ED.ED->session_dir(), ED.ED->group_of( J->csubject.id), J->csubject.id.c_str(), ED.AghD(), ED.AghE());
 
 	if ( system( exec.c_str()) )
 		pop_ok_message(

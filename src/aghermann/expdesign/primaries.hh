@@ -290,14 +290,11 @@ class CExpDesign {
 		}
 
 	int status() const
-		{
-			return _status;
-		}
+		{ return _status; }
 
-	const string& session_dir() const
-		{
-			return _session_dir;
-		}
+	const char*
+	session_dir() const
+		{ return _session_dir.c_str(); }
 
 	string name() const // dirname
 		{

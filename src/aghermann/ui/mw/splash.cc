@@ -138,7 +138,7 @@ try_download()
 	vte_terminal_fork_command_full(
 		tTerm,
 		VTE_PTY_DEFAULT,
-		ED->session_dir().c_str(),
+		ED->session_dir(),
 		const_cast<char**> (argv),
 		NULL, // char **envv,
 		(GSpawnFlags)G_SPAWN_DO_NOT_REAP_CHILD, // GSpawnFlags spawn_flags,
