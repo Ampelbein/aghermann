@@ -30,9 +30,7 @@ using namespace std;
 using namespace agh::ui;
 
 
-
-
-agh::ui::SExpDesignUI::SSubjectPresentation::
+SExpDesignUI::SSubjectPresentation::
 SSubjectPresentation (agh::CSubject& _j,
 		      SGroupPresentation& parent)
       : csubject (_j),
@@ -47,7 +45,7 @@ SSubjectPresentation (agh::CSubject& _j,
 
 
 agh::SProfileParamSet
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 make_active_profile_paramset() const
 {
 	switch ( display_profile_type ) {
@@ -70,7 +68,7 @@ make_active_profile_paramset() const
 
 
 void
-agh::ui::SExpDesignUI::SSubjectPresentation::
+SExpDesignUI::SSubjectPresentation::
 create_cprofile()
 {
 	if ( cprofile )
@@ -89,7 +87,7 @@ create_cprofile()
 	}
 }
 
-agh::ui::SExpDesignUI::SSubjectPresentation::
+SExpDesignUI::SSubjectPresentation::
 ~SSubjectPresentation ()
 {
 	if ( cprofile )
@@ -100,7 +98,7 @@ agh::ui::SExpDesignUI::SSubjectPresentation::
 
 
 
-agh::ui::SExpDesignUI::SSubjectPresentation*
+SExpDesignUI::SSubjectPresentation*
 __attribute__ ((pure))
 SExpDesignUI::
 subject_presentation_by_csubject( const agh::CSubject& j)
@@ -115,16 +113,16 @@ subject_presentation_by_csubject( const agh::CSubject& j)
 
 
 const array<unsigned, 4>
-	agh::ui::SExpDesignUI::FFTPageSizeValues = {{4, 20, 30, 60}};
+	SExpDesignUI::FFTPageSizeValues = {{4, 20, 30, 60}};
 const array<double, 3>
-	agh::ui::SExpDesignUI::FFTBinSizeValues = {{.1, .25, .5}};
+	SExpDesignUI::FFTBinSizeValues = {{.1, .25, .5}};
 
-double agh::ui::SExpDesignUI::scroll_factor = 1.05;
+double SExpDesignUI::scroll_factor = 1.05;
 
 using agh::confval::SValidator;
 
-agh::ui::SExpDesignUI::
-SExpDesignUI (agh::ui::SSessionChooser *parent,
+SExpDesignUI::
+SExpDesignUI (SSessionChooser *parent,
 	      const string& dir)
       : // let ED and cgroups be initialized after the UI gets constructed
 	// so we could entertain the user with progress_indicator
@@ -219,7 +217,7 @@ SExpDesignUI (agh::ui::SSessionChooser *parent,
 	ED = new agh::CExpDesign (sure_dir,
 				  bind( &SExpDesignUI::sb_main_progress_indicator, this,
 					placeholders::_1, placeholders::_2, placeholders::_3,
-					agh::ui::TGtkRefreshMode::gtk));
+					ui::TGtkRefreshMode::gtk));
 	load_artifact_detection_profiles();
 	if ( global_artifact_detection_profiles.empty() )
 		global_artifact_detection_profiles["default"] = metrics::mc::SArtifactDetectionPP ();
@@ -316,7 +314,7 @@ SExpDesignUI (agh::ui::SSessionChooser *parent,
 }
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 load_artifact_detection_profiles()
 {
 	FILE *domien = fopen( (ED->session_dir() + "/.AD_profiles").c_str(), "r");
@@ -356,7 +354,7 @@ load_artifact_detection_profiles()
 }
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 save_artifact_detection_profiles() const
 {
 	// libconfig::Config conf;
@@ -390,7 +388,7 @@ save_artifact_detection_profiles() const
 
 size_t
 __attribute__ ((pure))
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 figure_pagesize_item()
 {
 	size_t i = 0;
@@ -400,7 +398,7 @@ figure_pagesize_item()
 }
 size_t
 __attribute__ ((pure))
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 figure_binsize_item()
 {
 	size_t i = 0;
@@ -411,7 +409,7 @@ figure_binsize_item()
 
 
 
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 ~SExpDesignUI ()
 {
 	if ( dl_pid > 0 )
@@ -433,17 +431,17 @@ agh::ui::SExpDesignUI::
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 do_rescan_tree( const bool with_update)
 {
-	agh::ui::SBusyBlock bb (wMainWindow);
+	ui::SBusyBlock bb (wMainWindow);
 
 	depopulate( false);
 	ED -> sync();
 	if ( with_update )
 		ED -> scan_tree( bind (&SExpDesignUI::sb_main_progress_indicator, this,
 				       placeholders::_1, placeholders::_2, placeholders::_3,
-				       agh::ui::TGtkRefreshMode::gdk));
+				       ui::TGtkRefreshMode::gdk));
 	else
 		ED -> scan_tree();
 	populate( false);
@@ -451,13 +449,13 @@ do_rescan_tree( const bool with_update)
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 do_purge_computed()
 {
-	agh::ui::SBusyBlock bb (wMainWindow);
+	SBusyBlock bb (wMainWindow);
 
 	if ( ED->purge_cached_profiles() ) {
-		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", __buf__);
+		fprintf( stderr, "Command '%s' returned a non-zero status. This is suspicious.\n", ui::global::buf);
 		sb_message( "Failed to purge cache files. This is odd.");
 	}
 
@@ -466,7 +464,7 @@ do_purge_computed()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 do_detect_ultradian_cycle( agh::CRecording& M)
 {
 	gsl_siman_params_t siman_params;
@@ -492,7 +490,7 @@ do_detect_ultradian_cycle( agh::CRecording& M)
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 adjust_op_freq_spinbuttons()
 {
 	suppress_redraw = true;
@@ -516,7 +514,7 @@ adjust_op_freq_spinbuttons()
 
 
 double
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 calculate_profile_scale()
 {
 	double	avg_profile_height = 0.;
@@ -555,7 +553,7 @@ calculate_profile_scale()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 show_changelog()
 {
 	gtk_widget_show_all( (GtkWidget*)wAbout);
@@ -567,7 +565,7 @@ show_changelog()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 sb_message( const string& msg) const
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
@@ -575,7 +573,7 @@ sb_message( const string& msg) const
 }
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 sb_clear() const
 {
 	gtk_statusbar_pop( sbMainStatusBar, sbMainContextIdGeneral);
@@ -584,16 +582,16 @@ sb_clear() const
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 sb_main_progress_indicator( const string& current,
 			    const size_t n, const size_t i,
-			    const agh::ui::TGtkRefreshMode mode)
+			    const TGtkRefreshMode mode)
 {
 	sb_message( agh::str::sasprintf( "(%zu of %zu) %s", i, n, current.c_str()));
 
 	switch ( mode ) {
 	case TGtkRefreshMode::gtk:
-		agh::ui::gtk_flush();  // this brings down the whole of GTK if called from a callback
+		gtk_flush();  // this brings down the whole of GTK if called from a callback
 		break;
 	case TGtkRefreshMode::gdk:
 		gdk_window_process_all_updates(); // this, however, fails to do the update if called *not* from a callback

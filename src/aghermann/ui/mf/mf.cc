@@ -30,7 +30,7 @@ unsigned short __score_hypn_depth[8] = {
 }
 
 
-agh::ui::SModelrunFacility::
+SModelrunFacility::
 SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
       : csimulation (csim),
 // subject is known only by name, so look up his full object now
@@ -64,9 +64,10 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 
 	gtk_window_set_title(
 		wModelrunFacility,
-		snprintf_buf( "Simulation: %s (%s) in %s (%s)",
-			      csim.subject(), csim.session(), csim.channel(),
-			      csim.P().display_name().c_str()));
+		snprintf_buf(
+			"Simulation: %s (%s) in %s (%s)",
+			csim.subject(), csim.session(), csim.channel(),
+			csim.P().display_name().c_str()));
 	gtk_window_set_default_size(
 		wModelrunFacility,
 		gdk_screen_get_width( gdk_screen_get_default()) * .80,
@@ -79,16 +80,17 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 	gtk_scale_button_set_value( eMFSmooth, swa_smoothover);
 	update_infobar();
 
-	snprintf_buf( "### Simulation: %s (%s) in %s (%s)\n"
-		      "# sim start at p. %zu, end at p. %zu, baseline end at p. %zu,\n"
-		      "# %zu pp with SWA, %zu pp in bed;\n"
-		      "# SWA_L = %g, SWA[0] = %g, 100%% SWA = %g\n",
-		      csim.subject(),
-		      _p.AghD(), _p.AghH(), csim.P().display_name().c_str(),
-		      csim.sim_start(), csim.sim_end(), csim.baseline_end(),
-		      csim.pages_with_swa(), csim.pages_in_bed(),
-		      csim.SWA_L(), csim.SWA_0(), csim.SWA_100());
-	gtk_text_buffer_set_text( log_text_buffer, __buf__, -1);
+	snprintf_buf(
+		"### Simulation: %s (%s) in %s (%s)\n"
+		"# sim start at p. %zu, end at p. %zu, baseline end at p. %zu,\n"
+		"# %zu pp with SWA, %zu pp in bed;\n"
+		"# SWA_L = %g, SWA[0] = %g, 100%% SWA = %g\n",
+		csim.subject(),
+		_p.AghD(), _p.AghH(), csim.P().display_name().c_str(),
+		csim.sim_start(), csim.sim_end(), csim.baseline_end(),
+		csim.pages_with_swa(), csim.pages_in_bed(),
+		csim.SWA_L(), csim.SWA_0(), csim.SWA_100());
+	gtk_text_buffer_set_text( log_text_buffer, global::buf, -1);
 
 	for ( auto &tuple : eMFVx ) {
 		auto	jdst = gtk_spin_button_get_adjustment( tuple.first);
@@ -105,13 +107,13 @@ SModelrunFacility (agh::ach::CModelRun& csim, SExpDesignUI& parent)
 
 	gtk_button_set_label(
 		(GtkButton*)eMFSmooth,
-		(snprintf_buf( "Smooth: %zu", swa_smoothover), __buf__));
+		snprintf_buf( "Smooth: %zu", swa_smoothover));
 
 	gtk_widget_show_all( (GtkWidget*)wModelrunFacility);
 }
 
 
-agh::ui::SModelrunFacility::
+SModelrunFacility::
 ~SModelrunFacility()
 {
 	gtk_widget_destroy( (GtkWidget*)wModelrunFacility);
@@ -120,7 +122,7 @@ agh::ui::SModelrunFacility::
 
 
 void
-agh::ui::SModelrunFacility::
+SModelrunFacility::
 siman_param_printer( void *xp)
 {
 //	memcpy( __t_set.tunables, xp, __t_set.n_tunables * sizeof(double));
@@ -137,7 +139,7 @@ siman_param_printer( void *xp)
 
 
 void
-agh::ui::SModelrunFacility::
+SModelrunFacility::
 draw_timeline( cairo_t *cr)
 {
       // empirical SWA
@@ -213,14 +215,14 @@ draw_timeline( cairo_t *cr)
 
 
 
-size_t agh::ui::SModelrunFacility::swa_smoothover = 2;
+size_t SModelrunFacility::swa_smoothover = 2;
 
 
 
 
 
 void
-agh::ui::SModelrunFacility::
+SModelrunFacility::
 draw_episode( cairo_t *cr,
 	      const size_t ep,
 	      const size_t ep_start, const size_t ep_end,
@@ -342,7 +344,7 @@ draw_episode( cairo_t *cr,
 
 
 void
-agh::ui::SModelrunFacility::
+SModelrunFacility::
 draw_ticks( cairo_t *cr,
 	    size_t start, const size_t end)
 {
@@ -371,8 +373,7 @@ draw_ticks( cairo_t *cr,
 		cairo_move_to( cr,
 			       (float)(i-start)/(end-start) * da_wd_actual() + 2,
 			       da_ht - hypn_depth-lgd_margin + 14);
-		snprintf_buf_ts_h( (double)i/pph);
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, snprintf_buf_ts_h( (double)i/pph));
 		cairo_stroke( cr);
 	}
 }
@@ -385,7 +386,7 @@ draw_ticks( cairo_t *cr,
 
 
 void
-agh::ui::SModelrunFacility::
+SModelrunFacility::
 update_infobar()
 {
 	_suppress_Vx_value_changed = true;

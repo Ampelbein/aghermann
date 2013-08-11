@@ -14,8 +14,8 @@
 using namespace std;
 using namespace agh::ui;
 
-extern "C" {
 
+extern "C" {
 
 gboolean
 wSF_delete_event_cb(

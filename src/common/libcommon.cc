@@ -228,72 +228,72 @@ dhms_colon( double seconds, int dd)
 
 
 
+// uncomment on demand
+// wstring
+// agh::str::
+// to_wstring( const string& in, const char* charset)
+// {
+//         wstring out;
 
-wstring
-agh::str::
-to_wstring( const string& in, const char* charset)
-{
-        wstring out;
+//         size_t sufficient = ((in.size() + 1) * sizeof(wchar_t));
 
-        size_t sufficient = ((in.size() + 1) * sizeof(wchar_t));
+//         iconv_t cd = iconv_open( "WCHAR_T", charset);
+//         if ( cd == (iconv_t) -1 )
+//                 return out;
 
-        iconv_t cd = iconv_open( "WCHAR_T", charset);
-        if ( cd == (iconv_t) -1 )
-                return out;
+//         char    *inptr  = const_cast<char*> (&in[0]), // iconv doesn't touch input, or does it?
+//                 *wrptr  = (char*)malloc( sufficient),
+//                 *wrptr0 = wrptr;
 
-        char    *inptr  = const_cast<char*> (&in[0]), // iconv doesn't touch input, or does it?
-                *wrptr  = (char*)malloc( sufficient),
-                *wrptr0 = wrptr;
+//         size_t  insize = in.size(),
+//                 avail  = sufficient;
+//         size_t  nconv  = iconv( cd, &inptr, &insize, &wrptr, &avail);
+//         if ( nconv != (size_t) -1 ) {
+//                 if ( avail >= sizeof(wchar_t) ) {
+//                         *((wchar_t*) wrptr) = L'\0';
+//                         out.assign( (wchar_t*)wrptr0);
+//                 }
+//         }
 
-        size_t  insize = in.size(),
-                avail  = sufficient;
-        size_t  nconv  = iconv( cd, &inptr, &insize, &wrptr, &avail);
-        if ( nconv != (size_t) -1 ) {
-                if ( avail >= sizeof(wchar_t) ) {
-                        *((wchar_t*) wrptr) = L'\0';
-                        out.assign( (wchar_t*)wrptr0);
-                }
-        }
+//         free( (void*)wrptr0);
+//         if ( iconv_close( cd) != 0 )
+//                 perror ("iconv_close");
 
-        free( (void*)wrptr0);
-        if ( iconv_close( cd) != 0 )
-                perror ("iconv_close");
-
-        return out;
-}
+//         return out;
+// }
 
 
-string
-agh::str::
-from_wstring( const wstring& in, const char* charset)
-{
-        string out;
+// string
+// agh::str::
+// from_wstring( const wstring& in, const char* charset)
+// {
+//         string out;
 
-        size_t sufficient = (in.size() * 4 + 1);
+//         size_t sufficient = (in.size() * 4 + 1);
 
-        iconv_t cd = iconv_open( charset, "WCHAR_T");
-        if ( cd == (iconv_t) -1 )
-                return out;
+//         iconv_t cd = iconv_open( charset, "WCHAR_T");
+//         if ( cd == (iconv_t) -1 )
+//                 return out;
 
-        char    *inptr = (char*) const_cast<wchar_t*> (&in[0]), // yes we can!
-                *wrptr = (char*)malloc( sufficient),
-                *wrptr0 = wrptr;
+//         char    *inptr = (char*) const_cast<wchar_t*> (&in[0]), // yes we can!
+//                 *wrptr = (char*)malloc( sufficient),
+//                 *wrptr0 = wrptr;
 
-        size_t  insize = in.size() * sizeof(wchar_t),
-                avail  = sufficient;
-        size_t  nconv  = iconv( cd, &inptr, &insize, &wrptr, &avail);
-        if ( nconv != (size_t) -1 ) {
-                if ( avail > 0 ) {
-                        *wrptr = '\0';
-                        out.assign( wrptr0);
-                }
-        }
+//         size_t  insize = in.size() * sizeof(wchar_t),
+//                 avail  = sufficient;
+//         size_t  nconv  = iconv( cd, &inptr, &insize, &wrptr, &avail);
+//         if ( nconv != (size_t) -1 ) {
+//                 if ( avail > 0 ) {
+//                         *wrptr = '\0';
+//                         out.assign( wrptr0);
+//                 }
+//         }
 
-        free( wrptr0);
-        iconv_close( cd);
+//         free( wrptr0);
+//         iconv_close( cd);
 
-        return out;
-}
+//         return out;
+// }
 
 
 

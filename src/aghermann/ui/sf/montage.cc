@@ -18,6 +18,7 @@
 #include "d/patterns.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 namespace {
 
@@ -29,7 +30,7 @@ unsigned short PageTicks[] = {
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 draw_signal( const valarray<TFloat>& signal,
 	     size_t width, int vdisp, cairo_t *cr) const
 {
@@ -37,18 +38,19 @@ draw_signal( const valarray<TFloat>& signal,
 		end    = _p.cur_vpage_end()    * samplerate(),
 		run    = end - start,
 		half_pad = run * _p.skirting_run_per1;
-	agh::ui::cairo_draw_signal( cr, signal,
-				  start - half_pad,
-				  end + half_pad,
-				  width, 0, vdisp, signal_display_scale,
-				  resample_signal ? max(1u, (unsigned)spp()) : 1);
+	cairo_draw_signal(
+		cr, signal,
+		start - half_pad,
+		end + half_pad,
+		width, 0, vdisp, signal_display_scale,
+		resample_signal ? max(1u, (unsigned)spp()) : 1);
 }
 
 
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 estimate_montage_height()
 {
 	da_ht = channels.size() * interchannel_gap;
@@ -59,8 +61,8 @@ estimate_montage_height()
 
 
 struct SChHolder {
-	agh::ui::SScoringFacility::SChannel* ch;
-	SChHolder( agh::ui::SScoringFacility::SChannel& ini) : ch (&ini) {}
+	SScoringFacility::SChannel* ch;
+	SChHolder( SScoringFacility::SChannel& ini) : ch (&ini) {}
 	bool operator<( const SChHolder& rv) const
 		{
 			return ch->zeroy < rv.ch->zeroy;
@@ -70,7 +72,7 @@ struct SChHolder {
 
 
 sigfile::SAnnotation*
-agh::ui::SScoringFacility::
+SScoringFacility::
 interactively_choose_annotation() const
 {
 	// do some on-the-fly construcion
@@ -102,7 +104,7 @@ interactively_choose_annotation() const
 
 
 int
-agh::ui::SScoringFacility::
+SScoringFacility::
 find_free_space()
 {
 	vector<SChHolder> thomas;
@@ -134,7 +136,7 @@ find_free_space()
 }
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 space_evenly()
 {
 	vector<SChHolder> thomas;
@@ -157,7 +159,7 @@ space_evenly()
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 expand_by_factor( const double fac)
 {
 	for ( auto &H : channels ) {
@@ -182,7 +184,7 @@ expand_by_factor( const double fac)
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 draw_for_montage( const string& fname,
 		  const int width, const int height) // to a file
 {
@@ -197,7 +199,7 @@ draw_for_montage( const string& fname,
 }
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 draw_for_montage( cairo_t* cr)
 {
 	if ( !hidden ) {
@@ -209,7 +211,7 @@ draw_for_montage( cairo_t* cr)
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 draw_page( cairo_t *cr,
 	   const int wd, const float y0,
 	   bool draw_marquee) const
@@ -227,7 +229,7 @@ draw_page( cairo_t *cr,
 	}
 
       // marquee, goes first, not to obscure waveforms
-	if ( _p.mode != agh::ui::SScoringFacility::TMode::shuffling_channels
+	if ( _p.mode != SScoringFacility::TMode::shuffling_channels
 	     and draw_marquee // possibly undesired (such as when drawing for unfazer (what unfazer?))
 	     && agh::alg::overlap(
 		     selection_start_time, selection_end_time,
@@ -256,15 +258,16 @@ draw_page( cairo_t *cr,
 		_p._p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgba( cr);
 
 		cairo_text_extents_t extents;
-		snprintf_buf( "%5.2fs",
-			      selection_start_time - _p.cur_xvpage_start() - pre);
-		cairo_text_extents( cr, __buf__, &extents);
+		snprintf_buf(
+			"%5.2fs",
+			selection_start_time - _p.cur_xvpage_start() - pre);
+		cairo_text_extents( cr, global::buf, &extents);
 		double ido = ma - 3 - extents.width;
 		if ( ido < extents.width+3 )
 			cairo_move_to( cr, ma+3, ptop + 30);
 		else
 			cairo_move_to( cr, ido, ptop + 12);
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, global::buf);
 		cairo_stroke( cr);
 
 		if ( (draw_selection_envelope || draw_selection_course || draw_selection_dzcdf) &&
@@ -287,15 +290,15 @@ draw_page( cairo_t *cr,
 
 					cairo_set_source_rgba( cr, 1, 1, 1, .6);
 					cairo_set_line_width( cr, 1);
-					agh::ui::cairo_draw_signal(
+					cairo_draw_signal(
 						cr, env_u, 0, env_u.size(),
 						me-ma, ma, y0, signal_display_scale);
-					agh::ui::cairo_draw_signal(
+					cairo_draw_signal(
 						cr, env_l, 0, env_l.size(),
 						me-ma, ma, y0, signal_display_scale,
 						1,
-						agh::ui::TDrawSignalDirection::backward,
-						agh::ui::TDrawSignalPathOption::yes);
+						TDrawSignalDirection::backward,
+						TDrawSignalPathOption::yes);
 					cairo_close_path( cr);
 					cairo_fill( cr);
 					cairo_stroke( cr);
@@ -312,7 +315,7 @@ draw_page( cairo_t *cr,
 
 				cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 				cairo_set_line_width( cr, 3.);
-				agh::ui::cairo_draw_signal(
+				cairo_draw_signal(
 					cr, course, 0, course.size(),
 					me-ma, ma, y0, signal_display_scale);
 				cairo_stroke( cr);
@@ -330,7 +333,7 @@ draw_page( cairo_t *cr,
 
 					cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
 					cairo_set_line_width( cr, 1.);
-					agh::ui::cairo_draw_signal(
+					cairo_draw_signal(
 						cr, dzcdf, 0, dzcdf.size(),
 						me-ma, ma, y0, dzcdf_display_scale);
 					cairo_stroke( cr);
@@ -341,22 +344,24 @@ draw_page( cairo_t *cr,
 	      // labels
 		if ( selection_end_time - selection_start_time > .25 ) {  // don't mark end if selection is too short
 			_p._p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgba( cr);
-			snprintf_buf( "%5.2fs",
-				      selection_end_time - _p.cur_xvpage_start() - pre);
-			cairo_text_extents( cr, __buf__, &extents);
+			snprintf_buf(
+				"%5.2fs",
+				selection_end_time - _p.cur_xvpage_start() - pre);
+			cairo_text_extents( cr, global::buf, &extents);
 			ido = me + extents.width+3;
 			if ( ido > wd )
 				cairo_move_to( cr, me - 3 - extents.width, ptop + 30);
 			else
 				cairo_move_to( cr, me + 3, ptop + 12);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, global::buf);
 
-			snprintf_buf( "< %4.2fs >", // "←%4.2fs→",
-				      selection_end_time - selection_start_time);
-			cairo_text_extents( cr, __buf__, &extents);
+			snprintf_buf(
+				"< %4.2fs >", // "←%4.2fs→",
+				selection_end_time - selection_start_time);
+			cairo_text_extents( cr, global::buf, &extents);
 			cairo_move_to( cr, ma+(me-ma)/2 - extents.width/2,
 				       ptop + (extents.width < me-ma ? 12 : 30));
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, global::buf);
 
 			// MC metrics
 			if ( schannel().type() == sigfile::SChannel::TType::eeg &&
@@ -364,12 +369,13 @@ draw_page( cairo_t *cr,
 
 				cairo_set_font_size( cr, 10);
 				cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-				snprintf_buf( "%4.2f (%3.1f / %3.1f)",
-					      selection_SS / selection_SU, selection_SS, selection_SU);
-				cairo_text_extents( cr, __buf__, &extents);
+				snprintf_buf(
+					"%4.2f (%3.1f / %3.1f)",
+					selection_SS / selection_SU, selection_SS, selection_SU);
+				cairo_text_extents( cr, global::buf, &extents);
 				cairo_move_to( cr, ma+(me-ma)/2 - extents.width/2,
 					       pbot - (extents.width < me-ma ? 12 : 30));
-				cairo_show_text( cr, __buf__);
+				cairo_show_text( cr, global::buf);
 			}
 			cairo_stroke( cr);
 		}
@@ -385,7 +391,7 @@ draw_page( cairo_t *cr,
 		draw_signal_filtered( wd, y0, cr);
 		cairo_stroke( cr);
 
-		if ( _p.mode == agh::ui::SScoringFacility::TMode::scoring ) {
+		if ( _p.mode == SScoringFacility::TMode::scoring ) {
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-88, y0 - 15);
 			cairo_set_font_size( cr, 10);
@@ -407,7 +413,7 @@ draw_page( cairo_t *cr,
 		draw_signal_original( wd, y0, cr);
 		cairo_stroke( cr);
 
-		if ( _p.mode == agh::ui::SScoringFacility::TMode::scoring ) {
+		if ( _p.mode == SScoringFacility::TMode::scoring ) {
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgb( cr);
 			cairo_move_to( cr, wd-88, y0 - 25);
 			cairo_set_font_size( cr, 10);
@@ -417,7 +423,7 @@ draw_page( cairo_t *cr,
 	}
 
       // waveform: signal_reconstituted
-	if ( _p.mode == agh::ui::SScoringFacility::TMode::showing_remixed &&
+	if ( _p.mode == SScoringFacility::TMode::showing_remixed &&
 	     signal_reconstituted.size() != 0 ) {
 		if ( apply_reconstituted ) {
 			cairo_set_line_width( cr, fine_line() * 1.3);
@@ -477,7 +483,7 @@ draw_page( cairo_t *cr,
 	}
 
       // annotations
-	if ( _p.mode == agh::ui::SScoringFacility::TMode::scoring
+	if ( _p.mode == SScoringFacility::TMode::scoring
 	     and not annotations.empty() ) {
 		double last_label_end = 0;
 		int overlap_count = 0;
@@ -576,12 +582,12 @@ draw_page( cairo_t *cr,
 
 		cairo_set_source_rgba( cr, 1., 1., 1., 0.6);
 		cairo_move_to( cr, x+1, y+1);
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, global::buf);
 		cairo_stroke( cr);
 
 		cairo_set_source_rgba( cr, 0., 0., 0., 0.7);
 		cairo_move_to( cr, x, y);
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, global::buf);
 		cairo_stroke( cr);
 	}
 
@@ -595,7 +601,7 @@ draw_page( cairo_t *cr,
 		cairo_set_source_rgb( cr, 0., 0., 0.);
 		cairo_set_line_width( cr, 1.5);
 		double dpuf =
-			agh::alg::sensible_scale_reduction_factor(
+			alg::sensible_scale_reduction_factor(
 				1 * signal_display_scale, _p.interchannel_gap * .75);
 		int x = 10;
 		cairo_move_to( cr, x, ptop + 5);
@@ -612,15 +618,12 @@ draw_page( cairo_t *cr,
 	{
 		cairo_set_font_size( cr, 9);
 		if ( have_low_pass() ) {
-			snprintf_buf( "LP: %6.2f/%u", filters.low_pass_cutoff, filters.low_pass_order);
 			cairo_move_to( cr, wd-100, y0 + 15);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, snprintf_buf( "LP: %6.2f/%u", filters.low_pass_cutoff, filters.low_pass_order));
 		}
 		if ( have_high_pass() ) {
 			cairo_move_to( cr, wd-100, y0 + 24);
-			cairo_show_text(
-				cr,
-				snprintf_buf( "HP: %6.2f/%u", filters.high_pass_cutoff, filters.high_pass_order));
+			cairo_show_text( cr, snprintf_buf( "HP: %6.2f/%u", filters.high_pass_cutoff, filters.high_pass_order));
 		}
 		if ( have_notch_filter() ) {
 			static const char *nfs[] = { "", "50 Hz", "60 Hz" };
@@ -633,7 +636,7 @@ draw_page( cairo_t *cr,
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 draw_montage( const string& fname) // to a file
 {
 	cairo_surface_t *cs = cairo_svg_surface_create( fname.c_str(), da_wd, da_ht);
@@ -647,7 +650,7 @@ draw_montage( const string& fname) // to a file
 
 template <class T>
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 {
 	int gap = da_ht/mat.rows();
@@ -705,10 +708,11 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 			run   = end - start,
 			half_pad = run * skirting_run_per1;
 
-		agh::ui::cairo_draw_signal( cr, mat, r,
-					  start - half_pad,
-					  end + half_pad,
-					  da_wd, 0, our_y, our_display_scale);
+		cairo_draw_signal(
+			cr, mat, r,
+			start - half_pad,
+			end + half_pad,
+			da_wd, 0, our_y, our_display_scale);
 		cairo_stroke( cr);
 		our_y += gap;
 	}
@@ -716,7 +720,7 @@ _draw_matrix_to_montage( cairo_t *cr, const itpp::Mat<T>& mat)
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 draw_montage( cairo_t* cr)
 {
 	double	true_frac = 1. - 1. / (1. + 2*skirting_run_per1),
@@ -727,7 +731,7 @@ draw_montage( cairo_t* cr)
 	switch ( mode ) {
 	case TMode::showing_ics:
 		if ( ica_components.size() == 0 ) {
-			agh::ui::cairo_put_banner(
+			cairo_put_banner(
 				cr, da_wd, da_ht,
 				"Now set up ICA parameters, then press [Compute ICs]");
 		} else
@@ -735,7 +739,7 @@ draw_montage( cairo_t* cr)
 			// draw ignoring channels' zeroy
 	    break;
 	case TMode::separating:
-		agh::ui::cairo_put_banner(
+		cairo_put_banner(
 			cr, da_wd, da_ht,
 			"Separating...");
 	    break;
@@ -834,7 +838,7 @@ draw_montage( cairo_t* cr)
 			_p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr);
 			cairo_move_to( cr, half_pad + i * ef / PageTicks[pagesize_item] + 5, da_ht-2);
 			snprintf_buf_ts_s( tick_pos);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, global::buf);
 		}
 		cairo_stroke( cr);
 	}
@@ -850,7 +854,6 @@ draw_montage( cairo_t* cr)
 		cairo_stroke( cr);
 	}
 }
-
 
 
 // Local Variables:

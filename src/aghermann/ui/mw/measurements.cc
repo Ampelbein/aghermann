@@ -21,9 +21,10 @@
 #include "mw.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 bool
-agh::ui::SExpDesignUI::SSubjectPresentation::
+SExpDesignUI::SSubjectPresentation::
 get_episode_from_timeline_click( unsigned along)
 {
 	try {
@@ -42,7 +43,7 @@ get_episode_from_timeline_click( unsigned along)
 }
 
 void
-agh::ui::SExpDesignUI::SSubjectPresentation::
+SExpDesignUI::SSubjectPresentation::
 draw_timeline( const string& fname) const
 {
 	cairo_surface_t *cs =
@@ -58,13 +59,13 @@ draw_timeline( const string& fname) const
 
 
 void
-agh::ui::SExpDesignUI::SSubjectPresentation::
+SExpDesignUI::SSubjectPresentation::
 draw_timeline( cairo_t *cr) const
 {
 	bool have_episodes = cprofile && not cprofile->mm_list().empty();
 
 	if ( not have_episodes )
-		agh::ui::cairo_put_banner(
+		cairo_put_banner(
 			cr, 400, tl_height(), "(no episodes)", 24);
 
 	if ( have_episodes ) {
@@ -149,18 +150,19 @@ draw_timeline( cairo_t *cr) const
 
 			// episode start timestamp
 			time_t	dima = E.start_time();
-			strftime( __buf__, 79, "%F %T",
+			strftime( global::buf, 79, "%F %T",
 				  localtime( &dima));
-			g_string_printf( __ss__, "%s | %s",
-					 __buf__, E.name());
+			string ss = agh::str::sasprintf(
+				"%s | %s",
+				global::buf, E.name());
 			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2+1, 12+1);
 			cairo_set_source_rgb( cr, 0., 0., 0.);
-			cairo_show_text( cr, __ss__->str);
+			cairo_show_text( cr, ss.c_str());
 			cairo_stroke( cr);
 			// offset
 			cairo_move_to( cr, tl_left_margin() + e_pixel_start + 2, 12);
 			cairo_set_source_rgb( cr, 1., 1., 1.);
-			cairo_show_text( cr, __ss__->str);
+			cairo_show_text( cr, ss.c_str());
 			cairo_stroke( cr);
 
 			// highlight
@@ -261,9 +263,9 @@ draw_timeline( cairo_t *cr) const
 
 					snprintf_buf_ts_h( (clock_d - clock_d0 + 1) * 24 + clock_h);
 					cairo_text_extents_t extents;
-					cairo_text_extents( cr, __buf__, &extents);
+					cairo_text_extents( cr, global::buf, &extents);
 					cairo_move_to( cr, tl_left_margin() + x - extents.width/2, tl_height()-1);
-					cairo_show_text( cr, __buf__);
+					cairo_show_text( cr, global::buf);
 
 				} else {
 					cairo_move_to( cr, tl_left_margin() + x, tl_height() - 14);
@@ -293,14 +295,17 @@ draw_timeline( cairo_t *cr) const
 	cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size( cr, 9);
 	cairo_set_source_rgb( cr, .1, .1, .1);
-	cairo_show_text( cr, snprintf_buf( "%c %d y.o.",
-					   csubject.gender_sign(),
-					   (int)csubject.age( *_p._p._AghDi)));
+	cairo_show_text(
+		cr,
+		snprintf_buf(
+			"%c %d y.o.",
+			csubject.gender_sign(),
+			(int)csubject.age( *_p._p._AghDi)));
 }
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 modify_active_profile_scale( const GdkScrollDirection d)
 {
 	auto fac = (d == GDK_SCROLL_DOWN) ? 1/scroll_factor : scroll_factor;
@@ -313,7 +318,7 @@ modify_active_profile_scale( const GdkScrollDirection d)
 }
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 modify_profile_scales( const GdkScrollDirection d)
 {
 	auto fac = (d == GDK_SCROLL_DOWN) ? 1/scroll_factor : scroll_factor;

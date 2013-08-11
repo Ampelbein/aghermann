@@ -10,10 +10,13 @@ noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
 	forward-decls.hh \
+	globals.cc \
 	globals.hh \
-	libcommon.cc \
+	misc.cc \
 	misc.hh \
+	ui++.cc \
 	ui++.hh \
+	ui.cc \
 	ui.hh
 
 if DO_PCH

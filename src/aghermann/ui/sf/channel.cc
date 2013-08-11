@@ -23,14 +23,15 @@
 #include "d/patterns.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 pattern::SPatternPPack<TFloat>
-	agh::ui::SScoringFacility::SChannel::pattern_params =
+	SScoringFacility::SChannel::pattern_params =
 		{.25,  0., 1.5, 1,  .1, .5, 3};
 
 using agh::confval::SValidator;
 
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 SChannel (agh::CRecording& r,
 	  SScoringFacility& parent,
 	  size_t y0,
@@ -161,7 +162,7 @@ SChannel (agh::CRecording& r,
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_signal_original()
 {
 	signal_original =
@@ -175,7 +176,7 @@ get_signal_original()
 }
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_signal_filtered()
 {
 	signal_filtered =
@@ -190,7 +191,7 @@ get_signal_filtered()
 
 
 list<sigfile::SAnnotation*>
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 in_annotations( const double time) const
 {
 	// select this channel's annotations
@@ -206,7 +207,7 @@ in_annotations( const double time) const
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_psd_course()
 {
 	//psd_profile.compute();
@@ -222,7 +223,7 @@ get_psd_course()
 }
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_psd_in_bands()
 {
 	crecording.psd_profile.compute();
@@ -251,7 +252,7 @@ get_psd_in_bands()
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_swu_course()
 {
 	//swu_profile.compute();
@@ -268,7 +269,7 @@ get_swu_course()
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_mc_course()
 {
 	//mc_profile.compute();
@@ -286,7 +287,7 @@ get_mc_course()
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_raw_profile()
 {
 	raw_profile = sigproc::raw_signal_profile<TFloat>(
@@ -296,7 +297,7 @@ get_raw_profile()
 
 
 tuple<metrics::TType, valarray<TFloat>&>
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 which_profile( const metrics::TType metric)
 {
 	switch ( schannel().type() ) {
@@ -322,13 +323,13 @@ which_profile( const metrics::TType metric)
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_spectrum( const size_t p)
 {
 	spectrum = crecording.psd_profile.spectrum( p);
 }
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 get_spectrum()
 {
 	spectrum = crecording.psd_profile.spectrum( _p.cur_page());
@@ -340,7 +341,7 @@ get_spectrum()
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 update_profile_display_scales()
 {
 	psd.display_scale =
@@ -365,7 +366,7 @@ update_profile_display_scales()
 
 
 float
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 calculate_dirty_percent()
 {
 	size_t total = 0; // in samples
@@ -378,7 +379,7 @@ calculate_dirty_percent()
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 {
 	auto marked =
@@ -405,7 +406,7 @@ detect_artifacts( const metrics::mc::SArtifactDetectionPP& P)
 
 
 pair<double, double>
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 mark_flat_regions_as_artifacts( const double minsize, const double pad)
 {
 	double	total_before = artifacts.total();
@@ -451,7 +452,7 @@ mark_flat_regions_as_artifacts( const double minsize, const double pad)
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 mark_region_as_artifact( const bool do_mark)
 {
 	if ( do_mark )
@@ -480,7 +481,7 @@ mark_region_as_artifact( const bool do_mark)
 }
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 mark_region_as_annotation( const string& label,
 			   const sigfile::SAnnotation::TType type)
 {
@@ -493,7 +494,7 @@ mark_region_as_annotation( const string& label,
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 mark_region_as_pattern()
 {
 	if ( _p.patterns_d().import_from_selection( *this) == 0 )
@@ -503,7 +504,7 @@ mark_region_as_pattern()
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 update_channel_menu_items( const double x)
 {
 	_p.suppress_redraw = true;
@@ -560,7 +561,7 @@ update_channel_menu_items( const double x)
 }
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 update_power_menu_items()
 {
 	_p.suppress_redraw = true;
@@ -578,7 +579,7 @@ update_power_menu_items()
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 selectively_enable_selection_menu_items()
 {
 	bool findable =
@@ -588,7 +589,7 @@ selectively_enable_selection_menu_items()
 
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 put_selection( const size_t a, const size_t e)
 {
 	selection_start = a, selection_end = e;
@@ -598,7 +599,7 @@ put_selection( const size_t a, const size_t e)
 }
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 put_selection( const double a, const double e)
 {
 	selection_start_time = a, selection_end_time = e;
@@ -608,7 +609,7 @@ put_selection( const double a, const double e)
 }
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 _put_selection()
 {
 	if ( selection_end_time - selection_start_time > 1. ) {

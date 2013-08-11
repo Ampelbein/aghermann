@@ -25,8 +25,6 @@ using namespace std;
 namespace agh {
 
 
-
-
 typedef unsigned long hash_t;
 
 

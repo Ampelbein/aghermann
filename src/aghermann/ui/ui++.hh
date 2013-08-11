@@ -31,6 +31,93 @@ using namespace std;
 namespace agh {
 namespace ui {
 
+
+// SGeometry
+
+struct SGeometry {
+	int x, y, w, h;
+	SGeometry()
+	      : x (-1), y (-1), w (-1), h (-1)
+		{}
+	SGeometry( int x_, int y_, int w_, int h_)
+	      : x (x_), y (y_), w (w_), h (h_)
+		{}
+	bool is_valid() const
+		{
+			return	(x > 0) && (x < 3000) &&
+				(y > 0) && (y < 3000) &&
+				(w > 1) && (w < 50000) &&
+				(h > 1) && (h < 50000);
+		}
+};
+
+
+
+// SManagedColor
+// connects colours to buttons and also provides useful shortcuts for cairo
+
+struct SManagedColor {
+	GdkRGBA clr;
+	GtkColorButton* btn;
+
+	SManagedColor& operator=( const SManagedColor&) = default;
+	void acquire()
+		{
+			gtk_color_chooser_get_rgba( (GtkColorChooser*)btn, &clr);
+		}
+
+	void set_source_rgb( cairo_t* cr) const
+		{
+			cairo_set_source_rgb( cr, clr.red, clr.green, clr.blue);
+		}
+	void set_source_rgba( cairo_t* cr, double alpha_override = NAN) const
+		{
+			cairo_set_source_rgba(
+				cr, clr.red, clr.green, clr.blue,
+				isfinite(alpha_override) ? alpha_override : clr.alpha);
+		}
+	void set_source_rgb_contrasting( cairo_t* cr) const
+		{
+			cairo_set_source_rgb(
+				cr, 1-clr.red, 1-clr.green, 1-clr.blue);
+		}
+	void set_source_rgba_contrasting( cairo_t* cr, double alpha_override = NAN) const
+		{
+			cairo_set_source_rgba(
+				cr, 1-clr.red, 1-clr.green, 1-clr.blue,
+				isfinite(alpha_override) ? alpha_override : clr.alpha);
+		}
+
+	void pattern_add_color_stop_rgba( cairo_pattern_t* cp, double at, double alpha_override = NAN) const
+		{
+			cairo_pattern_add_color_stop_rgba(
+				cp, at, clr.red, clr.green, clr.blue,
+				isfinite(alpha_override) ? alpha_override : clr.alpha);
+		}
+};
+
+
+enum class TGtkRefreshMode {
+	gtk, gdk
+};
+
+
+inline GdkColor
+contrasting_to( const GdkColor* c)
+{
+	GdkColor cc;
+	if ( c->red + c->green + c->blue < 65535*3/2 )
+		cc.red = cc.green = cc.blue = 65535;
+	else
+		cc.red = cc.green = cc.blue = 0;
+	return cc;
+}
+
+
+
+
+// SBusyBlock
+
 class SBusyBlock {
 	DELETE_DEFAULT_METHODS (SBusyBlock);
     public:
@@ -39,23 +126,24 @@ class SBusyBlock {
 		{
 			lock();
 		}
-	// poor ubuntu people
-	// SBusyBlock (GtkWindow* w)
-	//       : SBusyBlock ((GtkWidget*)w)
-	// 	{}
-	// SBusyBlock (GtkDialog* w)
-	//       : SBusyBlock ((GtkWidget*)w)
-	// 	{}
-	SBusyBlock (GtkWindow* w_)
-	      : w ((GtkWidget*)w_)
-		{
-			lock();
-		}
-	SBusyBlock (GtkDialog* w_)
-	      : w ((GtkWidget*)w_)
-		{
-			lock();
-		}
+	// delegating ctors
+	SBusyBlock (GtkWindow* w)
+	      : SBusyBlock ((GtkWidget*)w)
+		{}
+	SBusyBlock (GtkDialog* w)
+	      : SBusyBlock ((GtkWidget*)w)
+		{}
+
+	// SBusyBlock (GtkWindow* w_)
+	//       : w ((GtkWidget*)w_)
+	// 	{
+	// 		lock();
+	// 	}
+	// SBusyBlock (GtkDialog* w_)
+	//       : w ((GtkWidget*)w_)
+	// 	{
+	// 		lock();
+	// 	}
 
        ~SBusyBlock ()
 		{
@@ -74,6 +162,9 @@ class SBusyBlock {
 };
 
 
+
+// SUIVar
+// binding GTK spinbuttons, comboboxes etc to variables
 
 class SUIVar_base {
     public:

@@ -395,10 +395,10 @@ bGlobalMontageResetAll_clicked_cb(
 
 	snprintf_buf( "find '%s' -name '.*.montage' -delete",
 		      ED.ED->session_dir().c_str());
-	if ( system( __buf__) )
+	if ( system( global::buf) )
 		pop_ok_message(
 			ED.wMainWindow,
-			"How strange!", "Command '%s' returned a non-zero status. This is weird.", __buf__);
+			"How strange!", "Command '%s' returned a non-zero status. This is weird.", global::buf);
 }
 
 

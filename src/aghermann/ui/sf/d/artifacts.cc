@@ -12,9 +12,10 @@
 #include "artifacts.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-agh::ui::SScoringFacility::SArtifactsDialog&
-agh::ui::SScoringFacility::
+SScoringFacility::SArtifactsDialog&
+SScoringFacility::
 artifacts_d()
 {
 	if ( not _artifacts_d )
@@ -23,8 +24,8 @@ artifacts_d()
 }
 
 
-agh::ui::SScoringFacility::SArtifactsDialog::
-SArtifactsDialog (agh::ui::SScoringFacility& p_)
+SScoringFacility::SArtifactsDialog::
+SArtifactsDialog (SScoringFacility& p_)
       : using_channel (nullptr),
 	_p (p_)
 {
@@ -52,7 +53,7 @@ SArtifactsDialog (agh::ui::SScoringFacility& p_)
 
 // maybe it's not needed in GTK+ 3?
 void
-agh::ui::SScoringFacility::SArtifactsDialog::
+SScoringFacility::SArtifactsDialog::
 populate_mSFADProfiles()
 {
 	g_signal_handler_block( eSFADProfiles, eSFADProfiles_changed_cb_handler_id);

@@ -1,40 +1,22 @@
 /*
- *       File name:  ui/globals.cc
+ *       File name:  aghermann/ui/ui.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-07-01
  *
- *         Purpose:  common GTK+ variables; ui init
+ *         Purpose:  general-purpose GTK+ functions; ui init
  *
  *         License:  GPL
  */
 
-#include <cassert>
 #include <gtk/gtk.h>
 
 #include "common/alg.hh"
 #include "globals.hh"
-#include "misc.hh"
 #include "ui.hh"
-#include "ui++.hh"
 
 using namespace std;
-
-char	agh::ui::__buf__[AGH_BUF_SIZE];
-
-GString	*agh::ui::__ss__;
-
-GdkDevice
-	*agh::ui::__client_pointer__;
-
-UniqueApp
-	*agh::ui::__unique_app__;
-
-GtkWindow
-	*agh::ui::__main_window__;
-
-double	agh::ui::__hdpmm__,
-	agh::ui::__vdpmm__;
+using namespace agh::ui;
 
 #define AGH_UI_GRESOURCE_FILE "aghermann.gresource"
 
@@ -45,8 +27,8 @@ agh::ui::
 set_unique_app_window( GtkWindow* w)
 {
 	unique_app_watch_window(
-		agh::ui::__unique_app__,
-		agh::ui::__main_window__ = w);
+		global::unique_app,
+		global::main_window = w);
 }
 
 // own init
@@ -55,19 +37,21 @@ int
 agh::ui::
 prepare_for_expdesign()
 {
-	__ss__ = g_string_new( "");
-
       // tell me what they are
-	__client_pointer__ =
+	global::client_pointer =
 		gdk_device_manager_get_client_pointer(
 			gdk_display_get_device_manager( gdk_display_get_default()));
 
 	{
 		auto scr = gdk_screen_get_default();
-		__hdpmm__ = (double)gdk_screen_get_width ( scr) / gdk_screen_get_width_mm ( scr);
-		__vdpmm__ = (double)gdk_screen_get_height( scr) / gdk_screen_get_height_mm( scr);
-		printf( "Screen xdpmm is %g v, %g h\n", __hdpmm__, __vdpmm__);
-		gdk_screen_set_resolution( scr, (__hdpmm__ + __vdpmm__)/2);
+
+		using global::hdpmm;
+		using global::vdpmm;
+
+		hdpmm = (double)gdk_screen_get_width ( scr) / gdk_screen_get_width_mm ( scr);
+		vdpmm = (double)gdk_screen_get_height( scr) / gdk_screen_get_height_mm( scr);
+		printf( "Screen xdpmm is %g v, %g h\n", hdpmm, vdpmm);
+		gdk_screen_set_resolution( scr, (hdpmm + vdpmm)/2);
 	}
 
 	GResource
@@ -82,80 +66,6 @@ prepare_for_expdesign()
 	g_resources_register( gresource);
 
 	return 0;
-}
-
-
-
-
-
-
-// these are intended for durations, not timestamps
-void
-agh::ui::
-snprintf_buf_ts_d( const double d_)
-{
-	if ( d_ < 1. )
-		snprintf_buf_ts_h( d_ * 24);
-	else {
-		unsigned m_ = lroundf(d_*24*60*60) / 60,
-			m = (m_ % 60),
-			h = (m_ / 60) % 24,
-			d = (m_ / 60 / 24);
-		if ( h % 24 == 0 && m % 60 == 0 )
-			snprintf_buf( "%ud", d);
-		else if ( m % 60 == 0 )
-			snprintf_buf( "%ud%uh", d, h);
-		else
-			snprintf_buf( "%ud%uh%um", d, h, m);
-	}
-}
-
-void
-agh::ui::
-snprintf_buf_ts_h( const double h_)
-{
-	if ( h_ < 1. )
-		snprintf_buf_ts_m( h_ * 60);
-	else if ( h_ >= 24. )
-		snprintf_buf_ts_d( h_ / 24);
-	else {
-		unsigned m_ = lroundf( h_*60*60) / 60,
-			m = (m_ % 60),
-			h = (m_ / 60);
-		if ( m % 60 == 0 )
-			snprintf_buf( "%uh", h);
-		else
-			snprintf_buf( "%uh%um", h, m);
-	}
-}
-
-void
-agh::ui::
-snprintf_buf_ts_m( const double m_)
-{
-	if ( m_ < 1. )
-		snprintf_buf_ts_s( m_ * 60);
-	else if ( m_ >= 60. )
-		snprintf_buf_ts_h( m_ / 60);
-	else {
-		unsigned s_ = lroundf( m_*60) / 60,
-			s = (s_ % 60),
-			m = (s_ / 60);
-		if ( s % 60 == 0 )
-			snprintf_buf( "%um", m);
-		else
-			snprintf_buf( "%um%us", m, s);
-	}
-}
-
-void
-agh::ui::
-snprintf_buf_ts_s( const double s_)
-{
-	if ( s_ >= 60. )
-		snprintf_buf_ts_m( s_/60);
-	else
-		snprintf_buf( "%.2gs", s_);
 }
 
 
@@ -193,8 +103,8 @@ cairo_draw_signal( cairo_t *cr, const valarray<TFloat>& V,
 		   const ssize_t start, const ssize_t end,
 		   const size_t hspan, const float hoff, const float voff, const float scale,
 		   const unsigned short decimate,
-		   const agh::ui::TDrawSignalDirection direction,
-		   const agh::ui::TDrawSignalPathOption continue_path_option)
+		   const TDrawSignalDirection direction,
+		   const TDrawSignalPathOption continue_path_option)
 {
 	bool continue_path = continue_path_option == TDrawSignalPathOption::yes;
 	switch ( direction ) {
@@ -259,7 +169,6 @@ cairo_draw_envelope( cairo_t *cr, const valarray<TFloat>& V,
 
 
 
-
 // gtk
 
 
@@ -278,10 +187,14 @@ agh::ui::
 gtk_cell_layout_set_renderer( GtkComboBox *cb)
 {
 	GtkCellRenderer *r = gtk_cell_renderer_text_new();
-	gtk_cell_layout_pack_start( (GtkCellLayout*)cb, r, FALSE);
-	gtk_cell_layout_set_attributes( (GtkCellLayout*)cb, r,
-					"text", 0,
-					NULL);
+	gtk_cell_layout_pack_start(
+		(GtkCellLayout*)cb,
+		r,
+		FALSE);
+	gtk_cell_layout_set_attributes(
+		(GtkCellLayout*)cb, r,
+		"text", 0,
+		NULL);
 }
 
 void
@@ -363,47 +276,9 @@ set_cursor_busy( bool busy, GtkWidget *wid)
 	gdk_window_set_cursor( gtk_widget_get_window( wid), busy ? cursor_busy : cursor_normal);
 }
 
-
-namespace agh {
-namespace ui {
-
-template <> void
-SUIVar_<GtkListStore, list<string>>::up() const
-{
-	gtk_list_store_clear( w);
-	GtkTreeIter iter;
-	for ( auto& s : *v ) {
-		gtk_list_store_append( w, &iter);
-		gtk_list_store_set( w, &iter,
-				    1, s.c_str(),
-				    -1);
-	}
-}
-template <> void
-SUIVar_<GtkListStore, list<string>>::down() const
-{
-	v->clear();
-	GtkTreeIter
-		iter;
-	gchar	*entry;
-	while ( gtk_tree_model_get_iter_first( (GtkTreeModel*)w, &iter) ) {
-		gtk_tree_model_get( (GtkTreeModel*)w, &iter,
-				    1, &entry,
-				    -1);
-		v->emplace_back( entry);
-		g_free( entry);
-	}
-}
-
-
-}
-} // namespace agh::ui
-
-
 // Local Variables:
 // Mode: c++
 // indent-tabs-mode: 8
 // tab-width: 8
 // c-basic-offset: 8
 // End:
-

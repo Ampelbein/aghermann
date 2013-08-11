@@ -12,9 +12,10 @@
 #include "artifacts-simple.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-agh::ui::SScoringFacility::SArtifactsSimpleDialog&
-agh::ui::SScoringFacility::
+SScoringFacility::SArtifactsSimpleDialog&
+SScoringFacility::
 artifacts_simple_d()
 {
 	if ( not _artifacts_simple_d )
@@ -23,8 +24,8 @@ artifacts_simple_d()
 }
 
 
-agh::ui::SScoringFacility::SArtifactsSimpleDialog::
-SArtifactsSimpleDialog (agh::ui::SScoringFacility& p_)
+SScoringFacility::SArtifactsSimpleDialog::
+SArtifactsSimpleDialog (SScoringFacility& p_)
       : min_size (0.5),
 	pad (),
 	_p (p_)

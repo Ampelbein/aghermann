@@ -4,8 +4,7 @@
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2008-04-28
  *
- *         Purpose: collected global variables for use after
- *                  gtk_main(), and __buf__ and __ss__ strings
+ *         Purpose: simple, C-style UI supporting functions
  *
  *         License:  GPL
  */
@@ -35,80 +34,10 @@ namespace agh {
 namespace ui {
 
 
-struct SGeometry {
-	int x, y, w, h;
-	SGeometry()
-	      : x (-1), y (-1), w (-1), h (-1)
-		{}
-	SGeometry( int x_, int y_, int w_, int h_)
-	      : x (x_), y (y_), w (w_), h (h_)
-		{}
-	bool is_valid() const
-		{
-			return	(x > 0) && (x < 3000) &&
-				(y > 0) && (y < 3000) &&
-				(w > 1) && (w < 50000) &&
-				(h > 1) && (h < 50000);
-		}
-};
+int prepare_for_expdesign();
 
+void set_unique_app_window( GtkWindow*);
 
-inline GdkColor
-contrasting_to( const GdkColor* c)
-{
-	GdkColor cc;
-	if ( c->red + c->green + c->blue < 65535*3/2 )
-		cc.red = cc.green = cc.blue = 65535;
-	else
-		cc.red = cc.green = cc.blue = 0;
-	return cc;
-}
-
-
-struct SManagedColor {
-	GdkRGBA clr;
-	GtkColorButton* btn;
-
-	SManagedColor& operator=( const SManagedColor&) = default;
-	void acquire()
-		{
-			gtk_color_chooser_get_rgba( (GtkColorChooser*)btn, &clr);
-		}
-
-	void set_source_rgb( cairo_t* cr) const
-		{
-			cairo_set_source_rgb( cr, clr.red, clr.green, clr.blue);
-		}
-	void set_source_rgba( cairo_t* cr, double alpha_override = NAN) const
-		{
-			cairo_set_source_rgba(
-				cr, clr.red, clr.green, clr.blue,
-				isfinite(alpha_override) ? alpha_override : clr.alpha);
-		}
-	void set_source_rgb_contrasting( cairo_t* cr) const
-		{
-			cairo_set_source_rgb(
-				cr, 1-clr.red, 1-clr.green, 1-clr.blue);
-		}
-	void set_source_rgba_contrasting( cairo_t* cr, double alpha_override = NAN) const
-		{
-			cairo_set_source_rgba(
-				cr, 1-clr.red, 1-clr.green, 1-clr.blue,
-				isfinite(alpha_override) ? alpha_override : clr.alpha);
-		}
-
-	void pattern_add_color_stop_rgba( cairo_pattern_t* cp, double at, double alpha_override = NAN) const
-		{
-			cairo_pattern_add_color_stop_rgba(
-				cp, at, clr.red, clr.green, clr.blue,
-				isfinite(alpha_override) ? alpha_override : clr.alpha);
-		}
-};
-
-
-enum class TGtkRefreshMode {
-	gtk, gdk
-};
 
 inline void
 gtk_flush()
@@ -133,11 +62,6 @@ cairo_draw_signal( cairo_t*,
 		   unsigned short decimate = 1,
 		   TDrawSignalDirection direction = TDrawSignalDirection::forward,
 		   TDrawSignalPathOption continue_path = TDrawSignalPathOption::yes);
-void
-cairo_draw_envelope( cairo_t*,
-		     const valarray<TFloat>&,
-		     ssize_t start, ssize_t end,
-		     size_t da_wd, float hdisp, float vdisp, float display_scale);
 
 inline void
 cairo_draw_signal( cairo_t *cr,
@@ -159,6 +83,12 @@ cairo_draw_signal( cairo_t *cr,
 			   direction,
 			   continue_path);
 }
+
+void
+cairo_draw_envelope( cairo_t*,
+		     const valarray<TFloat>&,
+		     ssize_t start, ssize_t end,
+		     size_t da_wd, float hdisp, float vdisp, float display_scale);
 
 
 void

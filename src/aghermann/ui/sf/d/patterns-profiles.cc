@@ -16,10 +16,11 @@
 #include "patterns.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 
 int
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 import_from_selection( SScoringFacility::SChannel& field)
 {
 	// double check, possibly redundant after due check in callback
@@ -28,7 +29,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 	if ( run == 0 )
 		return -1;
 	if ( run_time > 60. ) {
-		agh::ui::pop_ok_message(
+		pop_ok_message(
 			(GtkWindow*)wSFFD,
 			"<b>Selection greater than a minute</b>",
 			"This is surely the single occurrence, I tell you!");
@@ -36,7 +37,7 @@ import_from_selection( SScoringFacility::SChannel& field)
 	}
 	if ( run_time > 10. and
 	     GTK_RESPONSE_YES !=
-	     agh::ui::pop_question(
+	     pop_question(
 		     (GtkWindow*)wSFFD,
 		     "<b>The selection is greater than 10 sec</b>",
 		     "Sure to proceed with search?") )
@@ -114,7 +115,7 @@ make_subject_patterns_location( const agh::CExpDesign& ED, const agh::CSubject& 
 
 
 void
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 load_patterns()
 {
 	patterns.clear();
@@ -141,7 +142,7 @@ load_patterns()
 
 
 void
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 populate_combo()
 {
 	g_signal_handler_block( eSFFDPatternList, eSFFDPatternList_changed_cb_handler_id);
@@ -151,9 +152,10 @@ populate_combo()
 		GtkTreeIter iter, current_pattern_iter;
 		for ( auto I = patterns.begin(); I != patterns.end(); ++I ) {
 			gtk_list_store_append( mSFFDPatterns, &iter);
-			gtk_list_store_set( mSFFDPatterns, &iter,
-					    0, snprintf_buf( "%s %s", origin_markers[I->origin], I->name.c_str()),
-					    -1);
+			gtk_list_store_set(
+				mSFFDPatterns, &iter,
+				0, snprintf_buf( "%s %s", origin_markers[I->origin], I->name.c_str()),
+				-1);
 			if ( I == current_pattern )
 				current_pattern_iter = iter;
 		}
@@ -168,7 +170,7 @@ populate_combo()
 
 
 void
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 save_patterns()
 {
 	for ( auto& P : patterns )
@@ -193,7 +195,7 @@ save_patterns()
 
 
 void
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 discard_current_pattern()
 {
 	if ( current_pattern == patterns.end() )
@@ -204,7 +206,6 @@ discard_current_pattern()
 	pattern::delete_pattern( *todelete);
 	patterns.erase( todelete);
 }
-
 
 
 // Local Variables:

@@ -48,17 +48,12 @@ init()
 		rng = gsl_rng_alloc( T);
 	}
 
+#ifdef _OPENMP
       // 2. omp
 	{
-#ifdef _OPENMP
 		agh::global::num_procs = omp_get_max_threads();
-		// if ( agh::global::num_procs > 1 )
-		// 	printf( "This host is SMP-capable (omp_get_max_threads() returns %d)\n", agh::global::num_procs);
-		// else
-		// 	printf( "This host is not SMP-capable\n");
-#endif
-
 	}
+#endif
 }
 
 

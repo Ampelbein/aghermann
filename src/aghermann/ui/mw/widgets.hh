@@ -17,7 +17,7 @@
 #include "libsigfile/page.hh" // for various enums
 #include "libmetrics/bands.hh"
 #include "aghermann/model/achermann-tunable.hh"
-#include "aghermann/ui/ui.hh"  // for SManagedColor
+#include "aghermann/ui/ui++.hh"  // for SManagedColor
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"

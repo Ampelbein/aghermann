@@ -13,10 +13,11 @@
 #include "mw.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 populate_2()
 {
 	gtk_tree_store_clear( mSimulations);
@@ -67,7 +68,7 @@ populate_2()
 					// status (put CF here)
 					snprintf_buf( "CF = %g", M.cf);
 					gtk_tree_store_set( mSimulations, &iter_h,
-							    1, __buf__,
+							    1, global::buf,
 							    msimulations_modref_col, &M,
 							    -1);
 
@@ -78,7 +79,7 @@ populate_2()
 						snprintf_buf( td.fmt,
 							      M.tx[t] * td.display_scale_factor);
 						gtk_tree_store_set( mSimulations, &iter_h,
-								    2+t, __buf__, -1);
+								    2+t, global::buf, -1);
 					}
 				}
 			}
@@ -121,12 +122,13 @@ populate_2()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 cleanup_2()
 {
 	ED->remove_untried_modruns();
 	//populate( false);
 }
+
 
 // Local Variables:
 // Mode: c++

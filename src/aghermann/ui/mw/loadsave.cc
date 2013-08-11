@@ -23,7 +23,7 @@ using namespace agh::ui;
 
 namespace {
 
-forward_list<pair<const char*, agh::ui::SExpDesignUI::TColour>>
+forward_list<pair<const char*, SExpDesignUI::TColour>>
 saving_colors()
 {
 	using namespace agh::ui;
@@ -79,7 +79,7 @@ saving_colors()
 } // namespace
 
 int
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 load_settings()
 {
 	libconfig::Config conf;
@@ -152,7 +152,7 @@ load_settings()
 
 
 int
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 save_settings()
 {
 	libconfig::Config conf;

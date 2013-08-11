@@ -16,8 +16,10 @@
 #include "filters.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-agh::ui::SFiltersDialogWidgets::
+
+SFiltersDialogWidgets::
 SFiltersDialogWidgets ()
 {
 	builder = gtk_builder_new();
@@ -43,7 +45,7 @@ SFiltersDialogWidgets ()
 	G_CONNECT_2 (eSFFilterLowPassCutoff, value, changed);
 }
 
-agh::ui::SFiltersDialogWidgets::
+SFiltersDialogWidgets::
 ~SFiltersDialogWidgets ()
 {
 	// destroy toplevels

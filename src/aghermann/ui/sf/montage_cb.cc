@@ -22,6 +22,7 @@
 
 
 using namespace std;
+using namespace agh;
 using namespace agh::ui;
 
 extern "C" {
@@ -623,7 +624,7 @@ iSFPageShowHidden_activate_cb(
 	SF.using_channel = Ch;
 	gdk_window_get_device_position(
 		gtk_widget_get_window( (GtkWidget*)SF.daSFMontage),
-		__client_pointer__,
+		global::client_pointer,
 		NULL, (int*)&Ch->zeroy, NULL); //SF.find_free_space();
 	SF.zeroy_before_shuffling = Ch->zeroy;
 	SF.event_y_when_shuffling = (double)Ch->zeroy;
@@ -770,7 +771,9 @@ iSFPageFilter_activate_cb(
 
 	gtk_label_set_markup(
 		FD.lSFFilterCaption,
-		snprintf_buf( "<big>Filters for channel <b>%s</b></big>", SF.using_channel->name()));
+		snprintf_buf(
+			"<big>Filters for channel <b>%s</b></big>",
+			SF.using_channel->name()));
 
 	if ( gtk_dialog_run( FD.wSFFilters) == GTK_RESPONSE_OK ) {
 		FD.W_V.down();
@@ -816,8 +819,9 @@ iSFPageArtifactsMarkFlat_activate_cb(
 		auto marked = SF.using_channel->mark_flat_regions_as_artifacts( AS.min_size, AS.pad);
 
 		SF.sb_message(
-			snprintf_buf( "Detected %.2g sec of flat regions, adding %.2g sec to already marked",
-				      marked.first, marked.second));
+			snprintf_buf(
+				"Detected %.2g sec of flat regions, adding %.2g sec to already marked",
+				marked.first, marked.second));
 
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFMontage);
 		gtk_widget_queue_draw( (GtkWidget*)SF.daSFHypnogram);
@@ -875,14 +879,15 @@ iSFPageSaveChannelAsSVG_activate_cb(
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& ED = SF._p;
 	string j_dir = ED.ED->subject_dir( SF.using_channel->crecording.subject());
-	string fname { snprintf_buf(
-			"%s/%s/%s-p%zu@%zu.svg",
-			j_dir.c_str(), ED.AghD(), ED.AghT(), SF.cur_vpage(), SF.vpagesize()) };
+	string fname = str::sasprintf(
+		"%s/%s/%s-p%zu@%zu.svg",
+		j_dir.c_str(), ED.AghD(), ED.AghT(), SF.cur_vpage(), SF.vpagesize());
 
-	SF.using_channel->draw_for_montage( fname.c_str(), SF.da_wd, SF.interchannel_gap);
+	SF.using_channel->draw_for_montage( fname, SF.da_wd, SF.interchannel_gap);
 	ED.sb_message(
-		snprintf_buf( "Wrote \"%s\"",
-			      agh::str::homedir2tilda(fname).c_str()));
+		str::sasprintf(
+			"Wrote \"%s\"",
+			agh::str::homedir2tilda(fname).c_str()));
 }
 
 
@@ -894,15 +899,13 @@ iSFPageSaveMontageAsSVG_activate_cb(
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& ED = SF._p;
 	string j_dir = ED.ED->subject_dir( SF.using_channel->crecording.subject());
-	string fname { snprintf_buf(
+	string fname = str::sasprintf(
 			"%s/%s/montage-p%zu@%zu.svg",
-			j_dir.c_str(), ED.AghD(), SF.cur_vpage(), SF.vpagesize())};
+			j_dir.c_str(), ED.AghD(), SF.cur_vpage(), SF.vpagesize());
 
-	SF.draw_montage( fname.c_str());
+	SF.draw_montage( fname);
 	ED.sb_message(
-		snprintf_buf(
-			"Wrote \"%s\"",
-			agh::str::homedir2tilda(fname).c_str()));
+		str::sasprintf( "Wrote \"%s\"", agh::str::homedir2tilda(fname).c_str()));
 }
 
 
@@ -916,14 +919,12 @@ iSFPageExportSignal_activate_cb(
 	string fname_base = r.F().filename();
 	r.F().export_filtered(
 		SF.using_channel->h(),
-		snprintf_buf( "%s-filt.tsv", fname_base.c_str()));
-	snprintf_buf( "%s-orig.tsv", fname_base.c_str());
+		str::sasprintf( "%s-filt.tsv", fname_base.c_str()));
 	r.F().export_original(
 		SF.using_channel->h(),
-		snprintf_buf( "%s-filt.tsv", fname_base.c_str()));
-	SF._p.sb_message(
-		snprintf_buf( "Wrote \"%s-{filt,orig}.tsv\"",
-			      fname_base.c_str()));
+		str::sasprintf( "%s-filt.tsv", fname_base.c_str()));
+	SF.sb_message(
+		str::sasprintf( "Wrote \"%s-{filt,orig}.tsv\"", fname_base.c_str()));
 }
 
 
@@ -1189,7 +1190,7 @@ iSFPageSelectionAnnotate_activate_cb(
 			: SAnnotation::TType::plain;
 
 		if ( strlen( new_ann) == 0 && type == SAnnotation::TType::plain ) {
-			agh::ui::pop_ok_message( SF.wSF, "Give a plain annotation a name", "and try again.");
+			pop_ok_message( SF.wSF, "Give a plain annotation a name", "and try again.");
 			return;
 		}
 
@@ -1251,15 +1252,14 @@ iSFPowerExportRange_activate_cb(
 	auto& SF = *(SScoringFacility*)userdata;
 	auto& R = SF.using_channel->crecording;
 
-	string fname_base;
 	if ( SF.using_channel->draw_psd ) {
-		fname_base = R.psd_profile.fname_base();
-		snprintf_buf( "%s-psd_%g-%g.tsv",
-			      fname_base.c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
+		string fname = str::sasprintf(
+			"%s-psd_%g-%g.tsv",
+			R.psd_profile.fname_base().c_str(), SF.using_channel->psd.from, SF.using_channel->psd.upto);
 		R.psd_profile.export_tsv(
 			SF.using_channel->psd.from, SF.using_channel->psd.upto,
-			__buf__);
-		fname_base = __buf__; // recycle
+			fname);
+		SF.sb_message( str::sasprintf( "Wrote \"%s\"", str::homedir2tilda(fname).c_str()));
 	}
 	// if ( SF.using_channel->draw_swu ) {
 	// 	fname_base = R.swu_profile.fname_base();
@@ -1267,8 +1267,8 @@ iSFPowerExportRange_activate_cb(
 	// 		      fname_base.c_str(), SF.using_channel->swu.from, SF.using_channel->swu.upto);
 	// 	R.swu_profile.export_tsv(
 	// 		SF.using_channel->swu.from, SF.using_channel->swu.upto,
-	// 		__buf__);
-	// 	fname_base = __buf__; // recycle
+	// 		global::buf);
+	// 	fname_base = global::buf; // recycle
 	// }
 	// if ( SF.using_channel->draw_mc ) {
 	// 	fname_base = R.mc_profile.fname_base();
@@ -1278,11 +1278,9 @@ iSFPowerExportRange_activate_cb(
 	// 		      R.freq_from + R.bandwidth*(SF.using_channel->mc.bin+1));
 	// 	R.mc_profile.export_tsv(
 	// 		SF.using_channel->mc.bin,
-	// 		__buf__);
-	// 	fname_base = __buf__;
+	// 		global::buf);
+	// 	fname_base = global::buf;
 	// }
-
-	SF._p.sb_message( snprintf_buf( "Wrote %s", agh::str::homedir2tilda(fname_base).c_str()));
 }
 
 void
@@ -1295,26 +1293,26 @@ iSFPowerExportAll_activate_cb(
 
 	string fname_base;
 	if ( SF.using_channel->draw_psd ) {
-		fname_base = SF.using_channel->crecording.psd_profile.fname_base();
-		snprintf_buf( "%s-psd.tsv", fname_base.c_str());
-		R.psd_profile.export_tsv( __buf__);
-		fname_base = __buf__; // recycle
+		string fname = str::sasprintf(
+			"%s-psd.tsv",
+			SF.using_channel->crecording.psd_profile.fname_base().c_str());
+		R.psd_profile.export_tsv( fname);
+		SF.sb_message( str::sasprintf( "Wrote \"%s\"", agh::str::homedir2tilda(fname).c_str()));
 	}
 	if ( SF.using_channel->draw_swu ) {
-		fname_base = SF.using_channel->crecording.swu_profile.fname_base();
-		snprintf_buf( "%s-swu.tsv", fname_base.c_str());
-		R.swu_profile.export_tsv( __buf__);
-		fname_base = __buf__;
+		string fname = str::sasprintf(
+			"%s-swu.tsv",
+			SF.using_channel->crecording.swu_profile.fname_base().c_str());
+		R.swu_profile.export_tsv( fname);
+		SF.sb_message( str::sasprintf( "Wrote \"%s\"", agh::str::homedir2tilda(fname).c_str()));
 	}
 	if ( SF.using_channel->draw_mc ) {
-		fname_base = SF.using_channel->crecording.mc_profile.fname_base();
-		snprintf_buf( "%s-mc.tsv", fname_base.c_str());
-		R.mc_profile.export_tsv( __buf__);
-		fname_base = __buf__;
+		string fname = str::sasprintf(
+			"%s-psd.tsv",
+			SF.using_channel->crecording.psd_profile.fname_base().c_str());
+		R.psd_profile.export_tsv( fname);
+		SF.sb_message( str::sasprintf( "Wrote \"%s\"", agh::str::homedir2tilda(fname).c_str()));
 	}
-
-	snprintf_buf( "Wrote %s", agh::str::homedir2tilda(fname_base).c_str());
-	SF._p.sb_message( __buf__);
 }
 
 void

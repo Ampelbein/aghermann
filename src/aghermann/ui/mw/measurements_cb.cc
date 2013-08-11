@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/ui/mw/mw-measurements_cb.cc
+ *       File name:  aghermann/ui/mw/measurements_cb.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2011-06-29
@@ -291,7 +291,7 @@ iSubjectTimelineResetMontage_activate_cb(
 
 	if ( system( exec.c_str()) )
 		pop_ok_message(
-			ED.wMainWindow, "Wow", "Command '%s' returned a non-zero status. This is weird.", __buf__);
+			ED.wMainWindow, "Wow", "Command '%s' returned a non-zero status. This is weird.", global::buf);
 }
 
 

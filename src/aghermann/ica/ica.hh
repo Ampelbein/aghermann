@@ -9,8 +9,8 @@
  *         License:  GPL
  */
 
-#ifndef _AGH_ICA_HH
-#define _AGH_ICA_HH
+#ifndef _AGH_ICA_ICA_HH
+#define _AGH_ICA_ICA_HH
 
 #include <valarray>
 #include <vector>
@@ -43,7 +43,7 @@ to_vecva( const itpp::Mat<T>& rv)
 		ret.emplace_back( rv.cols());
 		memcpy( &ret.back()[0], &v(0), sizeof(T) * rv.cols());
 	}
-	return ret;
+	return move(ret);
 }
 
 template <class Tl, class Tr>
@@ -58,7 +58,7 @@ to_va( const itpp::Mat<Tr>& rv, int row)
 	else
 		for ( int c = 0; c < rv.cols(); ++c )
 			ret[c] = rv(row, c);
-	return ret;
+	return move(ret);
 }
 
 template <class Titpp, class T>

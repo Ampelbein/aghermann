@@ -17,9 +17,9 @@
 #include "sf_cb.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-
-agh::ui::SScoringFacilityWidgets::
+SScoringFacilityWidgets::
 SScoringFacilityWidgets ()
 {
 	builder = gtk_builder_new();
@@ -354,7 +354,7 @@ SScoringFacilityWidgets ()
 
 
 
-agh::ui::SScoringFacilityWidgets::
+SScoringFacilityWidgets::
 ~SScoringFacilityWidgets ()
 {
 	// destroy toplevels

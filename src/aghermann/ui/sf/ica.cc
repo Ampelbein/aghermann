@@ -19,12 +19,13 @@
 #include "sf_cb.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 const char
-	*agh::ui::SScoringFacility::ica_unmapped_menu_item_label = "(not mapped)";
+	*SScoringFacility::ica_unmapped_menu_item_label = "(not mapped)";
 
 int
-agh::ui::SScoringFacility::
+SScoringFacility::
 setup_ica()
 {
 	if ( ica )
@@ -135,13 +136,13 @@ setup_ica()
 
 
 int
-agh::ui::SScoringFacility::
+SScoringFacility::
 run_ica()
 {
 	if ( ica == nullptr )
 		return 1;
 
-	agh::ui::SBusyBlock bb (wSF);
+	SBusyBlock bb (wSF);
 
 	ica_components = itpp::mat (0, 0); // free up couple of hundred megs
 	ica->obj() . separate();
@@ -155,13 +156,13 @@ run_ica()
 
 
 int
-agh::ui::SScoringFacility::
+SScoringFacility::
 remix_ics()
 {
 	if ( ica == nullptr )
 		return 1;
 
-	agh::ui::SBusyBlock bb (wSF);
+	SBusyBlock bb (wSF);
 
 	switch ( remix_mode ) {
 	case TICARemixMode::map:
@@ -228,7 +229,7 @@ remix_ics()
 }
 
 int
-agh::ui::SScoringFacility::
+SScoringFacility::
 restore_ics()
 {
 	if ( ica == nullptr )
@@ -250,7 +251,7 @@ restore_ics()
 
 
 int
-agh::ui::SScoringFacility::
+SScoringFacility::
 apply_remix( const bool do_backup)
 {
 	if ( ica == nullptr )
@@ -267,8 +268,8 @@ apply_remix( const bool do_backup)
 		affected_sources.unique();
 		for ( auto &fname : affected_sources ) {
 			snprintf_buf( "cp -f '%s' '%s.orig'", fname.c_str(), fname.c_str());
-			if ( system(__buf__) )
-				fprintf( stderr, "SScoringFacility::apply_remix(): Command '%s' failed", __buf__);
+			if ( system(global::buf) )
+				fprintf( stderr, "SScoringFacility::apply_remix(): Command '%s' failed", global::buf);
 		}
 	}
 	// put signal
@@ -298,7 +299,7 @@ apply_remix( const bool do_backup)
 
 int
 __attribute__ ((pure))
-agh::ui::SScoringFacility::
+SScoringFacility::
 ic_near( const double y) const
 {
 	int nearest = INT_MAX, thisd;
@@ -324,7 +325,7 @@ ic_near( const double y) const
 
 int
 __attribute__ ((pure))
-agh::ui::SScoringFacility::
+SScoringFacility::
 ic_of( const SChannel* ch) const
 {
 	int h = 0;
@@ -333,7 +334,7 @@ ic_of( const SChannel* ch) const
 			return h;
 		++h;
 	}
-	throw out_of_range ("agh::ui::SScoringFacility::ic_of(): bad channel");
+	throw out_of_range ("SScoringFacility::ic_of(): bad channel");
 }
 
 

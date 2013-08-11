@@ -12,12 +12,10 @@
 #include <sys/time.h>
 
 #include "aghermann/ui/misc.hh"
-
 #include "patterns.hh"
 
 
 using namespace std;
-
 using namespace agh::ui;
 
 

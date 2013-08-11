@@ -9,6 +9,7 @@ noinst_LIBRARIES = liba.a
 
 liba_a_SOURCES = \
 	admit-one.cc \
+	admit-one_cb.cc \
 	construct.cc \
 	loadsave.cc \
 	mainmenu_cb.cc \

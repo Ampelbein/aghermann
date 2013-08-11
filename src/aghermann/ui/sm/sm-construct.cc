@@ -17,10 +17,11 @@
 #include "sm_cb.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 
 int
-agh::ui::SSessionChooser::
+SSessionChooser::
 construct_widgets()
 {
       // load glade

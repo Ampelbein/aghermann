@@ -19,8 +19,7 @@ using namespace std;
 using namespace agh::ui;
 
 
-
-agh::ui::SExpDesignUIWidgets::
+SExpDesignUIWidgets::
 SExpDesignUIWidgets ()
 {
       // load glade
@@ -685,7 +684,7 @@ SExpDesignUIWidgets ()
 }
 
 
-agh::ui::SExpDesignUIWidgets::
+SExpDesignUIWidgets::
 ~SExpDesignUIWidgets ()
 {
 	g_object_unref( (GObject*)builder);
@@ -724,7 +723,7 @@ agh::ui::SExpDesignUIWidgets::
 
 
 void
-agh::ui::SExpDesignUIWidgets::
+SExpDesignUIWidgets::
 set_wMainWindow_interactive( const bool indeed, const bool flush)
 {
 	set_cursor_busy( not indeed, (GtkWidget*)wMainWindow);
@@ -749,7 +748,7 @@ set_wMainWindow_interactive( const bool indeed, const bool flush)
 }
 
 void
-agh::ui::SExpDesignUIWidgets::
+SExpDesignUIWidgets::
 set_controls_for_empty_experiment( bool indeed, const bool flush)
 {
 	indeed = not indeed;

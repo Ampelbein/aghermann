@@ -14,8 +14,10 @@
 #include "phasediff.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-agh::ui::SPhasediffDialogWidgets::
+
+SPhasediffDialogWidgets::
 SPhasediffDialogWidgets (SScoringFacility& SF)
 {
 	builder = gtk_builder_new();
@@ -67,7 +69,7 @@ SPhasediffDialogWidgets (SScoringFacility& SF)
 }
 
 
-agh::ui::SPhasediffDialogWidgets::
+SPhasediffDialogWidgets::
 ~SPhasediffDialogWidgets ()
 {
 	gtk_widget_destroy( (GtkWidget*)wSFPD);

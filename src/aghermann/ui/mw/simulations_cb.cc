@@ -141,9 +141,10 @@ iSimulationsRunBatch_activate_cb(
 			       size_t i, size_t n)
 			{
 				ED.sb_message(
-					snprintf_buf( "(%zu of %zu) Running simulation in channel %s (%s) for %s (session %s) ...",
-						      i, n, H.c_str(), T.display_name().c_str(),
-						      J.id.c_str(), D.c_str()));
+					snprintf_buf(
+						"(%zu of %zu) Running simulation in channel %s (%s) for %s (session %s) ...",
+						i, n, H.c_str(), T.display_name().c_str(),
+						J.id.c_str(), D.c_str()));
 				gtk_flush();
 			};
 		CExpDesign::TModelRunFilterFun filter =
@@ -188,10 +189,10 @@ iSimulationsReportGenerate_activate_cb(
 			GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 			NULL);
 	if ( gtk_dialog_run( f_chooser) == GTK_RESPONSE_ACCEPT ) {
-		g_string_assign( __ss__, gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser));
-		if ( !g_str_has_suffix( __ss__->str, ".tsv") && !g_str_has_suffix( __ss__->str, ".TSV") )
-			g_string_append_printf( __ss__, ".tsv");
-		ED.ED->export_all_modruns( {__ss__->str});
+		string selected = gtk_file_chooser_get_filename( (GtkFileChooser*)f_chooser);
+		if ( not agh::str::has_suffix( selected, ".tsv", agh::str::TStrCmpCaseOption::insensitive) )
+			selected += ".tsv";
+		ED.ED->export_all_modruns( selected);
 	}
 	gtk_widget_destroy( (GtkWidget*)f_chooser);
 }

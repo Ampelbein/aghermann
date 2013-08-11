@@ -15,9 +15,11 @@
 #include "phasediff.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-agh::ui::SScoringFacility::SPhasediffDialog&
-agh::ui::SScoringFacility::phasediff_d()
+
+SScoringFacility::SPhasediffDialog&
+SScoringFacility::phasediff_d()
 {
 	if ( not _phasediff_d )
 		_phasediff_d = new SScoringFacility::SPhasediffDialog(*this);
@@ -25,8 +27,8 @@ agh::ui::SScoringFacility::phasediff_d()
 }
 
 
-agh::ui::SScoringFacility::SPhasediffDialog::
-SPhasediffDialog (agh::ui::SScoringFacility& parent)
+SScoringFacility::SPhasediffDialog::
+SPhasediffDialog (SScoringFacility& parent)
       : SPhasediffDialogWidgets (parent),
 	channel1 (nullptr),
 	channel2 (nullptr),
@@ -46,7 +48,7 @@ SPhasediffDialog (agh::ui::SScoringFacility& parent)
 
 
 void
-agh::ui::SScoringFacility::SPhasediffDialog::
+SScoringFacility::SPhasediffDialog::
 update_course()
 {
 	if ( channel1->samplerate() != channel2->samplerate() )
@@ -80,8 +82,8 @@ update_course()
 	}
 }
 
-const agh::ui::SScoringFacility::SChannel*
-agh::ui::SScoringFacility::SPhasediffDialog::
+const SScoringFacility::SChannel*
+SScoringFacility::SPhasediffDialog::
 channel_from_cbox( GtkComboBox *cbox)
 {
 	GtkTreeIter iter;
@@ -100,7 +102,7 @@ channel_from_cbox( GtkComboBox *cbox)
 
 
 void
-agh::ui::SScoringFacility::SPhasediffDialog::
+SScoringFacility::SPhasediffDialog::
 preselect_channel( GtkComboBox *cbox, const string& ch)
 {
 	GtkTreeModel *model = gtk_combo_box_get_model( cbox);
@@ -127,7 +129,7 @@ preselect_channel( GtkComboBox *cbox, const string& ch)
 
 
 void
-agh::ui::SScoringFacility::SPhasediffDialog::
+SScoringFacility::SPhasediffDialog::
 draw( cairo_t* cr, const int wd, const int ht)
 {
 	auto& SF = _p;
@@ -139,17 +141,17 @@ draw( cairo_t* cr, const int wd, const int ht)
 	cairo_stroke( cr);
 
 	if ( channel1 == channel2 ) {
-		agh::ui::cairo_put_banner( cr, wd, ht, "Same channel");
+		cairo_put_banner( cr, wd, ht, "Same channel");
 		return;
 	}
 
 	if ( course.size() == 0 ) {
-		agh::ui::cairo_put_banner( cr, wd, ht, "Huh?");
+		cairo_put_banner( cr, wd, ht, "Huh?");
 		return;
 	}
 
 	if ( channel1->samplerate() != channel2->samplerate() ) {
-		agh::ui::cairo_put_banner( cr, wd, ht, "Incompatible channels (different samplerate)");
+		cairo_put_banner( cr, wd, ht, "Incompatible channels (different samplerate)");
 		return;
 	}
 

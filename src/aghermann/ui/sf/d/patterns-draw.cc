@@ -14,10 +14,11 @@
 #include "patterns.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 
 void
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 set_thing_da_width( const int width)
 {
 	static int scrollbar_width = 15;
@@ -28,7 +29,7 @@ set_thing_da_width( const int width)
 }
 
 void
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 set_field_da_width( const int width)
 {
 	static int scrollbar_width = 15;
@@ -41,11 +42,11 @@ set_field_da_width( const int width)
 
 
 void
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 draw_thing( cairo_t *cr)
 {
 	if ( current_pattern == patterns.end() ) {
-		agh::ui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "(make a selection)");
+		cairo_put_banner( cr, da_thing_wd, da_thing_ht, "(make a selection)");
 		return;
 	}
 
@@ -75,9 +76,9 @@ draw_thing( cairo_t *cr)
 	int	zeroline = da_thing_ht/2;
 	cairo_set_source_rgb( cr, 0., 0., 0.);
 	cairo_set_line_width( cr, .8);
-	agh::ui::cairo_draw_signal( cr, current_pattern->thing, 0, current_pattern->thing.size(),
-				  da_thing_wd, 0, zeroline,
-				  thing_display_scale);
+	cairo_draw_signal( cr, current_pattern->thing, 0, current_pattern->thing.size(),
+			   da_thing_wd, 0, zeroline,
+			   thing_display_scale);
 	cairo_stroke( cr);
 
 	// lines marking out context
@@ -96,19 +97,22 @@ draw_thing( cairo_t *cr)
 			dzcdf;
 	      // envelope
 		{
-			if ( sigproc::envelope( {current_pattern->thing, current_pattern->samplerate}, Pp2.env_scope,
-						1./current_pattern->samplerate,
-						&env_l, &env_u) == 0 ) {
-				agh::ui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Pattern is too short for this envelope scope");
+			if ( 0 == sigproc::envelope(
+				     {current_pattern->thing, current_pattern->samplerate}, Pp2.env_scope,
+				     1./current_pattern->samplerate,
+				     &env_l, &env_u) ) {
+				cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Pattern is too short for this envelope scope");
 				goto out;
 			}
 
 			_p._p.CwB[SExpDesignUI::TColour::sf_selection].set_source_rgba_contrasting( cr, .3);
-			agh::ui::cairo_draw_signal( cr, env_u, 0, env_u.size(),
-						  da_thing_wd, 0, zeroline, thing_display_scale);
-			agh::ui::cairo_draw_signal( cr, env_l, 0, env_l.size(),
-						  da_thing_wd, 0, zeroline, thing_display_scale,
-						  1, agh::ui::TDrawSignalDirection::backward);
+			cairo_draw_signal(
+				cr, env_u, 0, env_u.size(),
+				da_thing_wd, 0, zeroline, thing_display_scale);
+			cairo_draw_signal(
+				cr, env_l, 0, env_l.size(),
+				da_thing_wd, 0, zeroline, thing_display_scale,
+				1, TDrawSignalDirection::backward);
 			cairo_close_path( cr);
 			cairo_fill( cr);
 			cairo_stroke( cr);
@@ -116,7 +120,7 @@ draw_thing( cairo_t *cr)
 	      // target frequency
 		{
 			if ( Pp2.bwf_ffrom >= Pp2.bwf_fupto ) {
-				agh::ui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Bad band-pass range");
+				cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Bad band-pass range");
 				goto out;
 			}
 			target_freq = exstrom::band_pass(
@@ -125,19 +129,20 @@ draw_thing( cairo_t *cr)
 
 			cairo_set_source_rgba( cr, 0.3, 0.3, 0.3, .5);
 			cairo_set_line_width( cr, 3.);
-			agh::ui::cairo_draw_signal( cr, target_freq, 0, target_freq.size(),
-						  da_thing_wd, 0, zeroline, thing_display_scale);
+			cairo_draw_signal(
+				cr, target_freq, 0, target_freq.size(),
+				da_thing_wd, 0, zeroline, thing_display_scale);
 			cairo_stroke( cr);
 		}
 
 	      // dzcdf
 		{
 			if ( current_pattern->samplerate < 10 ) {
-				agh::ui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Samplerate is too low");
+				cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Samplerate is too low");
 				goto out;
 			}
 			if ( Pp2.dzcdf_step * 10 > current_pattern->pattern_length() ) { // require at least 10 dzcdf points
-				agh::ui::cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Selection is too short for DZCDF");
+				cairo_put_banner( cr, da_thing_wd, da_thing_ht, "Selection is too short for DZCDF");
 				goto out;
 			}
 
@@ -147,8 +152,9 @@ draw_thing( cairo_t *cr)
 
 			cairo_set_source_rgba( cr, 0.3, 0.3, 0.99, .8);
 			cairo_set_line_width( cr, 1.);
-			agh::ui::cairo_draw_signal( cr, dzcdf, 0, dzcdf.size(),
-						  da_thing_wd, 0, zeroline, dzcdf_display_scale);
+			cairo_draw_signal(
+				cr, dzcdf, 0, dzcdf.size(),
+				da_thing_wd, 0, zeroline, dzcdf_display_scale);
 			cairo_stroke( cr);
 		}
 	}
@@ -157,7 +163,7 @@ out:
 }
 
 void
-agh::ui::SScoringFacility::SPatternsDialog::
+SScoringFacility::SPatternsDialog::
 draw_field( cairo_t *cr)
 {
       // field
@@ -168,13 +174,13 @@ draw_field( cairo_t *cr)
 	field_profile_type = get<0>(profile_with_corrected_type);
 	auto& profile = get<1>(profile_with_corrected_type);
 	if ( field_profile_type == metrics::TType::raw )
-		agh::ui::cairo_draw_envelope(
+		cairo_draw_envelope(
 			cr,
 			profile, 0, profile.size(),
 			da_field_wd, 0., da_field_ht/4,
 			field_display_scale);
 	else {
-		agh::ui::cairo_draw_signal(
+		cairo_draw_signal(
 			cr,
 			profile, 0, profile.size(),
 			da_field_wd, 0., da_field_ht/2,
@@ -188,7 +194,7 @@ draw_field( cairo_t *cr)
 
       // occurrences
 	if ( occurrences.size() > 500 )
-		agh::ui::cairo_put_banner(
+		cairo_put_banner(
 			cr, da_field_wd, da_field_ht / .75, "Too many; reduce strictness?");
 	else if ( occurrences.size() > 0 ) {
 		cairo_set_line_width( cr, 1.);
@@ -207,7 +213,7 @@ draw_field( cairo_t *cr)
 			cairo_stroke( cr);
 		}
 	} else
-		agh::ui::cairo_put_banner(
+		cairo_put_banner(
 			cr, da_field_wd, da_field_ht / .75, "Nothing found");
 
       // diff line with degree of criteria attainment
@@ -236,6 +242,7 @@ draw_field( cairo_t *cr)
 		}
 #undef KEKE
 }
+
 
 // Local Variables:
 // Mode: c++

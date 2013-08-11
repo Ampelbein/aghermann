@@ -16,9 +16,9 @@
 #include "artifacts.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-
-agh::ui::SArtifactsDialogWidgets::
+SArtifactsDialogWidgets::
 SArtifactsDialogWidgets ()
 {
 	builder = gtk_builder_new();
@@ -78,7 +78,7 @@ SArtifactsDialogWidgets ()
 }
 
 
-agh::ui::SArtifactsDialogWidgets::
+SArtifactsDialogWidgets::
 ~SArtifactsDialogWidgets ()
 {
 	gtk_widget_destroy( (GtkWidget*)wSFAD);

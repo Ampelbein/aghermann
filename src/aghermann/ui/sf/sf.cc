@@ -25,23 +25,23 @@
 #include "d/patterns.hh"
 
 using namespace std;
+using namespace agh::ui;
+
+size_t	SScoringFacility::IntersignalSpace = 120,
+	SScoringFacility::HypnogramHeight  =  40,
+	SScoringFacility::EMGProfileHeight =  30;
 
 
-size_t	agh::ui::SScoringFacility::IntersignalSpace = 120,
-	agh::ui::SScoringFacility::HypnogramHeight  =  40,
-	agh::ui::SScoringFacility::EMGProfileHeight =  30;
-
-
-// class agh::ui::SScoringFacility
+// class SScoringFacility
 
 const array<unsigned, 9>
-	agh::ui::SScoringFacility::DisplayPageSizeValues = {
+	SScoringFacility::DisplayPageSizeValues = {
 	{4, 5, 10, 15, 20, 30, 60, 60*3, 60*5}
 };
 
 size_t
 __attribute__ ((pure))
-agh::ui::SScoringFacility::
+SScoringFacility::
 figure_display_pagesize_item( const size_t seconds)
 {
 	size_t i = 0;
@@ -53,10 +53,10 @@ figure_display_pagesize_item( const size_t seconds)
 
 using agh::confval::SValidator;
 
-agh::ui::SScoringFacility::
+SScoringFacility::
 SScoringFacility (agh::CSubject& J,
 		  const string& D, const string& E,
-		  agh::ui::SExpDesignUI& parent)
+		  SExpDesignUI& parent)
       : _p (parent),
 	_csubject (J),
 	_session (D),
@@ -97,7 +97,7 @@ SScoringFacility (agh::CSubject& J,
 	da_wd (800), // gets properly set in a configure_event cb
 	da_ht (NAN) // bad value, to be estimated unless previously saved
 {
-	agh::ui::SBusyBlock bb (_p.wMainWindow);
+	SBusyBlock bb (_p.wMainWindow);
 
       // complete widget construction
       // histogram -> scores
@@ -260,7 +260,7 @@ SScoringFacility (agh::CSubject& J,
 		}
 	// if there's too many visible, suggest to hide some
 	if ( channels.size() > 10 && n_hidden == 0 )
-		agh::ui::pop_ok_message(
+		pop_ok_message(
 			wSF, "<b>Montage seems overcrowded</b>",
 			"The recording you are about to view has %zu channels.\n"
 			"You can hide some using appropriate channel context menus.", channels.size() - n_hidden);
@@ -302,7 +302,7 @@ SScoringFacility (agh::CSubject& J,
 }
 
 
-agh::ui::SScoringFacility::
+SScoringFacility::
 ~SScoringFacility ()
 {
 	// put scores
@@ -338,7 +338,7 @@ agh::ui::SScoringFacility::
 }
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 redraw_ssubject_timeline() const
 {
 	auto j = _p.subject_presentation_by_csubject( _csubject);
@@ -350,8 +350,8 @@ redraw_ssubject_timeline() const
 
 
 
-agh::ui::SScoringFacility::SChannel&
-agh::ui::SScoringFacility::
+SScoringFacility::SChannel&
+SScoringFacility::
 operator[]( const string& ch)
 {
 	auto iter = find( channels.begin(), channels.end(), ch);
@@ -360,8 +360,8 @@ operator[]( const string& ch)
 	return *iter;
 }
 
-agh::ui::SScoringFacility::SChannel&
-agh::ui::SScoringFacility::
+SScoringFacility::SChannel&
+SScoringFacility::
 channel_by_idx( size_t i)
 {
 	for ( auto &H : channels )
@@ -371,9 +371,9 @@ channel_by_idx( size_t i)
 }
 
 
-agh::ui::SScoringFacility::SChannel*
+SScoringFacility::SChannel*
 __attribute__ ((pure))
-agh::ui::SScoringFacility::
+SScoringFacility::
 channel_near( const int y)
 {
 	int nearest = INT_MAX, thisy;
@@ -399,7 +399,7 @@ channel_near( const int y)
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 update_all_channels_profile_display_scale()
 {
 	for ( auto& H : channels )
@@ -410,7 +410,7 @@ update_all_channels_profile_display_scale()
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 get_hypnogram()
 {
 	// just get from the first source,
@@ -421,7 +421,7 @@ get_hypnogram()
 		hypnogram[p] = F[p].score_code();
 }
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 put_hypnogram()
 {
 	// but put to all
@@ -434,7 +434,7 @@ put_hypnogram()
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 calculate_scored_percent()
 {
 	using namespace sigfile;
@@ -463,7 +463,7 @@ calculate_scored_percent()
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 set_cur_vpage( size_t p, const bool touch_self)
 {
 	if ( _cur_vpage == p && !touch_self )
@@ -489,7 +489,7 @@ set_cur_vpage( size_t p, const bool touch_self)
 }
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 set_vpagesize_item( int item, const bool touch_self)
 {
 	if ( pagesize_item == item && !touch_self )
@@ -517,7 +517,7 @@ set_vpagesize_item( int item, const bool touch_self)
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 do_score_forward( const char score_ch)
 {
 	hypnogram[_cur_page] = score_ch;
@@ -527,7 +527,7 @@ do_score_forward( const char score_ch)
 }
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 do_score_back( const char score_ch)
 {
 	hypnogram[_cur_page] = score_ch;
@@ -537,7 +537,7 @@ do_score_back( const char score_ch)
 }
 
 size_t
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 marquee_to_selection()
 {
 	if ( marquee_mstart < marquee_mend) {
@@ -565,7 +565,7 @@ marquee_to_selection()
 
 
 bool
-agh::ui::SScoringFacility::
+SScoringFacility::
 page_has_artifacts( const size_t p, const bool search_all) const
 {
 	for ( auto &H : channels )
@@ -581,7 +581,7 @@ page_has_artifacts( const size_t p, const bool search_all) const
 
 
 bool
-agh::ui::SScoringFacility::
+SScoringFacility::
 page_has_annotations( const size_t p, const SChannel& H) const
 {
 	int	half_pad_samples = skirting_run_per1 * vpagesize() * H.samplerate();
@@ -598,7 +598,7 @@ page_has_annotations( const size_t p, const SChannel& H) const
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 draw_score_stats() const
 {
 	gtk_label_set_markup(
@@ -617,7 +617,7 @@ draw_score_stats() const
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 draw_current_pos( const double x) const
 {
 	static const time_t epoch_clockhour = 3 * 60 * 60;
@@ -629,8 +629,9 @@ draw_current_pos( const double x) const
 			struct tm *ltime = localtime( &time_at_cur_pos);
 			char tmp[10];
 			strftime( tmp, 9, "%H:%M:%S", ltime);
-			snprintf_buf( "%s.%02d",
-				      tmp, (int)((clickt - floor(clickt)) * 100));
+			snprintf_buf(
+				"%s.%02d",
+				tmp, (int)((clickt - floor(clickt)) * 100));
 		} else
 			snprintf_buf( "--:--:--");
 	} else {
@@ -639,16 +640,15 @@ draw_current_pos( const double x) const
 		struct tm *ltime = localtime( &time_at_cur_pos);
 		char tmp[10];
 		strftime( tmp, 9, "%H:%M:%S", ltime);
-		snprintf_buf( "%s",
-			      tmp);
+		snprintf_buf( "%s", tmp);
 	}
 
-	gtk_button_set_label( eSFCurrentPos, __buf__);
+	gtk_button_set_label( eSFCurrentPos, global::buf);
 }
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 queue_redraw_all() const
 {
 	if ( suppress_redraw )
@@ -668,7 +668,7 @@ queue_redraw_all() const
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 load_montage()
 {
 	libconfig::Config conf;
@@ -713,7 +713,7 @@ load_montage()
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 save_montage()
 {
 	libconfig::Config conf;
@@ -740,7 +740,7 @@ save_montage()
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 sb_message( const string& msg) const
 {
 	gtk_statusbar_pop(  sbSF, sbSFContextIdGeneral);
@@ -748,7 +748,7 @@ sb_message( const string& msg) const
 }
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 sb_clear() const
 {
 	gtk_statusbar_pop(  sbSF, sbSFContextIdGeneral);
@@ -757,7 +757,7 @@ sb_clear() const
 
 
 const char* const
-	agh::ui::SScoringFacility::tooltips[2] = {
+	SScoringFacility::tooltips[2] = {
 	"<b>Page views:</b>\n"
 	"  Wheel:	adjust display scale;\n"
 	"  Ctrl+Wheel:	change scale for\n"
@@ -789,7 +789,7 @@ const char* const
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 set_tooltip( TTipIdx i) const
 {
 	gtk_widget_set_tooltip_markup( (GtkWidget*)lSFHint, tooltips[i]);
@@ -798,7 +798,7 @@ set_tooltip( TTipIdx i) const
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 update_main_menu_items()
 {
 	bool	all_draw_original[2] = {true, true},

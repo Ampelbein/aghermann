@@ -9,6 +9,7 @@
  *         License:  GPL
  */
 
+#include <sstream>
 #include <cairo-svg.h>
 
 #include "aghermann/model/beersma.hh"
@@ -83,7 +84,7 @@ daMFProfile_button_press_event_cb(
 				snprintf_buf( "%s%s", fname_,
 					      g_str_has_suffix( fname_, ".svg") ? "" : ".svg");
 				g_free( fname_);
-				cairo_surface_t *cs = cairo_svg_surface_create( __buf__, MF.da_wd, MF.da_ht);
+				cairo_surface_t *cs = cairo_svg_surface_create( global::buf, MF.da_wd, MF.da_ht);
 				cairo_t *cr = cairo_create( cs);
 				MF.draw_timeline( cr);
 				cairo_destroy( cr);
@@ -152,7 +153,7 @@ daMFProfile_scroll_event_cb(
 
 
 namespace {
-agh::ui::SModelrunFacility *this_mf = nullptr;
+SModelrunFacility *this_mf = nullptr;
 void this_mf_siman_param_printer(void *xp)
 {
 	this_mf -> siman_param_printer(xp);
@@ -166,7 +167,7 @@ bMFRun_clicked_cb(
 {
 	auto& MF = *(SModelrunFacility*)userdata;
 
-	agh::ui::SBusyBlock bb (MF.wModelrunFacility);
+	SBusyBlock bb (MF.wModelrunFacility);
 
 	void (*fun)(void*) = (this_mf == nullptr)
 		? (this_mf = &MF, this_mf_siman_param_printer)
@@ -181,32 +182,32 @@ bMFRun_clicked_cb(
 
 	GtkTextIter iter;
 	if ( not MF._tunables_header_printed ) {
-		g_string_printf( __ss__, "#");
+		ostringstream ss;
+		ss << "#";
 		for ( size_t t = 0; t < MF.csimulation.tx.size(); ++t )
-			g_string_append_printf(
-				__ss__, "%s%s",
+			ss << agh::str::sasprintf(
+				"%s%s",
 				agh::ach::tunable_name(t).c_str(),
 				t < MF.csimulation.tx.size()-1 ? "\t" : "\n");
 		gtk_text_buffer_insert(
 			MF.log_text_buffer,
 			(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
-			__ss__->str, -1);
+			ss.str().c_str(), -1);
 		MF._tunables_header_printed = true;
 	}
 
 	for ( size_t t = 0; t < MF.csimulation.tx.size(); ++t ) {
 		auto tg = min( t, (size_t)agh::ach::TTunable::_basic_tunables-1);
-		g_string_printf(
-			__ss__, agh::ach::stock[tg].fmt,
-			MF.csimulation.tx[t] * agh::ach::stock[tg].display_scale_factor);
 		snprintf_buf(
 			"%s%s",
-			__ss__->str,
+			agh::str::sasprintf(
+				agh::ach::stock[tg].fmt,
+				MF.csimulation.tx[t] * agh::ach::stock[tg].display_scale_factor).c_str(),
 			t < MF.csimulation.tx.size()-1 ? "\t" : "\n");
 		gtk_text_buffer_insert(
 			MF.log_text_buffer,
   			(gtk_text_buffer_get_end_iter( MF.log_text_buffer, &iter), &iter),
-			__buf__, -1);
+			global::buf, -1);
 	}
 	gtk_text_view_scroll_to_iter(
 		MF.lMFLog,
@@ -319,7 +320,7 @@ eMFClassicFit_toggled_cb(
 
 	gtk_label_set_markup(
 		MF.lMFClassicFit,
-		__buf__);
+		global::buf);
 }
 
 

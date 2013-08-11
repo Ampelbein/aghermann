@@ -1,5 +1,5 @@
 /*
- *       File name:  ui/forward-decls.hh
+ *       File name:  aghermann/ui/forward-decls.hh
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-09-03

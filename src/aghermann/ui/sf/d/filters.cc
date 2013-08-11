@@ -13,10 +13,10 @@
 #include "filters.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-
-agh::ui::SScoringFacility::SFiltersDialog&
-agh::ui::SScoringFacility::
+SScoringFacility::SFiltersDialog&
+SScoringFacility::
 filters_d()
 {
 	if ( not _filters_d )
@@ -24,7 +24,7 @@ filters_d()
 	return *_filters_d;
 }
 
-agh::ui::SScoringFacility::SFiltersDialog::
+SScoringFacility::SFiltersDialog::
 SFiltersDialog (SScoringFacility& p_)
       : _p (p_)
 {

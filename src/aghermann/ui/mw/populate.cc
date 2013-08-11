@@ -11,6 +11,7 @@
 
 
 #include <cstring>
+#include <sstream>
 
 #include "aghermann/expdesign/primaries.hh"
 #include "aghermann/model/beersma.hh"
@@ -23,7 +24,7 @@ using namespace agh::ui;
 
 
 int
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 populate( bool do_load)
 {
 	printf( "\nSExpDesignUI::populate():\n");
@@ -84,7 +85,7 @@ populate( bool do_load)
 		snprintf_buf( "Smooth: %zu", smooth_profile));
 
 	if ( AghTT.empty() )
-		agh::ui::pop_ok_message(
+		pop_ok_message(
 			wMainWindow,
 			"No EEG channels",
 			"There are no EEG channels found in any recordings in the tree.");
@@ -174,7 +175,7 @@ populate( bool do_load)
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 depopulate( bool do_save)
 {
 	if ( do_save )
@@ -209,7 +210,7 @@ depopulate( bool do_save)
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 populate_mSessions()
 {
 	g_signal_handler_block( eMsmtSession, eMsmtSession_changed_cb_handler_id);
@@ -231,7 +232,7 @@ populate_mSessions()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 populate_mChannels()
 {
 	g_signal_handler_block( eMsmtChannel, eMsmtChannel_changed_cb_handler_id);
@@ -264,7 +265,7 @@ populate_mChannels()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 __reconnect_channels_combo()
 {
 	gtk_combo_box_set_model( eMsmtChannel, (GtkTreeModel*)mEEGChannels);
@@ -280,7 +281,7 @@ __reconnect_channels_combo()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 __reconnect_sessions_combo()
 {
 	gtk_combo_box_set_model( eMsmtSession, (GtkTreeModel*)mSessions);
@@ -305,7 +306,7 @@ annotation_type_s( const sigfile::SAnnotation::TType t)
 }
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 populate_mGlobalAnnotations()
 {
 	gtk_tree_store_clear( mGlobalAnnotations);
@@ -368,7 +369,7 @@ populate_mGlobalAnnotations()
 									snprintf_buf( "%u-%u", pages.a + 1, pages.z + 1);
 								gtk_tree_store_append( mGlobalAnnotations, &iter_a, &iter_e);
 								gtk_tree_store_set( mGlobalAnnotations, &iter_a,
-										    1, __buf__,
+										    1, global::buf,
 										    2, A.channel(),
 										    3, annotation_type_s(A.type),
 										    4, A.label.c_str(),
@@ -387,7 +388,7 @@ populate_mGlobalAnnotations()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 populate_mGlobalADProfiles()
 {
 	gtk_list_store_clear( mGlobalADProfiles);
@@ -404,7 +405,7 @@ populate_mGlobalADProfiles()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 populate_1()
 {
 	if ( ED->groups.empty() )
@@ -469,7 +470,7 @@ populate_1()
       // walk again thoroughly, set timeline drawing area length
 	for ( auto &G : groups ) {
 	      // convert avg episode times
-		g_string_assign( __ss__, "");
+		ostringstream ss;
 		for ( auto &E : AghEE ) {
 			pair<float, float>& avge = G.cjgroup().avg_episode_times[*_AghDi][E];
 			unsigned seconds, h0, m0, s0, h9, m9, s9;
@@ -482,18 +483,20 @@ populate_1()
 			m9  = seconds % 3600 / 60;
 			s9  = seconds % 60;
 
-			g_string_append_printf( __ss__,
-						"       <i>%s</i> %02d:%02d:%02d ~ %02d:%02d:%02d",
-						E.c_str(),
-						h0 % 24, m0, s0,
-						h9 % 24, m9, s9);
+			ss << agh::str::sasprintf(
+				"       <i>%s</i> %02d:%02d:%02d ~ %02d:%02d:%02d",
+				E.c_str(),
+				h0 % 24, m0, s0,
+				h9 % 24, m9, s9);
 		}
 
-		gchar *g_escaped = g_markup_escape_text( G.name(), -1);
-		snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, G.size(), __ss__->str);
-		g_free( g_escaped);
+		{
+			gchar *g_escaped = g_markup_escape_text( G.name(), -1);
+			snprintf_buf( "<b>%s</b> (%zu) %s", g_escaped, G.size(), ss.str().c_str());
+			g_free( g_escaped);
+		}
 
-		GtkExpander *expander = (GtkExpander*)gtk_expander_new( __buf__);
+		GtkExpander *expander = (GtkExpander*)gtk_expander_new( global::buf);
 		gtk_expander_set_use_markup( expander, TRUE);
 		g_object_set( (GObject*)expander,
 			      "visible", TRUE,
@@ -600,7 +603,7 @@ populate_1()
 
 
 void
-agh::ui::SExpDesignUI::
+SExpDesignUI::
 sort_subjects()
 {
 	for ( auto Gi = groups.begin(); Gi != groups.end(); ++Gi )
@@ -609,7 +612,7 @@ sort_subjects()
 
 
 bool
-agh::ui::SExpDesignUI::SSubjectPresentation::
+SExpDesignUI::SSubjectPresentation::
 operator<( const SSubjectPresentation& rv) const
 {
 	if ( _p._p.sort_segregate and csubject.gender != rv.csubject.gender )

@@ -24,10 +24,11 @@
 #include "sm_cb.hh"
 
 using namespace std;
+using namespace agh::ui;
 
 
 void
-agh::ui::SSession::
+SSession::
 get_session_stats()
 {
 	agh::fs::total_supported_sigfiles = 0;
@@ -45,7 +46,7 @@ get_session_stats()
 }
 
 
-agh::ui::SSessionChooser::
+SSessionChooser::
 SSessionChooser (const char* explicit_session)
       : filename (string (getenv("HOME")) + "/.config/aghermann/sessionrc"),
 	ed (nullptr)
@@ -60,7 +61,7 @@ SSessionChooser (const char* explicit_session)
 	try {
 		if ( have_explicit_dir ) {
 			char* canonicalized = canonicalize_file_name( explicit_session);
-			ed = new agh::ui::SExpDesignUI(
+			ed = new SExpDesignUI(
 				this, canonicalized);
 			set_unique_app_window( ed->wMainWindow);
 			free( canonicalized);
@@ -70,25 +71,25 @@ SSessionChooser (const char* explicit_session)
 			//set_unique_app_window( (GtkWindow*)wSessionChooser);
 
 		} else {
-			ed = new agh::ui::SExpDesignUI(
+			ed = new SExpDesignUI(
 				this, get_dir());
 			set_unique_app_window( ed->wMainWindow);
 		}
 	} catch (runtime_error ex) {
-		agh::ui::pop_ok_message( nullptr, "Huh", "%s", ex.what());
+		pop_ok_message( nullptr, "Huh", "%s", ex.what());
 
 		string new_experiment_dir = string (getenv("HOME")) + "/NewExperiment";
 		if ( agh::fs::mkdir_with_parents( new_experiment_dir.c_str()) ) {
-			agh::ui::pop_ok_message( nullptr, "Failed to create a new directory in your $HOME.",
+			pop_ok_message( nullptr, "Failed to create a new directory in your $HOME.",
 					       " There's nothing we can do about that.");
 		}
-		ed = new agh::ui::SExpDesignUI( this, new_experiment_dir);
+		ed = new SExpDesignUI( this, new_experiment_dir);
 		// if HOME is non-writable, then don't catch: it's too seriously broken
 	}
 }
 
 
-agh::ui::SSessionChooser::
+SSessionChooser::
 ~SSessionChooser()
 {
 	destruct_widgets();
@@ -102,7 +103,7 @@ agh::ui::SSessionChooser::
 
 
 int
-agh::ui::SSessionChooser::
+SSessionChooser::
 open_selected_session()
 {
 	assert (ed == nullptr);
@@ -111,7 +112,7 @@ open_selected_session()
 		return 1; // double check
 
 	try {
-		ed = new agh::ui::SExpDesignUI(
+		ed = new SExpDesignUI(
 			this, selected);
 		set_unique_app_window( ed->wMainWindow);
 
@@ -130,7 +131,7 @@ open_selected_session()
 
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 close_current_session()
 {
 	assert (ed);
@@ -144,7 +145,7 @@ close_current_session()
 
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 destruct_widgets()
 {
       // // destroy toplevels
@@ -159,21 +160,21 @@ destruct_widgets()
 
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 buf_on_status_bar( const bool)
 {
 	// gtk_statusbar_pop( sbSessionChooserStatusBar, sbChooserContextIdGeneral);
-	// gtk_statusbar_push( sbSessionChooserStatusBar, sbChooserContextIdGeneral, __buf__);
+	// gtk_statusbar_push( sbSessionChooserStatusBar, sbChooserContextIdGeneral, global::buf);
 	/// segfaults no matter what. Cannot call gtk_events_pending() from a handler.
 	// if ( ensure ) {
 	//  	g_signal_handler_block( bSessionChooserSelect, bSessionChooserSelect_clicked_cb_handler);
-	//   	agh::ui::gtk_flush();
+	//   	gtk_flush();
 	//  	g_signal_handler_unblock( bSessionChooserSelect, bSessionChooserSelect_clicked_cb_handler);
 	// }
 }
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 sb_progress_indicator( const char* current, const size_t n, const size_t i)
 {
 	snprintf_buf( "(%zu of %zu) %s", i, n, current);
@@ -183,7 +184,7 @@ sb_progress_indicator( const char* current, const size_t n, const size_t i)
 
 
 string
-agh::ui::SSessionChooser::
+SSessionChooser::
 get_selected_dir()
 {
 	auto selection = gtk_tree_view_get_selection( tvSessionChooserList);
@@ -211,7 +212,7 @@ get_selected_dir()
 
 
 string
-agh::ui::SSessionChooser::
+SSessionChooser::
 get_dir( const int idx) const
 {
 	GtkTreeIter iter;
@@ -244,7 +245,7 @@ get_dir( const int idx) const
 
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 read_sessionrc()
 {
 	sessions.clear();
@@ -283,7 +284,7 @@ read_sessionrc()
 
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 write_sessionrc() const
 {
 	try {
@@ -306,7 +307,7 @@ write_sessionrc() const
 
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 conditionally_enable_buttons()
 {
 	auto selection = gtk_tree_view_get_selection( tvSessionChooserList);
@@ -319,7 +320,7 @@ conditionally_enable_buttons()
 
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 _sync_list_to_model()
 {
 	gtk_list_store_clear( mSessionChooserList);
@@ -329,17 +330,17 @@ _sync_list_to_model()
 		snprintf_buf( "%d", (int)E.n_recordings);
 		gtk_list_store_set( mSessionChooserList, &iter,
 				    2, E.c_str(),
-				    1, __buf__,
+				    1, global::buf,
 				    -1);
-		strftime( __buf__, AGH_BUF_SIZE-1, "%c", localtime(&E.last_visited));
+		strftime( global::buf, AGH_BUF_SIZE-1, "%c", localtime(&E.last_visited));
 		gtk_list_store_set( mSessionChooserList, &iter,
-				    0, __buf__,
+				    0, global::buf,
 				    -1);
 	}
 }
 
 void
-agh::ui::SSessionChooser::
+SSessionChooser::
 _sync_model_to_list()
 {
 	sessions.clear();

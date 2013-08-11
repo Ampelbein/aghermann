@@ -13,10 +13,12 @@
 #ifndef AGH_AGHERMANN_UI_MISC_H_
 #define AGH_AGHERMANN_UI_MISC_H_
 
+#include <stdio.h>
+#include <stdarg.h>
 #include "globals.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
-#  include "config.h"
+# include "config.h"
 #endif
 
 using namespace std;
@@ -24,12 +26,26 @@ using namespace std;
 namespace agh {
 namespace ui {
 
-#define snprintf_buf(...) (snprintf( __buf__, AGH_BUF_SIZE-1, __VA_ARGS__), __buf__)
+inline const char*
+snprintf_buf( const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
-void snprintf_buf_ts_d( double h);
-void snprintf_buf_ts_h( double h);
-void snprintf_buf_ts_m( double m);
-void snprintf_buf_ts_s( double s);
+inline const char*
+snprintf_buf( const char* fmt, ...)
+{
+	va_list ap;
+	va_start (ap, fmt);
+
+	vsnprintf( global::buf, AGH_BUF_SIZE-1, fmt, ap);
+	va_end (ap);
+
+	return global::buf;
+}
+
+
+const char* snprintf_buf_ts_d( double h);
+const char* snprintf_buf_ts_h( double h);
+const char* snprintf_buf_ts_m( double m);
+const char* snprintf_buf_ts_s( double s);
 
 }
 } // namespace agh::ui

@@ -12,9 +12,11 @@
 #include "mf.hh"
 #include "mf_cb.hh"
 
+using namespace std;
+using namespace agh::ui;
 
 int
-agh::ui::SModelrunFacility::
+SModelrunFacility::
 construct_widgets()
 {
 	if ( !(AGH_GBGETOBJ3 (builder, GtkWindow,	wModelrunFacility)) ||

@@ -18,10 +18,10 @@
 #include "sf.hh"
 
 using namespace std;
-
+using namespace agh::ui;
 
 void
-agh::ui::SScoringFacility::SChannel::
+SScoringFacility::SChannel::
 draw_overlays( cairo_t* cr,
 	       const int wd, const float zeroy) const
 {
@@ -59,17 +59,18 @@ draw_overlays( cairo_t* cr,
 
 				if ( b == psd.focused_band ) {
 					cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-					snprintf_buf( "%s %g–%g",
-						      _p._p.ED->FreqBandNames[(unsigned)b],
-						      _p._p.ED->freq_bands[(unsigned)b][0],
-						      _p._p.ED->freq_bands[(unsigned)b][1]);
+					snprintf_buf(
+						"%s %g–%g",
+						_p._p.ED->FreqBandNames[(unsigned)b],
+						_p._p.ED->freq_bands[(unsigned)b][0],
+						_p._p.ED->freq_bands[(unsigned)b][1]);
 				} else {
 					cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 					snprintf_buf( "%s", _p._p.ED->FreqBandNames[(unsigned)b]);
 				}
 				cairo_move_to( cr, _p.da_wd - 170,
 					       ptop + psd.uppermost_band*12 - 12*(unsigned)b + 12);
-				cairo_show_text( cr, __buf__);
+				cairo_show_text( cr, global::buf);
 				cairo_stroke( cr);
 			}
 		} else {
@@ -164,14 +165,15 @@ draw_overlays( cairo_t* cr,
 			_p._p.CwB[SExpDesignUI::TColour::sf_labels].set_source_rgba( cr);
 			cairo_set_font_size( cr, 8);
 
-			snprintf_buf( "%g Hz",
-				      last_spectrum_bin * crecording.psd_profile.Pp.binsize);
-//				      draw_spectrum_absolute ? 'A' : 'R');
-			cairo_text_extents( cr, __buf__, &extents);
+			snprintf_buf(
+				"%g Hz",
+				last_spectrum_bin * crecording.psd_profile.Pp.binsize);
+//				draw_spectrum_absolute ? 'A' : 'R');
+			cairo_text_extents( cr, global::buf, &extents);
 			cairo_move_to( cr,
 				       gx + gw - extents.width - 5,
 				       gy + 4);
-			cairo_show_text( cr, __buf__);
+			cairo_show_text( cr, global::buf);
 			cairo_stroke( cr);
 		}
 	}
@@ -304,7 +306,7 @@ draw_overlays( cairo_t* cr,
 		cairo_set_source( cr, cp);
 
 		cairo_set_line_width( cr, .3);
-		agh::ui::cairo_draw_envelope(
+		cairo_draw_envelope(
 			cr,
 			raw_profile, 0, raw_profile.size(),
 			_p.da_wd, 0., pbot - EMGProfileHeight/2, signal_display_scale/2.); // half-signal scale, looks ok?
@@ -323,17 +325,19 @@ draw_overlays( cairo_t* cr,
 		cairo_select_font_face( cr, "sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 		_p._p.CwB[SExpDesignUI::TColour::sf_cursor].set_source_rgb( cr);
 		if ( this == &_p.channels.front() )
-			snprintf_buf( "%4.2f (%5.2fs)",
-				      (draw_filtered_signal ? signal_filtered : signal_original)
-				      [ (size_t)(_p.crosshair_at_time * samplerate()) ],
-				      _p.crosshair_at_time - _p.cur_xvpage_start() - _p.skirting_run_per1 * _p.vpagesize());
+			snprintf_buf(
+				"%4.2f (%5.2fs)",
+				(draw_filtered_signal ? signal_filtered : signal_original)
+				[ (size_t)(_p.crosshair_at_time * samplerate()) ],
+				_p.crosshair_at_time - _p.cur_xvpage_start() - _p.skirting_run_per1 * _p.vpagesize());
 		else
-			snprintf_buf( "%4.2f",
-				      (draw_filtered_signal ? signal_filtered : signal_original)
-				      [ (size_t)(_p.crosshair_at_time * samplerate()) ]);
+			snprintf_buf(
+				"%4.2f",
+				(draw_filtered_signal ? signal_filtered : signal_original)
+				[ (size_t)(_p.crosshair_at_time * samplerate()) ]);
 
 		cairo_move_to( cr, _p.crosshair_at+2, ptop + 22);
-		cairo_show_text( cr, __buf__);
+		cairo_show_text( cr, global::buf);
 		cairo_stroke( cr);
 	}
 
@@ -354,7 +358,7 @@ draw_overlays( cairo_t* cr,
 
 
 void
-agh::ui::SScoringFacility::
+SScoringFacility::
 _draw_hour_ticks( cairo_t *cr,
 		  const int htop, const int hbot,
 		  const bool with_cursor)

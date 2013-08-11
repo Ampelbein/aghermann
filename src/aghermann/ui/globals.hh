@@ -25,35 +25,30 @@ using namespace std;
 
 namespace agh {
 namespace ui {
-
-extern UniqueApp
-	*__unique_app__;
-
-extern GtkWindow
-	*__main_window__;
+namespace global {
 
 // convenience assign-once vars
+extern UniqueApp
+	*unique_app;
+
+extern GtkWindow
+	*main_window;
+
 extern GdkDevice
-	*__client_pointer__;
+	*client_pointer;
+
+extern double
+	hdpmm,
+	vdpmm;
 
 // quick tmp storage
 #define AGH_BUF_SIZE (1024*5)
 extern char
-	__buf__[AGH_BUF_SIZE];
-extern GString
-	*__ss__;
-
-extern double
-	__hdpmm__,
-	__vdpmm__;
-
-
-int prepare_for_expdesign();
-
-void set_unique_app_window( GtkWindow*);
+	buf[AGH_BUF_SIZE];
 
 }
-} // namespace agh::ui
+}
+} // namespace agh::ui::global
 
 #endif
 

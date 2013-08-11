@@ -12,7 +12,7 @@
 
 
 #ifdef _OPENMP
-#include <omp.h>
+# include <omp.h>
 #endif
 
 #include <gtk/gtk.h>
@@ -24,16 +24,17 @@
 #include "ui/ui.hh"
 #include "ui/sm/sm.hh"
 
-
+using namespace agh;
 
 static UniqueResponse
-message_received_cb( UniqueApp         *,
-                     UniqueCommand      command,
-                     UniqueMessageData *message,
-                     guint              time_,
-                     gpointer           )
+message_received_cb(
+	UniqueApp*,
+	const UniqueCommand      command,
+	UniqueMessageData       *message,
+	const guint              time_,
+	gpointer)
 {
-	if ( agh::ui::__main_window__ == NULL )
+	if ( ui::global::main_window == NULL )
 		return UNIQUE_RESPONSE_OK;
 
 	UniqueResponse res;
@@ -41,8 +42,12 @@ message_received_cb( UniqueApp         *,
 	switch ( command ) {
 	case UNIQUE_ACTIVATE:
 		// move the main window to the screen that sent us the command
-		gtk_window_set_screen( agh::ui::__main_window__, unique_message_data_get_screen( message));
-		gtk_window_present_with_time( agh::ui::__main_window__, time_);
+		gtk_window_set_screen(
+			ui::global::main_window,
+			unique_message_data_get_screen( message));
+		gtk_window_present_with_time(
+			ui::global::main_window,
+			time_);
 		res = UNIQUE_RESPONSE_OK;
 	    break;
 	default:
@@ -84,35 +89,38 @@ main( int argc, char **argv)
 			return -1;
 		}
 
-		agh::global::init();
-		agh::CExpDesign ED (explicit_session); // essentially a very thoughtful no-op
-		agh::global::fini();
+		global::init();
+		CExpDesign ED (explicit_session); // essentially a very thoughtful no-op
+		global::fini();
 
 	} else {
-
 		gtk_init( &argc, &argv);
 
 		// don't let user get us started twice
-		agh::ui::__unique_app__ =
-			unique_app_new_with_commands( "com.johnhommer.Aghermann", NULL,
-						      "fafa", 1,
-						      NULL);
-		if ( unique_app_is_running( agh::ui::__unique_app__) ) {
+		ui::global::unique_app =
+			unique_app_new_with_commands(
+				"com.johnhommer.Aghermann",
+				NULL, "fafa", 1, NULL);
+		if ( unique_app_is_running( ui::global::unique_app) ) {
 			printf( "There is unique app, switching to it now\n");
-			unique_app_send_message( agh::ui::__unique_app__, UNIQUE_ACTIVATE, NULL);
+			unique_app_send_message( ui::global::unique_app, UNIQUE_ACTIVATE, NULL);
 		} else {
-			g_signal_connect( agh::ui::__unique_app__, "message-received",
-					  (GCallback)message_received_cb,
-					  NULL);
+			g_signal_connect(
+				ui::global::unique_app, "message-received",
+				(GCallback)message_received_cb,
+				NULL);
 
 			agh::global::init();
 
-			if ( agh::ui::prepare_for_expdesign() ) {
-				agh::ui::pop_ok_message( NULL, "UI failed to initialize", "Your install is broken.");
+			if ( ui::prepare_for_expdesign() ) {
+				ui::pop_ok_message(
+					NULL,
+					"UI failed to initialize",
+					"Your install is broken.");
 				return 2;
 			}
 
-			agh::ui::SSessionChooser chooser (argv[optind]);
+			ui::SSessionChooser chooser (argv[optind]);
 			// implicit read sessionrc, run
 
 			gtk_main();

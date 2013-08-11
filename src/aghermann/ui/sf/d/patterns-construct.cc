@@ -14,8 +14,9 @@
 #include "patterns.hh"
 
 using namespace std;
+using namespace agh::ui;
 
-agh::ui::SPatternsDialogWidgets::
+SPatternsDialogWidgets::
 SPatternsDialogWidgets (SScoringFacility& SF)
 {
 	builder = gtk_builder_new();
@@ -141,7 +142,7 @@ SPatternsDialogWidgets (SScoringFacility& SF)
 	G_CONNECT_1 (wSFFD, hide);
 }
 
-agh::ui::SPatternsDialogWidgets::
+SPatternsDialogWidgets::
 ~SPatternsDialogWidgets ()
 {
 	// destroy toplevels
