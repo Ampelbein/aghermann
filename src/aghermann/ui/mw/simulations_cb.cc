@@ -77,7 +77,7 @@ iSimulationsRunBatch_activate_cb(
 	if ( gtk_dialog_run( ED.wBatchSetup) == GTK_RESPONSE_OK ) {
 		SBusyBlock bb (ED.wMainWindow);
 
-		ED.ED->remove_untried_modruns();
+		ED.ED->prune_untried_modruns();
 		ED.populate_2();
 
 		list<string>

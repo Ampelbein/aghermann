@@ -23,7 +23,7 @@ populate_2()
 	gtk_tree_store_clear( mSimulations);
 
       // clean up
-	ED->remove_untried_modruns();
+	ED->prune_untried_modruns();
 	GtkTreeIter iter_g, iter_j, iter_m, iter_h;
 
 	for ( auto &G : ED->groups ) {
@@ -125,7 +125,7 @@ void
 SExpDesignUI::
 cleanup_2()
 {
-	ED->remove_untried_modruns();
+	ED->prune_untried_modruns();
 	//populate( false);
 }
 

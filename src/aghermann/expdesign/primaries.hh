@@ -365,7 +365,7 @@ class CExpDesign {
 			  const SProfileParamSet&,
 			  ach::CModelRun**);
 	void remove_all_modruns();
-	void remove_untried_modruns();
+	void prune_untried_modruns();
 	void export_all_modruns( const string& fname) const;
 
 	void sync();

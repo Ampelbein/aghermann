@@ -124,7 +124,7 @@ tTaskSelector_switch_page_cb(
 		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpClose, FALSE);
 		ED.populate_2();
 	} else if ( page_num == 0 ) {
-		// ED.ED->remove_untried_modruns(); // done in populate_2
+		// ED.ED->prune_untried_modruns(); // done in populate_2
 		// ED.populate( false);
 		gtk_widget_set_sensitive( (GtkWidget*)ED.iExpClose, TRUE);
 	}

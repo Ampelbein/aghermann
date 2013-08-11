@@ -494,7 +494,7 @@ get_annotations() const
 
 void
 agh::CExpDesign::
-remove_untried_modruns()
+prune_untried_modruns()
 {
 	for ( auto& G : groups )
 		for ( auto& J : G.second )
