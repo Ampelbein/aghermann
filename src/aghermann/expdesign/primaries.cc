@@ -172,7 +172,7 @@ error_log_serialize() const
 	string ret;
 	for ( const auto& E : _error_log )
 		ret += E.first + '\n';
-	return ret;
+	return move(ret);
 }
 
 
@@ -318,7 +318,7 @@ enumerate_groups() const
 	list<string> recp;
 	for ( auto &G : groups )
 		recp.push_back( G.first);
-	return recp;
+	return move(recp);
 }
 
 list<string>
@@ -329,7 +329,7 @@ enumerate_subjects() const
 	for ( auto &G : groups )
 		for ( auto &J : G.second )
 			recp.push_back( J.id);
-	return recp;
+	return move(recp);
 }
 
 
@@ -344,7 +344,7 @@ enumerate_sessions() const
 				recp.push_back( D.first);
 	recp.sort();
 	recp.unique();
-	return recp;
+	return move(recp);
 }
 
 list<string>
@@ -359,7 +359,7 @@ enumerate_episodes() const
 					recp.push_back( E.name());
 	recp.sort();
 	recp.unique();
-	return recp;
+	return move(recp);
 }
 
 list<sigfile::SChannel>
@@ -380,7 +380,7 @@ enumerate_eeg_channels() const
 								recp.push_back( F().channel_by_id(h));
 	recp.sort();
 	recp.unique();
-	return recp;
+	return move(recp);
 }
 
 list<sigfile::SChannel>
@@ -399,7 +399,7 @@ enumerate_all_channels() const
 					}
 	recp.sort();
 	recp.unique();
-	return recp;
+	return move(recp);
 }
 
 
@@ -420,7 +420,7 @@ used_samplerates( sigfile::SChannel::TType type) const
 							}
 	sort(recp.begin(), recp.end());
 	unique(recp.begin(), recp.end());
-	return recp;
+	return move(recp);
 }
 
 
