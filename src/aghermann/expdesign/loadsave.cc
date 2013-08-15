@@ -9,12 +9,6 @@
  *         License:  GPL
  */
 
-#include <sys/stat.h>
-#include <errno.h>
-#include <fcntl.h>
-
-#include <memory>
-
 #include "common/config-validate.hh"
 #include "aghermann/model/achermann.hh"
 #include "primaries.hh"
@@ -28,7 +22,7 @@ using namespace agh;
 
 
 int
-agh::CExpDesign::
+CExpDesign::
 load_settings()
 {
 	libconfig::Config conf;
@@ -111,7 +105,7 @@ load_settings()
 
 
 int
-agh::CExpDesign::
+CExpDesign::
 save_settings()
 {
 	libconfig::Config conf;

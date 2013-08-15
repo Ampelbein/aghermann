@@ -1,5 +1,5 @@
 /*
- *       File name:  aghermann/expdesign/primaries.cc
+ *       File name:  aghermann/expdesign/expdesign.cc
  *         Project:  Aghermann
  *          Author:  Andrei Zavada <johnhommer@gmail.com>
  * Initial version:  2010-04-28
@@ -11,10 +11,7 @@
 
 
 #include <stdarg.h>
-#include <errno.h>
-#include <cassert>
 #include <string>
-#include <fstream>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -35,13 +32,14 @@ const char
 };
 
 double
-agh::CExpDesign::freq_bands[metrics::TBand::TBand_total][2] = {
+	agh::CExpDesign::freq_bands[metrics::TBand::TBand_total][2] = {
 	{  1.5,  4.0 },
 	{  4.0,  8.0 },
 	{  8.0, 12.0 },
 	{ 15.0, 30.0 },
 	{ 30.0, 40.0 },
 };
+
 
 
 agh::CExpDesign::
@@ -426,68 +424,6 @@ used_samplerates( sigfile::SChannel::TType type) const
 
 
 
-
-
-
-float
-agh::CSubject::
-age() const
-{
-	time_t now = time(NULL);
-	if ( unlikely (now == -1) ) {
-		perror( "What's wrong with localtime? ");
-		return 21.;
-	}
-	return age_rel(now);
-}
-
-float
-agh::CSubject::
-age_rel( time_t rel) const
-{
-	return (difftime(rel, dob))/365.25/24/60/60;
-}
-
-
-
-
-agh::CSubject::SEpisode::
-SEpisode (sigfile::CTypedSource&& F_,
-	  const metrics::psd::SPPack& fft_params,
-	  const metrics::swu::SPPack& swu_params,
-	  const metrics::mc::SPPack& mc_params)
-{
-      // move it in place
-	sources.emplace_back( move(F_));
-	auto& F = sources.back();
-	auto HH = F().channel_list();
-	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
-		F().filename(), sigfile::join_channel_names(HH, ", ").c_str());
-	int h = 0;
-	for ( auto& H : HH )
-		recordings.insert( {H, {F, h++, fft_params, swu_params, mc_params}});
-}
-
-
-list<agh::CSubject::SEpisode::SAnnotation>
-agh::CSubject::SEpisode::
-get_annotations() const
-{
-	list<agh::CSubject::SEpisode::SAnnotation>
-		ret;
-	for ( auto &F : sources ) {
-		auto HH = F().channel_list();
-		for ( size_t h = 0; h < HH.size(); ++h ) {
-			auto &AA = F().annotations(h);
-			for ( auto &A : AA )
-				ret.emplace_back( F(), h, A);
-		}
-		for ( auto& A : F().annotations() )
-			ret.emplace_back( F(), -1, A);
-	}
-	ret.sort();
-	return ret;
-}
 
 
 

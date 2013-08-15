@@ -7,13 +7,14 @@ noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
 	forward-decls.hh \
-	loadsave.cc \
-	tree-scanner.cc \
-	primaries.cc \
 	primaries.hh \
+	profile.hh \
+	expdesign.cc \
+	loadsave.cc \
 	recording.cc \
 	recording.hh \
-	profile.hh
+	subject.cc \
+	tree-scanner.cc
 
 if DO_PCH
 BUILT_SOURCES := \

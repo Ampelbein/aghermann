@@ -15,6 +15,7 @@
 #include <list>
 #include <forward_list>
 #include <vector>
+#include <map>
 
 #if HAVE_CONFIG_H && !defined(VERSION)
 #  include "config.h"
@@ -44,6 +45,13 @@ bool
 member( const T& x, const vector<T>& v)
 {
 	return any( v.begin(), v.end(), x);
+}
+
+template <typename K, typename V>
+bool
+member( const K& x, const map<K, V>& m)
+{
+	return m.find(x) != m.end();
 }
 
 } // namespace alg

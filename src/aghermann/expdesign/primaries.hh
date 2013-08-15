@@ -14,21 +14,18 @@
 #define AGH_AGHERMANN_EXPDESIGN_PRIMARIES_H_
 
 
-#include <cstring>
 #include <string>
 #include <list>
-#include <functional>
 #include <forward_list>
 #include <map>
-#include <stdexcept>
 
 #include "common/config-validate.hh"
+#include "common/containers.hh"
 #include "common/subject_id.hh"
 #include "libsigproc/winfun.hh"
 #include "libmetrics/bands.hh"
 #include "aghermann/model/achermann.hh"
 
-#include "recording.hh"
 #include "forward-decls.hh"
 
 #if HAVE_CONFIG_H && !defined(VERSION)
@@ -70,34 +67,18 @@ class CSubject : public SSubjectId {
 		{ return _dir.c_str(); }
 
 	int try_update_subject_details( const agh::SSubjectId& j)
-		{
-			return SSubjectId::update_from( j);
-		}
+		{ return SSubjectId::update_from( j); }
 
-	float age( const string& d) const // age when recordings in this session were made
-		{
-			if ( measurements.find(d) != measurements.end() &&
-			     measurements.at(d).episodes.size() > 0 )
-				return age_rel(
-					measurements.at(d).episodes.front().start_time());
-			else
-				return -1.;
-		}
+	float age( const string& d) const; // age when recordings in this session were made
 	float age() const; // now
 	float age_rel( time_t) const;
 
 	bool operator==( const CSubject &o) const
-		{
-			return id == o.id;
-		}
+		{ return id == o.id; }
 	bool operator==( const string& n) const
-		{
-			return SSubjectId::id == n;
-		}
+		{ return SSubjectId::id == n; }
 	bool operator==( sid_t id) const
-		{
-			return _id == id;
-		}
+		{ return _id == id; }
 
       // contents
 	struct SEpisodeSequence;
@@ -121,14 +102,10 @@ class CSubject : public SSubjectId {
 
 		const char*
 		name() const
-			{
-				return sources.front()().episode();
-			}
+			{ return sources.front()().episode(); }
 		bool
 		operator==( const string& e) const
-			{
-				return e == name();
-			}
+			{ return e == name(); }
 		bool
 		operator<( const SEpisode& rv) const
 			{
@@ -150,20 +127,14 @@ class CSubject : public SSubjectId {
 
 			bool
 			operator<( const SAnnotation& rv) const
-				{
-					return span < rv.span;
-				}
+				{ return span < rv.span; }
 
 			const char*
 			channel() const
-				{
-					return (_h == -1) ? "(embedded)" : _source.channel_by_id(_h).name();
-				}
+				{ return (_h == -1) ? "(embedded)" : _source.channel_by_id(_h).name(); }
 			agh::alg::SSpan<float>
 			page_span( size_t pagesize) const
-				{
-					return span / (float)pagesize;
-				}
+				{ return span / (float)pagesize; }
 		};
 		list<SAnnotation>
 		get_annotations() const;
@@ -182,42 +153,21 @@ class CSubject : public SSubjectId {
 	    public:
 		list<SEpisode> episodes;
 		size_t
-		__attribute__ ((pure))
 		size() const
-			{
-				return episodes.size();
-			}
+			{ return episodes.size(); }
+
 		list<SEpisode>::const_iterator
 		episode_iter_by_name( const string& e) const
-			{
-				return find( episodes.begin(), episodes.end(), e);
-			}
+			{ return find( episodes.begin(), episodes.end(), e); }
 		bool
 		have_episode( const string& e) const
-			{
-				return episode_iter_by_name(e) != episodes.cend();
-			}
+			{ return episode_iter_by_name(e) != episodes.cend(); }
+
 		const SEpisode&
-		operator[]( const string& e) const
-			{
-				auto E = find( episodes.begin(), episodes.end(), e);
-				if ( E != episodes.end() )
-					return *E;
-				else
-					throw invalid_argument( string("no such episode: ") + e);
-			}
+		operator[]( const string& e) const;
 		SEpisode&
-		operator[]( const string& e)
-			{
-				auto E = find( episodes.begin(), episodes.end(), e);
-				if ( E != episodes.end() )
-					return *E;
-				else // or don't throw, go and make one?
-					throw invalid_argument( string("no such episode: ") + e);
-				// no, let it be created in
-				// CExpDesign::add_measurement, when
-				// episode start/end times are known
-			}
+		operator[]( const string& e);
+
 	      // either construct a new episode from F, or update an
 	      // existing one (add F to its sources)
 		int
@@ -296,10 +246,9 @@ class CExpDesign {
 	session_dir() const
 		{ return _session_dir.c_str(); }
 
-	string name() const // dirname
-		{
-			return _session_dir.substr( _session_dir.rfind( '/'));
-		}
+	string
+	name() const // dirname
+		{ return _session_dir.substr( _session_dir.rfind( '/')); }
 
       // error log
 	enum class TLogEntryStyle { plain, bold, italic };
