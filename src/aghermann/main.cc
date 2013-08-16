@@ -26,43 +26,13 @@
 
 using namespace agh;
 
-static UniqueResponse
-message_received_cb(
-	UniqueApp*,
-	const UniqueCommand      command,
-	UniqueMessageData       *message,
-	const guint              time_,
-	gpointer)
-{
-	if ( ui::global::main_window == NULL )
-		return UNIQUE_RESPONSE_OK;
-
-	UniqueResponse res;
-
-	switch ( command ) {
-	case UNIQUE_ACTIVATE:
-		// move the main window to the screen that sent us the command
-		gtk_window_set_screen(
-			ui::global::main_window,
-			unique_message_data_get_screen( message));
-		gtk_window_present_with_time(
-			ui::global::main_window,
-			time_);
-		res = UNIQUE_RESPONSE_OK;
-	    break;
-	default:
-		res = UNIQUE_RESPONSE_OK;
-	    break;
-	}
-
-	return res;
-}
-
-
-
 void print_version();
 
-static void print_usage( const char*);
+namespace {
+UniqueResponse message_received_cb( UniqueApp*, UniqueCommand,	UniqueMessageData*, const guint, gpointer);
+void print_usage( const char*);
+}
+
 
 int
 main( int argc, char **argv)
@@ -133,11 +103,45 @@ main( int argc, char **argv)
 	return 0;
 }
 
+namespace {
+UniqueResponse
+message_received_cb(
+	UniqueApp*,
+	const UniqueCommand      command,
+	UniqueMessageData       *message,
+	const guint              time_,
+	gpointer)
+{
+	if ( ui::global::main_window == NULL )
+		return UNIQUE_RESPONSE_OK;
+
+	UniqueResponse res;
+
+	switch ( command ) {
+	case UNIQUE_ACTIVATE:
+		// move the main window to the screen that sent us the command
+		gtk_window_set_screen(
+			ui::global::main_window,
+			unique_message_data_get_screen( message));
+		gtk_window_present_with_time(
+			ui::global::main_window,
+			time_);
+		res = UNIQUE_RESPONSE_OK;
+	    break;
+	default:
+		res = UNIQUE_RESPONSE_OK;
+	    break;
+	}
+
+	return res;
+}
+
 void
 print_usage( const char* argv0)
 {
 	printf( "Usage: %s [-n] [exp_root_dir]\n", argv0);
 }
+} // namespace
 
 // Local Variables:
 // Mode: c++
