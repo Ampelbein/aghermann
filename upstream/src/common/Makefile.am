@@ -6,15 +6,16 @@ noinst_LIBRARIES := \
 	liba.a
 
 liba_a_SOURCES := \
-	libcommon.cc \
-	subject_id.cc \
-	config-validate.hh \
-	string.hh \
+	../libsigfile/source-base.hh \
 	alg.hh \
+	config-validate.hh \
+	containers.hh \
 	fs.hh \
 	lang.hh \
-	subject_id.hh \
-	../libsigfile/source-base.hh
+	libcommon.cc \
+	string.hh \
+	subject_id.cc \
+	subject_id.hh
 
 if DO_PCH
 BUILT_SOURCES := \
