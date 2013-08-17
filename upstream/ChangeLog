@@ -1,5 +1,5 @@
 v.0.9.2 (2013-xx-xx)
-	* .
+	* Separate upstream tree from various distribution-related files.
 
 v.0.9.1.1 (2013-07-24)
 	* Fix 32-bit builds where sizeof(size_t) != sizeof(unsigned long).
