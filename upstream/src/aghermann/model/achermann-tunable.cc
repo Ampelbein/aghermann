@@ -10,8 +10,6 @@
  */
 
 
-
-#include <cassert>
 #include <gsl/gsl_rng.h>
 #include "aghermann/globals.hh"
 #include "achermann-tunable.hh"

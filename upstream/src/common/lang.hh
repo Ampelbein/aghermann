@@ -17,8 +17,7 @@
 #endif
 
 #include <unistd.h>
-#include <cassert>
-#include <memory>
+#include <stdio.h>
 
 using namespace std;
 
@@ -56,9 +55,6 @@ typedef unsigned long hash_t;
 #define likely(x)	__builtin_expect (!!(x), 1)
 #define unlikely(x)	__builtin_expect (!!(x), 0)
 
-
-#define ASPRINTF(...) \
-	assert (asprintf(__VA_ARGS__) > 0)
 
 #define FABUF printf( __FILE__ ":%d (%s): %s\n", __LINE__, __FUNCTION__, __buf__);
 #define FAFA printf( __FILE__ ":%d (%s): fafa\n", __LINE__, __FUNCTION__);

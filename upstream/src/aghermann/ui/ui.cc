@@ -216,7 +216,8 @@ pop_ok_message( GtkWindow *parent,
 		va_start (ap, fmt);
 
 		char *_;
-		assert (vasprintf( &_, fmt, ap) > 0);
+		if (vasprintf( &_, fmt, ap) <= 0)
+			abort();
 		va_end (ap);
 		gtk_message_dialog_format_secondary_markup( W, "%s", _);
 		free( (void*)_);
@@ -247,7 +248,8 @@ pop_question( GtkWindow* parent,
 		va_start (ap, fmt);
 
 		char *_;
-		assert (vasprintf( &_, fmt, ap) > 0);
+		if (vasprintf( &_, fmt, ap) <= 0)
+			abort();
 		va_end (ap);
 		gtk_message_dialog_format_secondary_markup( W, "%s", _);
 		free( (void*)_);

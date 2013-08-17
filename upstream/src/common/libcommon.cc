@@ -68,7 +68,8 @@ sasprintf( const char* fmt, ...)
 	char *_;
 	va_list ap;
 	va_start (ap, fmt);
-	assert (vasprintf( &_, fmt, ap) > 0);
+	if (vasprintf( &_, fmt, ap) <= 0)
+		abort();
 	va_end (ap);
 
 	string ret {_};

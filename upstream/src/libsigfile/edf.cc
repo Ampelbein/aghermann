@@ -758,63 +758,58 @@ details( const int which) const
 				++n_dicontinuities;
 			prev_offset = cur_offset;
 		}
-		char *outp;
-		ASPRINTF( &outp,
-			  "File\t: %s\n"
-			  " subtype\t: %s\n"
-			  " PatientID\t: %s\n"
-			  " RecordingID\t: %s\n"
-			  " Date\t: %s\n"
-			  " Time\t: %s\n"
-			  " # of channels\t: %zu\n"
-			  " # of records\t: %zu\n"
-			  " Record size\t: %g sec\n"
-			  " # of discontinuities\t: %zu\n"
-			  " # of embedded annotations\t: %zu\n",
-			  agh::str::homedir2tilda( filename()).c_str(),
-			  subtype_s(),
-			  patient_id(),
-			  trim( string (header.recording_id, 80)).c_str(),
-			  trim( string (header.recording_date, 8)).c_str(),
-			  trim( string (header.recording_time, 8)).c_str(),
-			  channels.size(),
-			  n_data_records,
-			  data_record_size,
-			  n_dicontinuities,
-			  common_annotations.size());
-		recv << outp;
-		free( outp);
+		recv << agh::str::sasprintf(
+			"File\t: %s\n"
+			" subtype\t: %s\n"
+			" PatientID\t: %s\n"
+			" RecordingID\t: %s\n"
+			" Date\t: %s\n"
+			" Time\t: %s\n"
+			" # of channels\t: %zu\n"
+			" # of records\t: %zu\n"
+			" Record size\t: %g sec\n"
+			" # of discontinuities\t: %zu\n"
+			" # of embedded annotations\t: %zu\n",
+			agh::str::homedir2tilda( filename()).c_str(),
+			subtype_s(),
+			patient_id(),
+			trim( string (header.recording_id, 80)).c_str(),
+			trim( string (header.recording_date, 8)).c_str(),
+			trim( string (header.recording_time, 8)).c_str(),
+			channels.size(),
+			n_data_records,
+			data_record_size,
+			n_dicontinuities,
+			common_annotations.size());
 
 		if ( which & with_channels ) {
 			size_t i = 0;
 			for ( auto &H : channels ) {
-				ASPRINTF( &outp,
-					  " Channel %zu:\n"
-					  "  Label\t: %s\n"
-					  "  Transducer type\t: %s\n"
-					  "  Physical dimension\t: %s\n"
-					  "  Physical min\t: % g\n"
-					  "  Physical max\t: % g\n"
-					  "  Digital min\t: % d\n"
-					  "  Digital max\t: % d\n"
-					  "  Filtering info\t: %s\n"
-					  "  Samples/rec\t: %zu\n"
-					  "  Scale\t: %g\n"
-					  "  (reserved)\t: %s\n",
-					  ++i,
-					  trim( string (H.header.label, 16)).c_str(),
-					  H.transducer_type.c_str(),
-					  H.physical_dim.c_str(),
-					  H.physical_min,
-					  H.physical_max,
-					  H.digital_min,
-					  H.digital_max,
-					  H.filtering_info.c_str(),
-					  H.samples_per_record,
-					  H.scale,
-					  H.reserved.c_str());
-				recv << outp;
-				free( outp);
+				recv << agh::str::sasprintf(
+					" Channel %zu:\n"
+					"  Label\t: %s\n"
+					"  Transducer type\t: %s\n"
+					"  Physical dimension\t: %s\n"
+					"  Physical min\t: % g\n"
+					"  Physical max\t: % g\n"
+					"  Digital min\t: % d\n"
+					"  Digital max\t: % d\n"
+					"  Filtering info\t: %s\n"
+					"  Samples/rec\t: %zu\n"
+					"  Scale\t: %g\n"
+					"  (reserved)\t: %s\n",
+					++i,
+					trim( string (H.header.label, 16)).c_str(),
+					H.transducer_type.c_str(),
+					H.physical_dim.c_str(),
+					H.physical_min,
+					H.physical_max,
+					H.digital_min,
+					H.digital_max,
+					H.filtering_info.c_str(),
+					H.samples_per_record,
+					H.scale,
+					H.reserved.c_str());
 			}
 		}
 

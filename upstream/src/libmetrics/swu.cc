@@ -11,7 +11,6 @@
  */
 
 
-#include <cassert>
 #include <unistd.h>
 
 #include "common/lang.hh"

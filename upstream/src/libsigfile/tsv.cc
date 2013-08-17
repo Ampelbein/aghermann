@@ -165,7 +165,7 @@ _parse_header()
 {
       // 1. read metadata
 	regex_t RE;
-	assert (0 == regcomp( &RE, "^#\\W*([a-zA-Z_][a-zA-Z_0-9]*)\\W*(:|=)\\W*(.+)\\W*\n", REG_EXTENDED));
+	regcomp( &RE, "^#\\W*([a-zA-Z_][a-zA-Z_0-9]*)\\W*(:|=)\\W*(.+)\\W*\n", REG_EXTENDED);
 	regmatch_t M[1+1+2];
 
 	_line0_mallocked_bytes = 4096;

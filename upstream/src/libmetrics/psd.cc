@@ -14,7 +14,6 @@
 
 
 #include <map>
-#include <cassert>
 #include <unistd.h>
 
 #if defined(_OPENMP)
