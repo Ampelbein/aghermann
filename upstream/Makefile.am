@@ -11,6 +11,3 @@ man_MANS = \
 	man/edfcat.1 \
 	man/edfhed.1 \
 	man/edfhed-gtk.1
-
-ebuild:
-	cp gentoo/aghermann.ebuild aghermann-$(VERSION).ebuild
