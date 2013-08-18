@@ -14,4 +14,5 @@ liba_a_SOURCES := \
 	recording.cc \
 	recording.hh \
 	subject.cc \
+	subject.hh \
 	tree-scanner.cc
