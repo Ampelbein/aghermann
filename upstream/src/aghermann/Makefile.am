@@ -18,8 +18,7 @@ aghermann_SOURCES := \
 	print_version.cc \
 	main.cc \
 	globals.cc \
-	globals.hh \
-	ui/sm/sm.hh
+	globals.hh
 
 print_version.o: FORCE
 FORCE:
