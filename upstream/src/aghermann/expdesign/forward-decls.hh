@@ -16,6 +16,8 @@
 namespace agh {
 
 class CSubject;
+struct SEpisode;
+struct SEpisodeSequence;
 class CJGroup;
 class CExpDesign;
 

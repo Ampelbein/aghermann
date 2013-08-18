@@ -179,17 +179,17 @@ iExpBasicSADetectUltradianCycles_activate_cb(
 
 	using namespace agh;
 	CExpDesign::TEpisodeFilterFun filter =
-		[&ED]( agh::CSubject::SEpisode& E) -> bool
+		[&ED]( agh::SEpisode& E) -> bool
 		{
 			return E.recordings.find( *ED._AghHi) != E.recordings.end();
 		};
 	CExpDesign::TEpisodeOpFun F =
-		[&ED]( agh::CSubject::SEpisode& E)
+		[&ED]( agh::SEpisode& E)
 		{
 			ED.do_detect_ultradian_cycle( E.recordings.at( *ED._AghHi));
 		};
 	CExpDesign::TEpisodeReportFun reporter =
-		[&ED]( const agh::CJGroup&, const agh::CSubject& J, const string&, const agh::CSubject::SEpisode& E,
+		[&ED]( const agh::CJGroup&, const agh::CSubject& J, const string&, const agh::SEpisode& E,
 		       size_t i, size_t n)
 		{
 			ED.sb_main_progress_indicator(
@@ -249,7 +249,7 @@ iExpGloballyDetectArtifacts_activate_cb(
 	CExpDesign::TRecordingOpFun op;
 	CExpDesign::TRecordingFilterFun filter;
 	CExpDesign::TRecordingReportFun reporter =
-		[&]( const CJGroup&, const CSubject& J, const string& D, const CSubject::SEpisode& E, const CRecording& R,
+		[&]( const CJGroup&, const CSubject& J, const string& D, const SEpisode& E, const CRecording& R,
 		     size_t i, size_t total)
 		{
 			ED.sb_main_progress_indicator(

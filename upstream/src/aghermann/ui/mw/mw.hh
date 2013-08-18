@@ -24,7 +24,7 @@
 #include "common/config-validate.hh"
 #include "libmetrics/mc-artifacts.hh"
 #include "aghermann/model/forward-decls.hh"
-#include "aghermann/expdesign/primaries.hh"
+#include "aghermann/expdesign/expdesign.hh"
 #include "aghermann/ui/ui.hh"
 #include "aghermann/ui/ui++.hh"
 #include "aghermann/ui/forward-decls.hh"
@@ -67,11 +67,11 @@ class SExpDesignUI
 			*cprofile;
 		void create_cprofile();
 
-		list<agh::CSubject::SEpisode>&
+		list<agh::SEpisode>&
 		sepisodesequence() const
 			{ return csubject.measurements[*_p._p._AghDi].episodes; }
 
-		agh::CSubject::SEpisode
+		agh::SEpisode
 			*using_episode;
 		bool is_episode_focused() const
 			{ return using_episode != nullptr; }
@@ -186,13 +186,13 @@ class SExpDesignUI
       // inventory
 	// full-path annotations
 	struct SAnnotation
-	      : public agh::CSubject::SEpisode::SAnnotation {
+	      : public agh::SEpisode::SAnnotation {
 		agh::CSubject& csubject;
 		const string& session;
-		agh::CSubject::SEpisode& sepisode;
-		SAnnotation (agh::CSubject& j, const string& d, agh::CSubject::SEpisode& e,
-			     agh::CSubject::SEpisode::SAnnotation& a)
-		      : agh::CSubject::SEpisode::SAnnotation (a),
+		agh::SEpisode& sepisode;
+		SAnnotation (agh::CSubject& j, const string& d, agh::SEpisode& e,
+			     agh::SEpisode::SAnnotation& a)
+		      : agh::SEpisode::SAnnotation (a),
 			csubject (j), session (d), sepisode (e)
 			{}
 	};

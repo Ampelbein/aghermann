@@ -7,7 +7,7 @@ noinst_LIBRARIES := liba.a
 
 liba_a_SOURCES := \
 	forward-decls.hh \
-	primaries.hh \
+	expdesign.hh \
 	profile.hh \
 	expdesign.cc \
 	loadsave.cc \
@@ -21,7 +21,8 @@ BUILT_SOURCES := \
 	forward-decls.hh.gch \
 	profile.hh.gch \
 	recording.hh.gch \
-	primaries.hh.gch
+	subject.hh.gch \
+	expdesign.hh.gch
 %.hh.gch: %.hh
 	$(CXXCOMPILE) -c $<
 CLEANFILES = \

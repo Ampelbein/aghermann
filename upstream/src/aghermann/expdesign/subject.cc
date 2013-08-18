@@ -10,7 +10,10 @@
  */
 
 
-#include "primaries.hh"
+#include "common/containers.hh"
+#include "aghermann/model/achermann.hh"
+#include "recording.hh"
+#include "subject.hh"
 
 
 using namespace std;
@@ -56,7 +59,7 @@ age_rel( time_t rel) const
 
 
 
-CSubject::SEpisode::
+SEpisode::
 SEpisode (sigfile::CTypedSource&& F_,
 	  const metrics::psd::SPPack& fft_params,
 	  const metrics::swu::SPPack& swu_params,
@@ -66,7 +69,7 @@ SEpisode (sigfile::CTypedSource&& F_,
 	sources.emplace_back( move(F_));
 	auto& F = sources.back();
 	auto HH = F().channel_list();
-	printf( "CSubject::SEpisode::SEpisode( \"%s\"): %s\n",
+	printf( "SEpisode::SEpisode( \"%s\"): %s\n",
 		F().filename(), sigfile::join_channel_names(HH, ", ").c_str());
 	int h = 0;
 	for ( auto& H : HH )
@@ -74,11 +77,11 @@ SEpisode (sigfile::CTypedSource&& F_,
 }
 
 
-list<CSubject::SEpisode::SAnnotation>
-CSubject::SEpisode::
+list<SEpisode::SAnnotation>
+SEpisode::
 get_annotations() const
 {
-	list<agh::CSubject::SEpisode::SAnnotation>
+	list<agh::SEpisode::SAnnotation>
 		ret;
 	for ( auto &F : sources ) {
 		auto HH = F().channel_list();
@@ -96,8 +99,8 @@ get_annotations() const
 
 
 
-const CSubject::SEpisode&
-CSubject::SEpisodeSequence::
+const SEpisode&
+SEpisodeSequence::
 operator[]( const string& e) const
 {
 	auto E = find( episodes.begin(), episodes.end(), e);
@@ -107,8 +110,8 @@ operator[]( const string& e) const
 		throw invalid_argument( string("no such episode: ") + e);
 }
 
-CSubject::SEpisode&
-CSubject::SEpisodeSequence::
+SEpisode&
+SEpisodeSequence::
 operator[]( const string& e)
 {
 	auto E = find( episodes.begin(), episodes.end(), e);

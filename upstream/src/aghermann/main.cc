@@ -19,7 +19,7 @@
 #include <unique/unique.h>
 
 #include "globals.hh"
-#include "expdesign/primaries.hh"
+#include "expdesign/expdesign.hh"
 #include "ui/globals.hh"
 #include "ui/ui.hh"
 #include "ui/sm/sm.hh"

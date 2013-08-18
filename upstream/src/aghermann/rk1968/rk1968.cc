@@ -15,7 +15,8 @@
 #include "libsigfile/page.hh"
 #include "libsigfile/typed-source.hh"
 #include "aghermann/expdesign/recording.hh"
-#include "aghermann/expdesign/primaries.hh"
+#include "aghermann/expdesign/subject.hh"
+#include "aghermann/expdesign/expdesign.hh"
 #include "libmetrics/bands.hh"
 
 #include "rk1968.hh"
@@ -26,7 +27,7 @@ using namespace agh::rk1968;
 
 int
 CScoreAssistant::
-score( agh::CSubject::SEpisode& E)
+score( agh::SEpisode& E)
 {
 	forward_list<agh::CRecording*> HH;
 	for ( auto &R : E.recordings )
@@ -54,7 +55,7 @@ score( agh::CSubject::SEpisode& E)
 		int decision = 0;
 		for ( ; Di != courses_delta.end(); ++Di, ++Ti )
 			decision +=
-				( (*Di)[p] > (*Ti)[p] * 1.5 );
+				( (*Di)[p] > (*Ti)[p] * nrem3_delta_theta_ratio );
 		if ( decision > 0 )
 			firstsource[p].mark( sigfile::SPage::TScore::nrem3);
 	}

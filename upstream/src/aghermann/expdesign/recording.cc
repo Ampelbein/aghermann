@@ -15,7 +15,7 @@
 #include "aghermann/model/beersma.hh"
 
 #include "recording.hh"
-#include "primaries.hh"
+#include "subject.hh"
 
 using namespace std;
 
@@ -138,7 +138,7 @@ CProfile (CSubject& J, const string& d, const sigfile::SChannel& h,
 			_status |= TFlags::enegoffset;
 			return;
 		}
-		// this condition is checked against already in CSubject::SEpisodeSequence::add_one()
+		// this condition is checked against already in SEpisodeSequence::add_one()
 		// if ( _mm_bounds.size() > 0  &&  pa - _mm_bounds.back().second > 4 * 24 * 3600 ) {
 		// 	_status |= (int)TSimPrepError::efarapart;
 		// 	return;
@@ -193,7 +193,7 @@ CProfile (CRecording& M,
 		_status |= TFlags::enegoffset;
 		return;
 	}
-	// this condition is checked against already in CSubject::SEpisodeSequence::add_one()
+	// this condition is checked against already in SEpisodeSequence::add_one()
 	// if ( _mm_bounds.size() > 0  &&  pa - _mm_bounds.back().second > 4 * 24 * 3600 ) {
 	// 	_status |= (int)TSimPrepError::efarapart;
 	// 	return;

@@ -16,7 +16,7 @@
 
 #include "common/alg.hh"
 #include "libsigfile/all.hh"
-#include "primaries.hh"
+#include "expdesign.hh"
 
 
 using namespace std;
@@ -42,7 +42,7 @@ agh::CExpDesign::TMsmtCollectProgressIndicatorFun
 // let them be
 
 int
-agh::CSubject::SEpisodeSequence::
+agh::SEpisodeSequence::
 add_one( sigfile::CTypedSource&& Fmc,
 	 const metrics::psd::SPPack& fft_params,
 	 const metrics::swu::SPPack& swu_params,
@@ -72,7 +72,7 @@ add_one( sigfile::CTypedSource&& Fmc,
 
 	} else { // same as SEpisode() but done on an existing one
 	      // check that the edf source being added has exactly the same timestamp and duration
-		printf( "CSubject::SEpisodeSequence::add_one( \"%s\") try in-place\n",
+		printf( "SEpisodeSequence::add_one( \"%s\") try in-place\n",
 			Fmc().filename());
 		if ( fabs( difftime( Ei->start_time(), Fmc().start_time())) > 1 )
 			return AGH_EPSEQADD_TOOFAR;
@@ -405,7 +405,7 @@ compute_profiles()
 			R.mc_profile.compute();
 		};
 	TRecordingReportFun G =
-		[&]( const CJGroup&, const CSubject&, const string&, const CSubject::SEpisode&, const CRecording& R,
+		[&]( const CJGroup&, const CSubject&, const string&, const SEpisode&, const CRecording& R,
 		     size_t i, size_t total)
 		{
 			only_progress_fun(

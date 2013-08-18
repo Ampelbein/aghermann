@@ -9,9 +9,8 @@
  *         License:  GPL
  */
 
-#include "common/config-validate.hh"
 #include "aghermann/model/achermann.hh"
-#include "primaries.hh"
+#include "expdesign.hh"
 
 
 using namespace std;

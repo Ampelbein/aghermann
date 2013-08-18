@@ -13,7 +13,7 @@
 #include <cstring>
 #include <sstream>
 
-#include "aghermann/expdesign/primaries.hh"
+#include "aghermann/expdesign/expdesign.hh"
 #include "aghermann/model/beersma.hh"
 #include "aghermann/ui/misc.hh"
 #include "mw.hh"

@@ -22,9 +22,9 @@
 #include "common/config-validate.hh"
 #include "libsigproc/winfun.hh"
 #include "libsigproc/sigproc.hh"
-#include "aghermann/patterns/patterns.hh"
 #include "libmetrics/mc-artifacts.hh"
-#include "aghermann/expdesign/primaries.hh"
+#include "aghermann/patterns/patterns.hh"
+#include "aghermann/expdesign/forward-decls.hh"
 #include "aghermann/ica/ica.hh"
 #include "aghermann/ui/globals.hh"
 #include "aghermann/ui/ui++.hh"
@@ -62,11 +62,11 @@ class SScoringFacility
 	agh::CSubject&
 		_csubject;
 	string	_session;
-	agh::CSubject::SEpisode&
+	agh::SEpisode&
 		_sepisode;
     public:
 	agh::CSubject&			csubject() const { return _csubject; }
-	agh::CSubject::SEpisode&	sepisode() const { return _sepisode; }
+	agh::SEpisode&	sepisode() const { return _sepisode; }
 	const string&			session()  const { return _session;  }
 
       // channels

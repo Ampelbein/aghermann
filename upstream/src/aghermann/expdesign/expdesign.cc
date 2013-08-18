@@ -19,7 +19,7 @@
 
 #include "aghermann/globals.hh"
 #include "common/config-validate.hh"
-#include "primaries.hh"
+#include "expdesign.hh"
 
 
 using namespace std;
@@ -209,7 +209,7 @@ for_all_episodes( const TEpisodeOpFun& F, const TEpisodeReportFun& report, const
 	vector<tuple<CJGroup*,
 		     CSubject*,
 		     const string*,
-		     CSubject::SEpisode*>> v;
+		     SEpisode*>> v;
 	for ( auto& G : groups )
 		for ( auto& J : G.second )
 			for ( auto& M : J.measurements )
@@ -240,7 +240,7 @@ for_all_recordings( const TRecordingOpFun& F, const TRecordingReportFun& report,
 	vector<tuple<CJGroup*,
 		     CSubject*,
 		     const string*,
-		     CSubject::SEpisode*,
+		     SEpisode*,
 		     CRecording*>> v;
 	for ( auto& G : groups )
 		for ( auto& J : G.second )
@@ -426,6 +426,52 @@ used_samplerates( sigfile::SChannel::TType type) const
 
 
 
+
+
+
+
+
+int
+agh::CExpDesign::
+setup_modrun( const string& j, const string& d, const string& h,
+	      const SProfileParamSet& profile_params0,
+	      agh::ach::CModelRun** Rpp)
+{
+	try {
+		CSubject& J = subject_by_x(j);
+
+		if ( J.measurements[d].size() == 1 && ctl_params0.DBAmendment2 )
+			return CProfile::TFlags::eamendments_ineffective;
+
+		if ( J.measurements[d].size() == 1 && tstep[ach::TTunable::rs] > 0. )
+			return CProfile::TFlags::ers_nonsensical;
+
+		J.measurements[d].modrun_sets[profile_params0].insert(
+			pair<string, ach::CModelRun> (
+				h,
+				ach::CModelRun (
+					J, d, h,
+					profile_params0,
+					ctl_params0,
+					tunables0))
+			);
+		if ( Rpp )
+			*Rpp = &J.measurements[d]
+				. modrun_sets[profile_params0][h];
+
+	} catch (invalid_argument ex) { // thrown by CProfile ctor
+		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j.c_str(), d.c_str(), h.c_str(), ex.what());
+		return -1;
+	} catch (out_of_range ex) {
+		fprintf( stderr, "CExpDesign::setup_modrun( %s, %s, %s): %s\n", j.c_str(), d.c_str(), h.c_str(), ex.what());
+		return -1;
+	} catch (int ex) { // thrown by CModelRun ctor
+		log_message( "CExpDesign::setup_modrun( %s, %s, %s): %s", j.c_str(), d.c_str(), h.c_str(), CProfile::explain_status(ex).c_str());
+		return ex;
+	}
+
+	return 0;
+}
 
 
 void

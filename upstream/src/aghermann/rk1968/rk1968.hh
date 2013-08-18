@@ -12,19 +12,24 @@
 #ifndef _AGH_RK1968_H
 #define _AGH_RK1968_H
 
-#include "aghermann/expdesign/primaries.hh"
+#include "aghermann/expdesign/forward-decls.hh"
 
 namespace agh {
 namespace rk1968 {
 
 struct SScoreAssistantPPack {
+	double	nrem3_delta_theta_ratio;
+
+	SScoreAssistantPPack ()
+	      : nrem3_delta_theta_ratio (1.5)
+		{}
 };
 
-class CScoreAssistant {
+class CScoreAssistant
+  : public SScoreAssistantPPack {
 
     public:
-	int score( agh::CSubject::SEpisode&);
-
+	int score( agh::SEpisode&);
 };
 
 
