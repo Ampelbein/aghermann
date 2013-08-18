@@ -37,20 +37,6 @@ libsigfile_la_LDFLAGS := \
 # 	edf.hh \
 # 	page.hh
 
-if DO_PCH
-BUILT_SOURCES := \
-	forward-decls.hh.gch \
-	channel.hh.gch \
-	source-base.hh.gch \
-	typed-source.hh.gch \
-	edf.hh.gch \
-	tsv.hh.gch \
-	page.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
-CLEANFILES = \
-	$(BUILT_SOURCES)
-endif
 
 if DO_UPDATE_MIME_DB
 xdgdatadir := $(XDGDATADIR)

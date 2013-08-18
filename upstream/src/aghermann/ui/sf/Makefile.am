@@ -46,18 +46,3 @@ liba_a_SOURCES := \
 	d/phasediff.cc \
 	d/phasediff-construct.cc \
 	d/phasediff_cb.cc
-
-if DO_PCH
-BUILT_SOURCES = \
-	sf.hh.gch \
-	sf_cb.hh.gch \
-	widgets.hh.gch \
-	d/artifacts.hh.gch \
-	d/patterns.hh.gch \
-	d/filters.hh.gch \
-	d/phasediff.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
-CLEANFILES = \
-	$(BUILT_SOURCES)
-endif

@@ -25,14 +25,3 @@ liba_a_SOURCES = \
 	mw.hh \
 	mw_cb.cc \
 	mw_cb.hh
-
-if DO_PCH
-BUILT_SOURCES = \
-	mw.hh.gch \
-	widgets.hh.gch \
-	mw_cb.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
-CLEANFILES = \
-	$(BUILT_SOURCES)
-endif

@@ -14,15 +14,3 @@ liba_a_SOURCES := \
 	borbely.cc \
 	beersma.hh \
 	forward-decls.hh
-
-if DO_PCH
-BUILT_SOURCES := \
-	achermann.hh.gch \
-	beersma.hh.gch \
-	achermann-tunable.hh.gch \
-	forward-decls.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
-CLEANFILES = \
-	$(BUILT_SOURCES)
-endif

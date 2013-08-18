@@ -16,18 +16,6 @@ libsigproc_la_LDFLAGS := \
 	-rpath $(libdir)/$(PACKAGE) \
 	-shared -module
 
-if DO_PCH
-BUILT_SOURCES := \
-	ext-filters.hh.gch \
-	exstrom.hh.gch \
-	winfun.hh.gch \
-	sigproc.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
-CLEANFILES = \
-	$(BUILT_SOURCES)
-endif
-
-EXTRA_DIST := \
-	sigproc.ii \
-	ext-filters.ii
+# EXTRA_DIST := \
+# 	sigproc.ii \
+# 	ext-filters.ii

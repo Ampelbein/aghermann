@@ -18,16 +18,3 @@ liba_a_SOURCES := \
 	ui++.hh \
 	ui.cc \
 	ui.hh
-
-if DO_PCH
-BUILT_SOURCES := \
-	forward-decls.hh.gch \
-	globals.hh.gch \
-	misc.hh.gch \
-	ui++.hh.gch \
-	ui.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
-CLEANFILES = \
-	$(BUILT_SOURCES)
-endif

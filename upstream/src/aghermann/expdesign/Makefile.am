@@ -15,16 +15,3 @@ liba_a_SOURCES := \
 	recording.hh \
 	subject.cc \
 	tree-scanner.cc
-
-if DO_PCH
-BUILT_SOURCES := \
-	forward-decls.hh.gch \
-	profile.hh.gch \
-	recording.hh.gch \
-	subject.hh.gch \
-	expdesign.hh.gch
-%.hh.gch: %.hh
-	$(CXXCOMPILE) -c $<
-CLEANFILES = \
-	$(BUILT_SOURCES)
-endif

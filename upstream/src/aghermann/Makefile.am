@@ -1,8 +1,7 @@
 SUBDIRS := \
-	ica \
 	expdesign \
 	patterns \
-	rk1968 model \
+	rk1968 model ica \
 	ui
 
 AM_CXXFLAGS := \
