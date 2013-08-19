@@ -1,0 +1,42 @@
+# emacs
+TAGS
+cscope.*
+
+# generated files
+*.gch
+*.a
+*.o
+*.la
+*.lo
+*.pc
+/*.tar.bz2
+
+# autotools
+.deps/
+.dirstamp
+.libs/
+Makefile
+Makefile.in
+aclocal*
+autom4te*
+compile
+config.guess
+config.h
+config.h.in
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+libtool
+ltmain.sh
+m4
+missing
+stamp-h1
+
+# rest
+doc/html
+doxygen
+Doxyfile
+.DirIcon

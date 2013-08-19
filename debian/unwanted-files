@@ -15,5 +15,4 @@ data/Makefile.in
 doc/Makefile.in
 doc/org/Makefile.in
 
-gentoo/*
 doc/org/img/*.png
