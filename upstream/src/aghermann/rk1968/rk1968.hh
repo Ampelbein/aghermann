@@ -20,6 +20,7 @@ namespace rk1968 {
 struct SScoreAssistantPPack {
 	double	nrem3_delta_theta_ratio;
 
+	SScoreAssistantPPack (const SScoreAssistantPPack&) = default;
 	SScoreAssistantPPack ()
 	      : nrem3_delta_theta_ratio (1.5)
 		{}
