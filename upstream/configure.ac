@@ -5,7 +5,7 @@ AC_CONFIG_SRCDIR([src/aghermann/main.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PREREQ(2.61)
 
-AM_INIT_AUTOMAKE([-Wno-portability, silent-rules])
+AM_INIT_AUTOMAKE([-Wno-portability silent-rules subdir-objects])
 dnl AM_SILENT_RULES([yes])
 AC_CONFIG_HEADERS([config.h])
 
