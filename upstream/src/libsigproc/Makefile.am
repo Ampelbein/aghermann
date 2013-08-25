@@ -11,6 +11,9 @@ libsigproc_la_SOURCES := \
 	sigproc.cc sigproc.hh sigproc.ii \
 	winfun.cc winfun.hh
 
+libsigproc_la_LIBADD := \
+	$(SAMPLERATE_LIBS)
+
 libsigproc_la_LDFLAGS := \
 	-avoid-version \
 	-rpath $(libdir)/$(PACKAGE) \
